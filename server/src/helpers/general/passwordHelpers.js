@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 
-const hash = (plainTextPasword) => {
+const hashPassword = (plainTextPasword) => {
   if (!plainTextPasword) {
     throw new Error("Invalid plain-text password");
   }
@@ -8,8 +8,8 @@ const hash = (plainTextPasword) => {
   return bcrypt.hashSync(plainTextPasword, salt);
 };
 
-const verify = (plainTextPasword, hashedPassword) => {
+const verifyPassword = (plainTextPasword, hashedPassword) => {
   return bcrypt.compareSync(plainTextPasword, hashedPassword);
 };
 
-module.exports = { hash, verify };
+module.exports = { hashPassword, verifyPassword };

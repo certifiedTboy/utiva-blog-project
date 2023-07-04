@@ -56,8 +56,27 @@ const checkThatUserExistById = async (userId) => {
   throw new NotFoundError("invalid user token");
 };
 
+const checkThatUserIsVerified = async (email) => {
+  const user = await User.findOne({ email });
+  if (user) {
+    if (!user.isVerified) {
+      throw new ConflictError("user account is not verified");
+    }
+
+    return user;
+  } else {
+    throw new NotFoundError("user account does not exist");
+  }
+};
+
 const deleteUserById = async (userId) => {
   return await User.findByIdAndRemove(userId);
 };
 
-module.exports = { newUser, checkThatUserExistById, deleteUserById };
+module.exports = {
+  newUser,
+  checkThatUserExistById,
+  deleteUserById,
+  checkThatUserAlreadyExist,
+  checkThatUserIsVerified,
+};

@@ -3,6 +3,10 @@ const K = require("../constants/index");
 const httpStatusCode = require("../constants/httpStatusCode");
 
 class ResponseHandler {
+  static send(res, statusCode, data, message = K.responseMessage.SUCCESS) {
+    return res.status(statusCode).json({ message: message, data });
+  }
+
   static ok(res, data, message = K.responseMessage.OK) {
     return ResponseHandler.send(res, httpStatusCode.SUCCESS, data, message);
   }
