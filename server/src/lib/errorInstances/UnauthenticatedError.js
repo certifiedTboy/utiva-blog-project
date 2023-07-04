@@ -1,8 +1,9 @@
 const K = require("../constants/index");
+const CustomError = require("./CustomError");
 
-class UnauthenticatedError {
+class UnauthenticatedError extends CustomError {
   constructor(message = K.ResponseMessage.ERR_UNAUTHENTICATED, metaData) {
-    K.httpStatusCode.UNAUTHENTICATED, message, metaData;
+    super(K.httpStatusCode.UNAUTHENTICATED, message, metaData);
   }
 }
 
