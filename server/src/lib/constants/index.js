@@ -1,7 +1,7 @@
-const ResponseMessage = require("./ResponseMessage");
+const responseMessage = require("./ResponseMessage");
 const httpStatusCode = require("./HttpStatusCode");
 
 module.exports = {
   httpStatusCode,
-  ResponseMessage,
+  responseMessage,
 };

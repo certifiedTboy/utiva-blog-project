@@ -24,6 +24,10 @@ const userSchema = new Schema(
       type: String,
       trim: true,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
     userType: {
       type: String,
       default: "User",
@@ -51,6 +55,8 @@ const userSchema = new Schema(
         name: String,
       },
     ],
+    verificationToken: { type: String },
+    verificationTokenExpiresAt: { type: Date },
     resetPasswordToken: String,
     resetPasswordExpires: Date,
   },
