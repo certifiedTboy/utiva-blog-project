@@ -1,5 +1,18 @@
 const UnprocessableError = require("../../lib/errorInstances/UnprocessableError");
 
+const checkUserDataInputIsEmpty = async (req, res, next) => {
+  try {
+    const { firstName, lastName, email } = req.body;
+    if (!firstName || !lastName || !email) {
+      throw new UnprocessableError("all input fields are required");
+    } else {
+      next();
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 const checkEmailValidity = async (req, res, next) => {
   const { email } = req.body;
   try {
@@ -57,6 +70,19 @@ const checkPasswordMatch = async (req, res, next) => {
 const checkNameDataLength = async (req, res, next) => {
   try {
     const { firstName, lastName } = req.body;
+    const format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+    const num = /\d/g;
+
+    if (
+      firstName.match(format) ||
+      lastName.match(format) ||
+      firstName.match(num) ||
+      lastName.match(num)
+    ) {
+      throw new UnprocessableError(
+        "names should not contain special characters or numbers"
+      );
+    }
 
     if (firstName.length > 40 || lastName.length > 40) {
       throw new UnprocessableError(
@@ -71,6 +97,7 @@ const checkNameDataLength = async (req, res, next) => {
 };
 
 module.exports = {
+  checkUserDataInputIsEmpty,
   checkEmailValidity,
   checkPasswordValidity,
   checkPasswordMatch,

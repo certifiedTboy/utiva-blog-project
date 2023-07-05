@@ -34,4 +34,6 @@ const verifyUser = async (req, res, next) => {
   }
 };
 
+// const uploadPro
+
 module.exports = { createUser, verifyUser };

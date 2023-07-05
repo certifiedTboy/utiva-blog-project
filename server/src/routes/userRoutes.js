@@ -3,12 +3,14 @@ const { createUser, verifyUser } = require("../controllers/userController");
 const {
   checkEmailValidity,
   checkNameDataLength,
+  checkUserDataInputIsEmpty,
 } = require("../middlewares/validators/authDataValidator");
 
 const router = express.Router();
 
 router.post(
   "/create-user",
+  checkUserDataInputIsEmpty,
   checkEmailValidity,
   checkNameDataLength,
   createUser
