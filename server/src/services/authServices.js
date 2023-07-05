@@ -22,7 +22,6 @@ const updateUserPassword = async (email, password) => {
 const loginUser = async (email, password, ipAddress) => {
   const user = await checkThatUserIsVerified(email);
   if (user) {
-    console.log(user);
     await verifyPassword(password, user.password);
 
     const userSession = await createOrUpdatePlatformSession(
