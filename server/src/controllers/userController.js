@@ -1,5 +1,5 @@
 const ResponseHandler = require("../lib/generalResponse/ResponseHandler");
-const { newUser } = require("../services/userServices");
+const { newUser, updateUserProfileImage } = require("../services/userServices");
 const { verifyUserToken } = require("../services/verificationServices");
 
 const createUser = async (req, res, next) => {
@@ -34,6 +34,19 @@ const verifyUser = async (req, res, next) => {
   }
 };
 
-// const uploadPro
+const uploadUserProfile = async (req, res, next) => {
+  const userId = req.user.id;
+  try {
+    const imagePath = "uploads/" + req.file.filename;
 
-module.exports = { createUser, verifyUser };
+    const updatedUser = await updateUserProfileImage(userId, imagePath);
+
+    if (updatedUser) {
+      ResponseHandler.ok(res, updatedUser, "profile uploaded success");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { createUser, verifyUser, uploadUserProfile };

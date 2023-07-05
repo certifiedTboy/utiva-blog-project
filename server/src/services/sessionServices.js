@@ -24,7 +24,6 @@ const getUserPlatformSession = async (userId) => {
     userSession = new UserSession();
     userSession.userId = userId;
     await userSession.save();
-    return;
   }
 
   return userSession;
