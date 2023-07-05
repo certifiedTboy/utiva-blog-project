@@ -14,6 +14,7 @@ const envVariable = {
   FRONT_END_URL: env.FRONT_END_URL,
   ACCOUNT_VERIFY_TOKEN_TTL_IN_HOURS: 24,
   PASSWORD_RESET_TOKEN_TTL_IN_HOURS: 1,
+  JWT_TOKEN_SECRET: env.JWT_TOKEN_SECRET,
 };
 
 module.exports = envVariable;

@@ -1,4 +1,4 @@
-const { updateUserPassword } = require("../services/authServices");
+const { updateUserPassword, loginUser } = require("../services/authServices");
 const ResponseHandler = require("../lib/generalResponse/ResponseHandler");
 
 const setUserPassword = async (req, res, next) => {
@@ -17,4 +17,19 @@ const setUserPassword = async (req, res, next) => {
   }
 };
 
-module.exports = { setUserPassword };
+const userLogin = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const ipAddress = req.ip;
+
+    const data = await loginUser(email, password, ipAddress);
+
+    if (data) {
+      ResponseHandler.ok(res, data, "login successful");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { setUserPassword, userLogin };

@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const UnauthenticatedError = require("../../lib/errorInstances/UnauthenticatedError");
 
 const hashPassword = (plainTextPasword) => {
   if (!plainTextPasword) {
@@ -9,7 +10,9 @@ const hashPassword = (plainTextPasword) => {
 };
 
 const verifyPassword = (plainTextPasword, hashedPassword) => {
-  return bcrypt.compareSync(plainTextPasword, hashedPassword);
+  if (!bcrypt.compareSync(plainTextPasword, hashedPassword)) {
+    throw new UnauthenticatedError("Incorrect login credentials");
+  }
 };
 
 module.exports = { hashPassword, verifyPassword };

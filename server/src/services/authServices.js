@@ -4,6 +4,8 @@ const {
   verifyPassword,
 } = require("../helpers/general/passwordHelpers");
 
+const createOrUpdatePlatformSession = require("./sessionServices");
+
 const updateUserPassword = async (email, password) => {
   const user = await checkThatUserIsVerified(email);
 
@@ -17,4 +19,26 @@ const updateUserPassword = async (email, password) => {
   }
 };
 
-module.exports = { updateUserPassword };
+const loginUser = async (email, password, ipAddress) => {
+  const user = await checkThatUserIsVerified(email);
+  if (user) {
+    console.log(user);
+    await verifyPassword(password, user.password);
+
+    const userSession = await createOrUpdatePlatformSession(
+      user._id.toString(),
+      ipAddress
+    );
+
+    const userData = {
+      username: user.username,
+      userType: user.userType,
+    };
+
+    if (userSession) {
+      return { userData, authToken: userSession.token };
+    }
+  }
+};
+
+module.exports = { updateUserPassword, loginUser };
