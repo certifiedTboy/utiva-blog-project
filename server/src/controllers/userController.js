@@ -1,5 +1,9 @@
 const ResponseHandler = require("../lib/generalResponse/ResponseHandler");
-const { newUser, updateUserProfileImage } = require("../services/userServices");
+const {
+  newUser,
+  updateUserProfileImage,
+  userNameUpdate,
+} = require("../services/userServices");
 const { verifyUserToken } = require("../services/verificationServices");
 
 const createUser = async (req, res, next) => {
@@ -49,4 +53,19 @@ const uploadUserProfile = async (req, res, next) => {
   }
 };
 
-module.exports = { createUser, verifyUser, uploadUserProfile };
+const updateUserName = async (req, res, next) => {
+  try {
+    const userId = req.user;
+    const { firstName, lastName } = req.body;
+
+    const updatedUser = await userNameUpdate(userId, firstName, lastName);
+
+    if (updatedUser) {
+      ResponseHandler.ok(res, updatedUser, "user name changed successfully");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { createUser, verifyUser, uploadUserProfile, updateUserName };

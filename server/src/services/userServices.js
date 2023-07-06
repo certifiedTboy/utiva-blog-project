@@ -53,6 +53,18 @@ const updateUserProfileImage = async (userId, imagePath) => {
   }
 };
 
+const userNameUpdate = async (userId, firstName, lastName) => {
+  const user = await checkThatUserExistById(userId);
+
+  if (user) {
+    user.firstName = firstName;
+    user.lastName = lastName;
+
+    await user.save();
+    return user;
+  }
+};
+
 const checkThatUserAlreadyExist = async (email) => {
   const user = await User.findOne({ email });
   return user;
@@ -91,4 +103,5 @@ module.exports = {
   checkThatUserAlreadyExist,
   checkThatUserIsVerified,
   updateUserProfileImage,
+  userNameUpdate,
 };
