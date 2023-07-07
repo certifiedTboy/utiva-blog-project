@@ -1,4 +1,4 @@
 /server/.env
 /server/node_modules
-/client/node_modules
+/client/utiva-blog/client/node_modules
 /client/.env
