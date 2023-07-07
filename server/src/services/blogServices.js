@@ -64,4 +64,5 @@ module.exports = {
   checkBlogExistByTitle,
   updateBlogData,
   removeBlog,
+  checkBlogExistById,
 };

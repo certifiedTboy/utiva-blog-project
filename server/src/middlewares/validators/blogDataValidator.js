@@ -26,4 +26,21 @@ const checkBlogDataValidity = async (req, res, next) => {
   }
 };
 
-module.exports = { checkBlogDataValidity };
+const checkCommentDataValidity = async (req, res, next) => {
+  try {
+    const { text } = req.body;
+    if (!text) {
+      throw new UnprocessableError("comment filed can not be empty");
+    }
+
+    if (text.length > 1000) {
+      throw new UnprocessableError(
+        "comments should not be longer than 1000 characters"
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { checkBlogDataValidity, checkCommentDataValidity };

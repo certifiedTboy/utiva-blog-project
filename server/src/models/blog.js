@@ -25,6 +25,13 @@ const blogSchema = new Schema(
     reactions: [
       {
         userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        reaction: String,
+      },
+    ],
+    comments: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        text: String,
       },
     ],
     totalRead: {
