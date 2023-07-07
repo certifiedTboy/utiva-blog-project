@@ -16,6 +16,9 @@ const checkUserDataInputIsEmpty = async (req, res, next) => {
 const checkEmailValidity = async (req, res, next) => {
   const { email } = req.body;
   try {
+    if (!email) {
+      throw new UnprocessableError("email field is required");
+    }
     const emailIsValid = email.includes("@");
     if (!emailIsValid) {
       throw new UnprocessableError("invalid email format");

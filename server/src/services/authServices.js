@@ -3,8 +3,9 @@ const {
   hashPassword,
   verifyPassword,
 } = require("../helpers/general/passwordHelpers");
-
+const generatePasswordResetUrl = require("../helpers/url-generator/passwordResetUrl");
 const createOrUpdatePlatformSession = require("./sessionServices");
+const { sendPasswordResetUrl } = require("./emailServices");
 
 const updateUserPassword = async (email, password) => {
   const user = await checkThatUserIsVerified(email);
@@ -12,9 +13,23 @@ const updateUserPassword = async (email, password) => {
   if (user) {
     const hashedPassword = await hashPassword(password);
     if (hashedPassword) {
-      user.password = hashedPassword;
-      await user.save();
-      return user;
+      if (!user.password) {
+        /// user password update for first time registration
+        user.password = hashedPassword;
+        user.verificationToken = undefined;
+        user.verificationTokenExpiresAt = undefined;
+        user.isVerified = true;
+
+        await user.save();
+        return user;
+      } else {
+        // user password update for password reset request
+        user.password = hashedPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+        return user;
+      }
     }
   }
 };
@@ -40,4 +55,28 @@ const loginUser = async (email, password, ipAddress) => {
   }
 };
 
-module.exports = { updateUserPassword, loginUser };
+const requestPasswordReset = async (email) => {
+  const user = await checkThatUserIsVerified(email);
+
+  if (user) {
+    const passwordResetData = await generatePasswordResetUrl(
+      user._id.toString()
+    );
+
+    if (passwordResetData) {
+      if (passwordResetData) {
+        user.resetPasswordToken = passwordResetData.passwordResetToken;
+        user.resetPasswordExpires = passwordResetData.expiresAt;
+        await user.save();
+        // await sendPasswordResetUrl(
+        //   user.email,
+        //   passwordResetData.passwordResetUrl
+        // );
+
+        return { email: user.email };
+      }
+    }
+  }
+};
+
+module.exports = { updateUserPassword, loginUser, requestPasswordReset };

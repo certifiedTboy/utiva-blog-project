@@ -2,7 +2,7 @@ const envVariable = require("../../config/config");
 const dateTimeCalculator = require("../general/dateAndTimeCalculator");
 const randomCodeGenerator = require("../general/randomCodeGenerator");
 
-const generateUrl = async (userId) => {
+const generateVerificationUrl = async (userId) => {
   const TOKEN_SEPERATOR = ":";
 
   const verificationData = await generateToken();
@@ -29,4 +29,4 @@ const generateToken = () => {
   return verificationData;
 };
 
-module.exports = generateUrl;
+module.exports = generateVerificationUrl;

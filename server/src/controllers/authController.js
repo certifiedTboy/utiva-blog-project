@@ -1,4 +1,11 @@
-const { updateUserPassword, loginUser } = require("../services/authServices");
+const {
+  updateUserPassword,
+  loginUser,
+  requestPasswordReset,
+} = require("../services/authServices");
+const {
+  verifyPasswordResetToken,
+} = require("../services/verificationServices");
 const ResponseHandler = require("../lib/generalResponse/ResponseHandler");
 
 const setUserPassword = async (req, res, next) => {
@@ -32,4 +39,42 @@ const userLogin = async (req, res, next) => {
   }
 };
 
-module.exports = { setUserPassword, userLogin };
+const passwordResetRequest = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const response = await requestPasswordReset(email);
+
+    if (response) {
+      ResponseHandler.ok(
+        res,
+        response,
+        `A mail has been sent to ${response.email} to complete your request`
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+const verifyPasswordResetData = async (req, res, next) => {
+  try {
+    const { userId, passwordResetToken } = req.body;
+    const response = await verifyPasswordResetToken(userId, passwordResetToken);
+
+    if (response) {
+      ResponseHandler.ok(
+        res,
+        { email: response.email },
+        "Select a new password"
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+module.exports = {
+  setUserPassword,
+  userLogin,
+  passwordResetRequest,
+  verifyPasswordResetData,
+};

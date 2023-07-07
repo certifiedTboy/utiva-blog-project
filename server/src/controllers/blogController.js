@@ -4,8 +4,11 @@ const {
   updateBlogData,
   removeBlog,
   checkBlogExistByTitle,
+  updateBlogPublishState,
+  publishedBlogs,
+  blogsByAUser,
 } = require("../services/blogServices");
-
+const getPagination = require("../helpers/pagination/pagination");
 const { updateReactionToBlog } = require("../services/reactionServices");
 const {
   addCommentsToBlog,
@@ -34,9 +37,23 @@ const createBlog = async (req, res, next) => {
   }
 };
 
+const publishBlog = async (req, res, next) => {
+  try {
+    const { blogId } = req.params;
+    const blog = await updateBlogPublishState(blogId);
+
+    if (blog) {
+      ResponseHandler.ok(res, blog, "success");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getAllBlogs = async (req, res, next) => {
   try {
-    const blogs = await allBlogs();
+    const { skip, limit } = getPagination(req.query);
+    const blogs = await allBlogs(skip, limit);
     if (blogs) {
       ResponseHandler.ok(res, blogs, "success");
     }
@@ -45,6 +62,28 @@ const getAllBlogs = async (req, res, next) => {
   }
 };
 
+const getAllPublishedBlogs = async (req, res, next) => {
+  try {
+    const { skip, limit } = getPagination(req.query);
+    const publishedBlog = await publishedBlogs(skip, limit);
+
+    ResponseHandler.ok(res, publishedBlog, "success");
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getBlogsByAUser = async (req, res, next) => {
+  const userId = req.user.id;
+  try {
+    const { skip, limit } = getPagination(req.query);
+    const userBlogs = await blogsByAUser(userId, skip, limit);
+
+    ResponseHandler.ok(res, userBlogs, "success");
+  } catch (error) {
+    next(error);
+  }
+};
 const getBlogByTitle = async (req, res, next) => {
   try {
     const { blogTitle } = req.params;
@@ -156,4 +195,7 @@ module.exports = {
   commentToBlog,
   editComment,
   deleteComment,
+  publishBlog,
+  getAllPublishedBlogs,
+  getBlogsByAUser,
 };

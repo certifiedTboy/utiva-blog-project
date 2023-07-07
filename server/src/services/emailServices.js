@@ -19,4 +19,22 @@ const sendVerificationUrl = async (email, verificationUrl) => {
   await transport.sendMail(mailOptions);
 };
 
-module.exports = { sendVerificationUrl };
+const sendPasswordResetUrl = async (email, passwordResetUrl) => {
+  const mailOptions = {
+    to: email,
+    from: SMTP_USER,
+    subject: "Password Reset Request",
+    html: `<div><p> Dear <strong>Valid user</strong> </p>
+                <p> You recently requested for password reset, if this is you, Click on the link below to complete the request</p>
+            <a href=${passwordResetUrl}>ResetPassword</a>
+
+
+            <p> If you're unaware, kindly ignore this mail </p>
+            <p>Thanks </p>.
+            <div>`,
+  };
+
+  await transport.sendMail(mailOptions);
+};
+
+module.exports = { sendVerificationUrl, sendPasswordResetUrl };

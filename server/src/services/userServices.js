@@ -1,6 +1,6 @@
 const User = require("../models/user");
 const { sendVerificationUrl } = require("./emailServices");
-const generateUrl = require("../helpers/verification/verificationUrl");
+const generateVerificationUrl = require("../helpers/url-generator/verificationUrl");
 const UnprocessableError = require("../lib/errorInstances/UnprocessableError");
 const NotFoundError = require("../lib/errorInstances/NotFoundError");
 
@@ -16,7 +16,9 @@ const newUser = async (email, firstName, lastName) => {
     await newUser.save();
 
     if (newUser) {
-      const verificationData = await generateUrl(newUser._id.toString());
+      const verificationData = await generateVerificationUrl(
+        newUser._id.toString()
+      );
 
       if (verificationData) {
         newUser.verificationToken = verificationData.verificationToken;
@@ -28,7 +30,7 @@ const newUser = async (email, firstName, lastName) => {
       }
     }
   } else if (!user.isVerified) {
-    const verificationData = await generateUrl(user._id.toString());
+    const verificationData = await generateVerificationUrl(user._id.toString());
     if (verificationData) {
       user.verificationToken = verificationData.verificationToken;
       user.verificationTokenExpiresAt = verificationData.expiresAt;

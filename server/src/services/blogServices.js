@@ -11,10 +11,27 @@ const createNewBlog = async (title, description, content, userId) => {
   }
 };
 
-const allBlogs = async () => {
-  const blogs = await Blog.find({});
+const allBlogs = async (skip, limit) => {
+  const blogs = await Blog.find({}, { __v: 0 }).skip(skip).limit(limit);
 
   return blogs;
+};
+
+const publishedBlogs = async () => {
+  const blogs = await Blog.find({}, { __v: 0 }).skip(skip).limit(limit);
+  const publishedBlogs = blogs.filter((blog) => blog.isPublished);
+
+  return publishedBlogs;
+};
+
+const blogsByAUser = async (userId, skip, limit) => {
+  const blogs = await Blog.find({}, { __v: 0 }).skip(skip).limit(limit);
+
+  const userBlogs = blogs.filter(
+    (blog) => blog.user.userId.toString() === userId
+  );
+
+  return userBlogs;
 };
 
 const checkBlogExistByTitle = async (blogTitle) => {
@@ -25,6 +42,22 @@ const checkBlogExistByTitle = async (blogTitle) => {
   }
 
   return blog;
+};
+
+const updateBlogPublishState = async (blogId) => {
+  const blog = await checkBlogExistById(blogId);
+
+  if (blog) {
+    if (!blog.isPublished) {
+      blog.isPublished = true;
+      await blog.save();
+      return blog;
+    } else {
+      blog.isPublished = false;
+      await blog.save();
+      return blog;
+    }
+  }
 };
 
 const checkBlogExistById = async (blogId) => {
@@ -65,4 +98,7 @@ module.exports = {
   updateBlogData,
   removeBlog,
   checkBlogExistById,
+  updateBlogPublishState,
+  publishedBlogs,
+  blogsByAUser,
 };
