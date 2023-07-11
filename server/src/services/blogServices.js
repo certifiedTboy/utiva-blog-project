@@ -17,7 +17,7 @@ const allBlogs = async (skip, limit) => {
   return blogs;
 };
 
-const publishedBlogs = async () => {
+const publishedBlogs = async (skip, limit) => {
   const blogs = await Blog.find({}, { __v: 0 }).skip(skip).limit(limit);
   const publishedBlogs = blogs.filter((blog) => blog.isPublished);
 

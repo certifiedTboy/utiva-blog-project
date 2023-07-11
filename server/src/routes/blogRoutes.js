@@ -25,13 +25,8 @@ const {
 const router = express.Router();
 
 router.post("/create-blog", checkBlogDataValidity, Authenticate, createBlog);
-router.post(
-  "/publish-blog/:blogId",
-  Authenticate,
-  checkBlogOwnership,
-  publishBlog
-);
-router.get("/", Authenticate, getAllBlogs);
+router.post("/:blogId", Authenticate, checkBlogOwnership, publishBlog);
+router.get("/", getAllBlogs);
 router.get("/published-blogs", getAllPublishedBlogs);
 router.get("blogs-by-user", Authenticate, getBlogsByAUser);
 router.get("/:blogTitle", getBlogByTitle);

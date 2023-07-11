@@ -65,6 +65,7 @@ const getAllBlogs = async (req, res, next) => {
 const getAllPublishedBlogs = async (req, res, next) => {
   try {
     const { skip, limit } = getPagination(req.query);
+
     const publishedBlog = await publishedBlogs(skip, limit);
 
     ResponseHandler.ok(res, publishedBlog, "success");

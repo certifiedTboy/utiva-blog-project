@@ -1,0 +1,71 @@
+.mousePoint {
+    cursor: pointer;
+}
+
+.dropDownLink {
+    color:#f8f7f7 !important;
+    font-weight: 500;
+}
+
+.dropDownLink :hover {
+    color:#F28123 !important;
+}
+
+.dropDownLink img {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    margin-left: 20px;
+}
+
+
+.mobile_img {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    margin-left: 20px;
+}
+
+
+.form_control {
+    width: 50px;
+   
+}
+
+.form_control2 {
+    margin-bottom: 7px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.hero {
+    position: relative;
+    width: 100%;
+    margin-bottom: 45px;
+    padding: 120px 0 0 0;
+    overflow: hidden;
+    background:  #07212e;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  
+  .hero .container-fluid {
+    padding: 0;
+  }
+  
+
+  
+.navbar.nav_sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(177, 177, 177, 0.3);
+  }
+
+@media only screen and (max-width: 470px) {
+   .mobile_a{
+    font-size: 30px !important;
+   }
+   }
+
