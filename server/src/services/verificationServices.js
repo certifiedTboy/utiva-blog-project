@@ -5,6 +5,7 @@ const NotFoundError = require("../lib/errorInstances/NotFoundError");
 
 const verifyUserToken = async (userId, verificationToken) => {
   const user = await checkThatUserExistById(userId);
+
   if (user) {
     if (!user.verificationToken) {
       throw new NotFoundError("token does not exist or is invalid");
@@ -18,7 +19,7 @@ const verifyUserToken = async (userId, verificationToken) => {
       throw UnprocessableError("expired verification token");
     }
 
-    if (user.verificationToken !== verificationToken) {
+    if (user.verificationToken !== `${verificationToken}:${userId}`) {
       throw new ConflictError("invalid verification token");
     }
     return { email: user.email };

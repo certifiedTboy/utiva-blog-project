@@ -13,16 +13,17 @@ const BasicExample = ({ title, description, blogId, createdAt }) => {
     <Card
       style={{ width: "22rem" }}
       onClick={() => setShowA({ state: false, key: "" })}
-      key={blogId}>
+      key={blogId}
+      className="mt-5">
       <Card.Img variant="top" src={blogImg} />
       <Card.Body>
-        <Card.Title>Card Title</Card.Title>
+        <Card.Title>{title}</Card.Title>
         <i className="fas fa-user"></i>{" "}
         <NavLink to={`/w-d/`} className="mr-3">
           {" "}
           Adebisi Tosin
         </NavLink>
-        <span className="date">
+        <span className="date" style={{ float: "right" }}>
           <i className="fas fa-calendar"></i>
           <Moment className="ml-2" fromNow>
             {createdAt}

@@ -3,6 +3,7 @@ const { sendVerificationUrl } = require("./emailServices");
 const generateVerificationUrl = require("../helpers/url-generator/verificationUrl");
 const UnprocessableError = require("../lib/errorInstances/UnprocessableError");
 const NotFoundError = require("../lib/errorInstances/NotFoundError");
+const ConflictError = require("../lib/errorInstances/ConflictError");
 
 const newUser = async (email, firstName, lastName) => {
   const user = await checkThatUserAlreadyExist(email);
@@ -24,7 +25,7 @@ const newUser = async (email, firstName, lastName) => {
         newUser.verificationToken = verificationData.verificationToken;
         newUser.verificationTokenExpiresAt = verificationData.expiresAt;
         await newUser.save();
-        // await sendVerificationUrl(user.email, verificationData.verificationUrl);
+        await sendVerificationUrl(user.email, verificationData.verificationUrl);
 
         return { email: newUser.email };
       }
@@ -35,7 +36,7 @@ const newUser = async (email, firstName, lastName) => {
       user.verificationToken = verificationData.verificationToken;
       user.verificationTokenExpiresAt = verificationData.expiresAt;
       await user.save();
-      // await sendVerificationUrl(user.email, verificationData.verificationUrl);
+      await sendVerificationUrl(user.email, verificationData.verificationUrl);
 
       return { email: user.email };
     }
@@ -55,12 +56,13 @@ const updateUserProfileImage = async (userId, imagePath) => {
   }
 };
 
-const userNameUpdate = async (userId, firstName, lastName) => {
+const userNameUpdate = async (userId, firstName, lastName, about) => {
   const user = await checkThatUserExistById(userId);
 
   if (user) {
     user.firstName = firstName;
     user.lastName = lastName;
+    user.about = about;
 
     await user.save();
     return user;
@@ -73,12 +75,25 @@ const checkThatUserAlreadyExist = async (email) => {
 };
 
 const checkThatUserExistById = async (userId) => {
-  const user = await User.findById(userId);
-  if (user) {
+  const user = await User.findById(userId).select("-password");
+  if (!user) {
+    throw new NotFoundError("invalid user token");
+  } else if (!user.isVerified) {
+    throw new NotFoundError("invalid user token");
+  } else {
     return user;
   }
+};
 
-  throw new NotFoundError("invalid user token");
+const checkThatUserExistByUsername = async (username) => {
+  const user = await User.findOne({ username }).select("-password");
+  if (!user) {
+    throw new NotFoundError("User does not exist");
+  } else if (!user.isVerified) {
+    throw new NotFoundError("User does not exist");
+  } else {
+    return user;
+  }
 };
 
 const checkThatUserIsVerified = async (email) => {
@@ -94,6 +109,17 @@ const checkThatUserIsVerified = async (email) => {
   }
 };
 
+const checkUserForNewPassword = async (email) => {
+  const user = await User.findOne({ email });
+  if (user) {
+    if (!user) {
+      throw new ConflictError("user account does not exist");
+    }
+
+    return user;
+  }
+};
+
 const deleteUserById = async (userId) => {
   return await User.findByIdAndRemove(userId);
 };
@@ -106,4 +132,6 @@ module.exports = {
   checkThatUserIsVerified,
   updateUserProfileImage,
   userNameUpdate,
+  checkUserForNewPassword,
+  checkThatUserExistByUsername,
 };

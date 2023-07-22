@@ -20,7 +20,7 @@ router.post(
   checkPasswordMatch,
   setUserPassword
 );
-router.post("/login-user", checkEmailValidity, userLogin);
+router.post("/login", checkEmailValidity, userLogin);
 
 router.post(
   "/request-password-reset",

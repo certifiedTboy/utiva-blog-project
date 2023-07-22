@@ -25,6 +25,7 @@ const setUserPassword = async (req, res, next) => {
 };
 
 const userLogin = async (req, res, next) => {
+  const userAgents = req.headers["user-agent"];
   try {
     const { email, password } = req.body;
     const ipAddress = req.ip;
@@ -32,7 +33,20 @@ const userLogin = async (req, res, next) => {
     const data = await loginUser(email, password, ipAddress);
 
     if (data) {
-      ResponseHandler.ok(res, data, "login successful");
+      const jwtTokenOptions = {
+        expires: data.userSession.expiresAt,
+        maxAge: 24 * 60 * 1000,
+        httpOnly: true,
+        sameSite: "lax",
+        secure: true,
+      };
+
+      ResponseHandler.authenticated(
+        res,
+        data,
+        jwtTokenOptions,
+        "login success"
+      );
     }
   } catch (error) {
     next(error);

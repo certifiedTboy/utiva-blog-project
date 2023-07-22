@@ -7,12 +7,31 @@ class ResponseHandler {
     return res.status(statusCode).json({ message: message, data });
   }
 
+  static auth(res, jwtTokenOptions, data, message = K.responseMessage.SUCCESS) {
+    res
+      .cookie("authToken", data.userSession.token, jwtTokenOptions)
+      .json({
+        message: message,
+        userData: data.userData,
+        authToken: data.userSession.token,
+      });
+  }
+
   static ok(res, data, message = K.responseMessage.OK) {
     return ResponseHandler.send(res, httpStatusCode.SUCCESS, data, message);
   }
 
   static created(res, data, message = K.responseMessage.CREATED) {
     return ResponseHandler.send(res, httpStatusCode.CREATED, data, message);
+  }
+
+  static authenticated(
+    res,
+    data,
+    jwtTokenOptions,
+    message = K.responseMessage.OK
+  ) {
+    return ResponseHandler.auth(res, jwtTokenOptions, data, message);
   }
 }
 

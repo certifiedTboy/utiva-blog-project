@@ -4,11 +4,14 @@ const {
   verifyUser,
   uploadUserProfile,
   updateUserName,
+  getCurrentUser,
+  getUserByUsername,
 } = require("../controllers/userController");
 const {
   checkEmailValidity,
   checkNameDataLength,
   checkUserDataInputIsEmpty,
+  checkAcceptTerms,
 } = require("../middlewares/validators/authDataValidator");
 const {
   checkUserAccountOwnership,
@@ -22,6 +25,7 @@ router.post(
   "/create-user",
   checkUserDataInputIsEmpty,
   checkEmailValidity,
+  checkAcceptTerms,
   checkNameDataLength,
   createUser
 );
@@ -43,4 +47,7 @@ router.put(
   checkNameDataLength,
   updateUserName
 );
+
+router.get("/me", Authenticate, getCurrentUser);
+router.get("/:username", getUserByUsername);
 module.exports = router;

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-
 import BlogCard from "../../blogs/all-blogs/BlogCard";
 import { useGetAllBlogsQuery } from "../../../lib/APIS/blogApis/BlogApi";
 import DataError from "../../Error/DataError";
@@ -40,7 +39,7 @@ const RecentTopic = () => {
         <div className="row">
           <div className="col-12 text-center">
             {isLoading && loadingData}
-            {isError && <DataError errorMessage={error.data.message} />}
+            {isError && <DataError errorMessage={"Something went wrong"} />}
           </div>
           {!isLoading &&
             data &&

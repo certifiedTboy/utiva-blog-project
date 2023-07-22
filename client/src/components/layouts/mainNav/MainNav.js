@@ -1,9 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, animateScroll as scroll } from "react-scroll";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useGetCurrentUserMutation } from "../../../lib/APIS/userApi/userApi";
 import classes from "./MainNav.module.css";
 
 const MainNav = ({ scrollTop }) => {
+  const [getCurrentUser] = useGetCurrentUserMutation({
+    refetchOnMountOrArgChange: true,
+  });
+
+  const { user } = useSelector((state) => state.userState);
+
+  const params = useParams();
+
+  const { username } = params;
+  useEffect(() => {
+    const getCurrentUserData = async () => {
+      await getCurrentUser();
+    };
+
+    getCurrentUserData();
+  }, [username, getCurrentUser]);
+
   return (
     <div
       className={`navbar navbar-expand-lg bg-light navbar-light  ${
@@ -46,20 +65,52 @@ const MainNav = ({ scrollTop }) => {
               Blogs
             </NavLink>
 
-            <Link
-              activeClass="active"
-              className={`nav-item nav-link ${classes.mousePoint} d-none d-sm-none d-md-block`}
-              to="contact"
-              spy={true}
-              smooth={true}
-              hashSpy={true}
-              duration={500}
-              delay={500}
-              isDynamic={true}
-              ignoreCancelEvents={false}
-              spyThrottle={500}>
-              Contact
-            </Link>
+            {!user && (
+              <NavLink
+                activeClass="active"
+                className={`nav-item nav-link ${classes.mousePoint} d-none d-sm-none d-md-block`}
+                to="/get-started/sign-in">
+                Get Started
+              </NavLink>
+            )}
+
+            {user && (
+              <li
+                className={`nav-link nav-item dropdown d-none d-sm-none d-md-block`}>
+                <NavLink
+                  className={`${classes.dropDownLink} dropdown-toggle`}
+                  to="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  <img
+                    src={`http://localhost:8000/${user.data.profilePicture}`}
+                    alt="profile_picture"
+                  />
+                </NavLink>
+
+                <ul className="dropdown-menu">
+                  <li>
+                    <NavLink
+                      className="dropdown-item"
+                      to={`/w-d/${user.data.username}`}>
+                      Profile
+                    </NavLink>
+                  </li>
+
+                  {/* {user.userType === "Admin" && (
+                    <li>
+                      <NavLink className="dropdown-item" to="/admin">
+                        Admin Dashboard
+                      </NavLink>
+                    </li>
+                  )} */}
+                  <li>
+                    <NavLink className="dropdown-item">Signout</NavLink>
+                  </li>
+                </ul>
+              </li>
+            )}
           </div>
         </div>
       </div>

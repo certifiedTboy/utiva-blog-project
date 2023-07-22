@@ -1,0 +1,190 @@
+.user_details {
+    margin-top: 50px;
+}
+
+.profile_image {
+    height: 120px;
+    width: 120px;
+    border-radius: 50%;
+}
+
+.user_details h3 {
+    font-weight: 700;
+    font-size: 20px;
+    color: #07212e;
+    margin-top: 10px;
+}
+
+.upload_btn {
+ position: absolute;
+margin-left: 70px;
+margin-top: -20px;
+margin-bottom: 20px;
+color:#07212e
+
+}
+
+.upload_btn2 {
+    position: absolute;
+   margin-left: 10px;
+   margin-top: -40px;
+   margin-bottom: 24px;
+   color:#07212e
+   
+   }
+
+.edit_btn {
+    font-weight: 600;
+    font-size: 14px;
+    color: rgb(185, 2, 2);
+}
+
+.following h4{
+    text-transform: capitalize;
+    font-weight: 700;
+    font-size: 18px;
+    color: #07212e;
+    margin-bottom: 20px;
+}
+
+.following p {
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+.following img {
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+}
+
+.following svg {
+    cursor: pointer;
+    float: right;
+}
+
+
+.user_story {
+    margin-top: 50px;
+}
+
+.user_story h2 {
+    color: #07212e;
+    font-weight: 700;
+    font-size: 35px;
+    display: inline;
+}
+
+.user_story svg {
+    cursor: pointer;
+    float: right;
+    display: inline;
+    margin-right: 150px;
+    margin-top: 20px;
+}
+
+/* .nav_border nav {
+    padding-left: 0px !important;
+} */
+
+.nav_border a {
+    font-size: 15px;
+}
+
+
+.card_body {
+    padding: 5px !important;
+    font-weight: 500;
+}
+
+.action_btn {
+    border: none;
+    background: none;
+}
+
+.delete_btn {
+    color: rgb(209, 5, 5);
+    border: none;
+    background: none;
+    font-weight: 500;
+}
+
+.confirm_btn {
+    color: rgb(250, 242, 242);
+    background: rgb(209, 5, 5);
+    font-size: 15px;
+    border: none;
+    font-weight: 500;
+}
+
+.email_input {
+    width: 200px;
+}
+
+.btn_container {
+    display: inline;
+}
+
+.input_container {
+    display: inline;
+    margin-left: 20px;
+}
+
+.follow_data {
+    font-weight: 600;
+  }
+
+  .link {
+    font-weight: 600;
+  }
+
+  .about{
+overflow: hidden !important;
+font: inherit !important
+  }
+
+@media only screen and (max-width: 590px) {
+   .nav_tab a {
+font-size: 10px;
+padding: 0px !important;
+margin-right: 5px;
+   }
+
+   .nav_icon {
+    margin-right: 0px !important;
+   }
+
+   .about {
+    align-content: center;
+   }
+  }
+
+
+  @media only screen and (max-width: 767px) {
+   .move_center {
+    text-align: center !important;
+   }
+
+   .date  {
+    font-weight: 600;
+    font-size: 15px;
+   }
+
+   /* .user_details {
+    display: none !important;
+   } */
+
+   }
+
+   .date span {
+    font-weight: 600;
+   }
+   
+  
+/*   
+  @media only screen and (max-width: 342px) {
+   
+   
+  } */
+
+ 

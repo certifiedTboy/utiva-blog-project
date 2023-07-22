@@ -1,4 +1,7 @@
-const { checkThatUserIsVerified } = require("./userServices");
+const {
+  checkThatUserIsVerified,
+  checkUserForNewPassword,
+} = require("./userServices");
 const {
   hashPassword,
   verifyPassword,
@@ -8,7 +11,7 @@ const createOrUpdatePlatformSession = require("./sessionServices");
 const { sendPasswordResetUrl } = require("./emailServices");
 
 const updateUserPassword = async (email, password) => {
-  const user = await checkThatUserIsVerified(email);
+  const user = await checkUserForNewPassword(email);
 
   if (user) {
     const hashedPassword = await hashPassword(password);
@@ -50,7 +53,7 @@ const loginUser = async (email, password, ipAddress) => {
     };
 
     if (userSession) {
-      return { userData, authToken: userSession.token };
+      return { userData, userSession };
     }
   }
 };

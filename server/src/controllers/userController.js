@@ -3,6 +3,9 @@ const {
   newUser,
   updateUserProfileImage,
   userNameUpdate,
+  checkThatUserExistById,
+  checkThatUserExistByUsername,
+  updateUserAbout,
 } = require("../services/userServices");
 const { verifyUserToken } = require("../services/verificationServices");
 
@@ -25,6 +28,7 @@ const createUser = async (req, res, next) => {
 const verifyUser = async (req, res, next) => {
   try {
     const { userId, verificationToken } = req.body;
+
     const userIsVerified = await verifyUserToken(userId, verificationToken);
     if (userIsVerified) {
       ResponseHandler.ok(
@@ -56,9 +60,14 @@ const uploadUserProfile = async (req, res, next) => {
 const updateUserName = async (req, res, next) => {
   try {
     const userId = req.user;
-    const { firstName, lastName } = req.body;
+    const { firstName, lastName, about } = req.body;
 
-    const updatedUser = await userNameUpdate(userId, firstName, lastName);
+    const updatedUser = await userNameUpdate(
+      userId,
+      firstName,
+      lastName,
+      about
+    );
 
     if (updatedUser) {
       ResponseHandler.ok(res, updatedUser, "user name changed successfully");
@@ -68,4 +77,37 @@ const updateUserName = async (req, res, next) => {
   }
 };
 
-module.exports = { createUser, verifyUser, uploadUserProfile, updateUserName };
+const getCurrentUser = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const currentUser = await checkThatUserExistById(userId);
+
+    if (currentUser) {
+      ResponseHandler.ok(res, currentUser, "success");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getUserByUsername = async (req, res, next) => {
+  try {
+    const { username } = req.params;
+    const user = await checkThatUserExistByUsername(username);
+
+    if (user) {
+      ResponseHandler.ok(res, user, "success");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  createUser,
+  verifyUser,
+  uploadUserProfile,
+  updateUserName,
+  getCurrentUser,
+  getUserByUsername,
+};

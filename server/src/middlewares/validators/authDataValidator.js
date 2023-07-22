@@ -19,9 +19,24 @@ const checkEmailValidity = async (req, res, next) => {
     if (!email) {
       throw new UnprocessableError("email field is required");
     }
-    const emailIsValid = email.includes("@");
-    if (!emailIsValid) {
-      throw new UnprocessableError("invalid email format");
+    let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (!email.match(regex)) {
+      throw new UnprocessableError("Invalid email address");
+    } else {
+      next();
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+const checkAcceptTerms = async (req, res, next) => {
+  const { acceptTerms } = req.body;
+  try {
+    if (!acceptTerms) {
+      throw new UnprocessableError(
+        "You're yet to accept our terms and conditions"
+      );
     } else {
       next();
     }
@@ -105,4 +120,5 @@ module.exports = {
   checkPasswordValidity,
   checkPasswordMatch,
   checkNameDataLength,
+  checkAcceptTerms,
 };

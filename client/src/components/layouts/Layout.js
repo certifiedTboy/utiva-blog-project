@@ -22,31 +22,33 @@ const Layout = (props) => {
       title: "WebDev - About",
       metaDescription: "About Webdev blog",
     };
-    //   } else if (pathname === "/admin") {
-    //     titleData = {
-    //       title: "WebDev - Admin Page",
-    //       metaDescription: "Welcome to admin page",
-    //     };
+  } else if (pathname === "/login") {
+    titleData = {
+      title: "WebDev - Admin Page",
+      metaDescription: "Welcome to admin page",
+    };
   } else if (pathname === "/blogs") {
     titleData = {
       title: "WebDev - blogs",
       metaDescription: "all available blogs on webdev blog",
     };
-  } else if (pathname === "/login") {
+  } else if (pathname === "/get-started/sign-in") {
     titleData = {
       title: "WebDev - Get Started",
-      metaDescription: "login to get started",
+      metaDescription: "sign in on webdev blog to get started",
     };
-    //   } else if (pathname === "/write-article") {
-    //     titleData = {
-    //       title: "WebDev - Write article",
-    //       metaDescription: "Write and publish your articles on webdev blog",
-    //     };
-    //   } else if (pathname === "/write-article/hints") {
-    //     titleData = {
-    //       title: "WebDev - Hints",
-    //       metaDescription: "Hints in writing better articles",
-    //     };
+  } else if (pathname === "/get-started/sign-up") {
+    titleData = {
+      title: "WebDev - Get Started",
+      metaDescription: "Sign up on webdev blog to get started",
+    };
+  } else if (
+    pathname === `/get-started/auth/account/verify/${pathname.split("/")[5]}`
+  ) {
+    titleData = {
+      title: "WebDev - Set new user password",
+      metaDescription: "set new password for newly created account",
+    };
     //   } else if (pathname === `/blogs/${pathname.split("/")[2]}`) {
     //     titleData = {
     //       title: `WebDev - blogs/${pathname.split("/")[2]}`,
@@ -57,13 +59,13 @@ const Layout = (props) => {
     //     title: `WebDev - Edit-Blog`,
     //     metaDescription: `Edit blog`,
     //   };
-    //   } else if (pathname === `/w-d/${pathname.split("/")[2]}`) {
-    //     titleData = {
-    //       title: `WebDev - webdev/${pathname.split("/")[2]}`,
-    //       metaDescription: `profile details and activities of ${
-    //         pathname.split("/")[2]
-    //       } on webdev blog`,
-    //     };
+  } else if (pathname === `/w-d/${pathname.split("/")[2]}`) {
+    titleData = {
+      title: `WebDev - webdev/${pathname.split("/")[2]}`,
+      metaDescription: `profile details and activities of ${
+        pathname.split("/")[2]
+      } on webdev blog`,
+    };
     //   } else if (pathname === `/auth/account/verify/${pathname.split("/")[4]}`) {
     //     titleData = {
     //       title: `WebDev - Email verification`,
