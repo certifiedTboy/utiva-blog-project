@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
-import { useGetCurrentUserMutation } from "../../lib/APIS/userApi/userApi";
 import ImageUploadModal from "./modal/ImageUploadModal";
 import { useSelector } from "react-redux";
-// import { useParams } from "react-router-dom";
-// import { onGetOtherUserProfilePicture } from "../../../lib/generaRequestRedux/profileActions";
-// import UpdateUser from "./Modals/UpdateUser";
-
+import NameUpdateModal from "./modal/NameUpdateModal";
 import classes from "./Profile.module.css";
 
 const OtherData = ({ user }) => {
@@ -16,7 +11,6 @@ const OtherData = ({ user }) => {
   const { user: currentUser } = useSelector((state) => state.userState);
 
   const onShowModal = (event) => {
-    event.preventDefault();
     if (!showUpdateModal) {
       setShowUpdateModal(true);
     } else {
@@ -28,16 +22,13 @@ const OtherData = ({ user }) => {
     if (!showUploadModal) {
       setShowUploadModal(true);
     } else {
-      // await getCurrentUser(username);
       setShowUploadModal(false);
     }
   };
 
   return (
     <>
-      {/* {showUpdateModal && (
-        <UpdateUser onShowModal={onShowModal} userData={userData} />
-      )} */}
+      {showUpdateModal && <NameUpdateModal onShowModal={onShowModal} />}
       {showUploadModal && <ImageUploadModal onShowModal={onShowProfileModal} />}
       <div className={`${classes.user_details} d-none d-sm-none d-md-block`}>
         <div>
@@ -77,7 +68,7 @@ const OtherData = ({ user }) => {
 
         <div className="mt-3 mb-5">
           {currentUser && user._id === currentUser._id && (
-            <a href="#" className={classes.edit_btn}>
+            <a href="#" className={classes.edit_btn} onClick={onShowModal}>
               Edit Profile
             </a>
           )}

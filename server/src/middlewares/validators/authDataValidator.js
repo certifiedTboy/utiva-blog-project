@@ -114,6 +114,19 @@ const checkNameDataLength = async (req, res, next) => {
   }
 };
 
+const checkUserDataInputForUpdateIsEmpty = async (req, res, next) => {
+  try {
+    const { firstName, lastName, about } = req.body;
+    if (!firstName || !lastName || !about) {
+      throw new UnprocessableError("all input fields are required");
+    } else {
+      next();
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   checkUserDataInputIsEmpty,
   checkEmailValidity,
@@ -121,4 +134,5 @@ module.exports = {
   checkPasswordMatch,
   checkNameDataLength,
   checkAcceptTerms,
+  checkUserDataInputForUpdateIsEmpty,
 };

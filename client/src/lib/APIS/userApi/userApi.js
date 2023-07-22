@@ -43,11 +43,17 @@ export const userApi = createApi({
 
     changeName: builder.mutation({
       query: (userData) => ({
-        url: `user/upload-image`,
+        url: `user/change-username`,
         method: "PUT",
         body: userData,
         credentials: "include",
       }),
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setUser(data));
+        } catch (error) {}
+      },
     }),
   }),
 });

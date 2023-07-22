@@ -12,6 +12,7 @@ const {
   checkNameDataLength,
   checkUserDataInputIsEmpty,
   checkAcceptTerms,
+  checkUserDataInputForUpdateIsEmpty,
 } = require("../middlewares/validators/authDataValidator");
 const {
   checkUserAccountOwnership,
@@ -40,10 +41,10 @@ router.put(
 );
 
 router.put(
-  "/change-user-name",
+  "/change-username",
   Authenticate,
   checkUserAccountOwnership,
-  checkUserDataInputIsEmpty,
+  checkUserDataInputForUpdateIsEmpty,
   checkNameDataLength,
   updateUserName
 );

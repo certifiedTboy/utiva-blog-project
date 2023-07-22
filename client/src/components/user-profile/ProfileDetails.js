@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import Moment from "react-moment";
 import About from "./About";
 import ImageUploadModal from "./modal/ImageUploadModal";
+import NameUpdateModal from "./modal/NameUpdateModal";
 
-// import { useGetUserProfileMutation } from "../../lib/APIS/userApi/userApi";
 // import { onFollowUser } from "../../../lib/generaRequestRedux/FollowActions";
 
 import classes from "./Profile.module.css";
@@ -15,7 +15,6 @@ const ProfileDetails = ({ user }) => {
   const [showUploadModal, setShowUploadModal] = useState(false);
 
   const onShowModal = (event) => {
-    event.preventDefault();
     if (!showUpdateModal) {
       setShowUpdateModal(true);
     } else {
@@ -24,7 +23,6 @@ const ProfileDetails = ({ user }) => {
   };
 
   const onShowProfileModal = (event) => {
-    event.preventDefault();
     if (!showUploadModal) {
       setShowUploadModal(true);
     } else {
@@ -34,9 +32,7 @@ const ProfileDetails = ({ user }) => {
 
   return (
     <>
-      {/* {showUpdateModal && (
-        <UpdateUser onShowModal={onShowModal} userData={userData} />
-      )} */}
+      {showUpdateModal && <NameUpdateModal onShowModal={onShowModal} />}
       {showUploadModal && <ImageUploadModal onShowModal={onShowProfileModal} />}
 
       <div className={classes.user_story}>
@@ -75,7 +71,7 @@ const ProfileDetails = ({ user }) => {
 
           <div className="mb-2 d-lg-none d-md-none d-sm-block">
             {currentUser && user._id === currentUser._id && (
-              <a href="#" className={classes.edit_btn}>
+              <a href="#" className={classes.edit_btn} onClick={onShowModal}>
                 Edit Profile
               </a>
             )}

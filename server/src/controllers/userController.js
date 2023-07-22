@@ -59,7 +59,7 @@ const uploadUserProfile = async (req, res, next) => {
 
 const updateUserName = async (req, res, next) => {
   try {
-    const userId = req.user;
+    const userId = req.user.id;
     const { firstName, lastName, about } = req.body;
 
     const updatedUser = await userNameUpdate(
