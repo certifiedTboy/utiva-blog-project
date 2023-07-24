@@ -103,6 +103,18 @@ const getUserByUsername = async (req, res, next) => {
   }
 };
 
+const getUserById = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const user = await checkThatUserExistById(userId);
+    if (user) {
+      ResponseHandler.ok(res, user, "success");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createUser,
   verifyUser,
@@ -110,4 +122,5 @@ module.exports = {
   updateUserName,
   getCurrentUser,
   getUserByUsername,
+  getUserById,
 };

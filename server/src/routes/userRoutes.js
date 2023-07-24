@@ -6,6 +6,7 @@ const {
   updateUserName,
   getCurrentUser,
   getUserByUsername,
+  getUserById,
 } = require("../controllers/userController");
 const {
   checkEmailValidity,
@@ -51,4 +52,5 @@ router.put(
 
 router.get("/me", Authenticate, getCurrentUser);
 router.get("/:username", getUserByUsername);
+router.get("/profile/:userId", getUserById);
 module.exports = router;

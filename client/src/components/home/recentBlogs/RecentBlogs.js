@@ -1,19 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import BlogCard from "../../blogs/all-blogs/BlogCard";
-import { useGetAllBlogsQuery } from "../../../lib/APIS/blogApis/BlogApi";
+import { useGetAllBlogsMutation } from "../../../lib/APIS/blogApis/BlogApi";
 import DataError from "../../Error/DataError";
 import Loader from "../../UI/loader/Loader";
 import "./RecentBlogs.css";
 
 const RecentTopic = () => {
-  const { data, isError, error, isLoading } = useGetAllBlogsQuery();
+  const [getAllBlogs, { data, isError, error, isLoading }] =
+    useGetAllBlogsMutation();
 
   const [recordsPerPage] = useState(3);
   const [recentBlogs, setRecentBlogs] = useState([]);
 
   const indexOfLastRecord = 1 * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+
+  useEffect(() => {
+    const onLoadHomePage = async () => {
+      await getAllBlogs();
+    };
+
+    onLoadHomePage();
+  }, []);
 
   useEffect(() => {
     if (data) {

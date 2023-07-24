@@ -4,7 +4,7 @@ import Toast from "react-bootstrap/Toast";
 
 const DescriptionPopUp = ({ showA, description }) => {
   return (
-    <Row style={{ position: "absolute" }}>
+    <Row style={{ position: "absolute", width: "100%" }}>
       <Col md={12} className="mb-2">
         <Toast show={showA}>
           <Toast.Body>{description}</Toast.Body>

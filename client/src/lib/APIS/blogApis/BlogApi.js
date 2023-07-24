@@ -4,8 +4,11 @@ export const blogApi = createApi({
   reducerPath: "blogApi",
   baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:8000/api/v1/" }),
   endpoints: (builder) => ({
-    getAllBlogs: builder.query({
-      query: () => `blogs?page=1&limit=5`,
+    getAllBlogs: builder.mutation({
+      query: (payload) => ({
+        url: `blogs?page=${payload}&limit=3`,
+        method: "GET",
+      }),
     }),
 
     createNewBlog: builder.mutation({
@@ -19,4 +22,4 @@ export const blogApi = createApi({
   }),
 });
 
-export const { useGetAllBlogsQuery, useCreateNewBlogMutation } = blogApi;
+export const { useGetAllBlogsMutation, useCreateNewBlogMutation } = blogApi;

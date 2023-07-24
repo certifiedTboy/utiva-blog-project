@@ -26,6 +26,13 @@ export const userApi = createApi({
       }),
     }),
 
+    getUserProfileById: builder.mutation({
+      query: (userId) => ({
+        url: `user/profile/${userId}`,
+        method: "GET",
+      }),
+    }),
+
     uploadPicture: builder.mutation({
       query: (formData) => ({
         url: `user/upload-image`,
@@ -63,4 +70,5 @@ export const {
   useGetUserProfileMutation,
   useChangeNameMutation,
   useUploadPictureMutation,
+  useGetUserProfileByIdMutation,
 } = userApi;
