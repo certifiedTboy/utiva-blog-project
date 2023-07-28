@@ -4,7 +4,10 @@ import Moment from "react-moment";
 import { NavLink, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useGetBlogByTitleMutation } from "../../../lib/APIS/blogApis/BlogApi";
-import { useGetUserProfileByIdMutation } from "../../../lib/APIS/userApi/userApi";
+import {
+  useGetUserProfileByIdMutation,
+  useFollowUserMutation,
+} from "../../../lib/APIS/userApi/userApi";
 import { transform } from "./Transform";
 import RelatedPosts from "./RelatedPosts";
 import KeyWords from "./KeyWords";
@@ -12,21 +15,21 @@ import "./SingleBlog.css";
 import Reaction from "./Reaction";
 
 const SingleBlog = () => {
-  const [following, setFollowing] = useState([]);
-  const [followers, setFollowers] = useState([]);
-  const [profilePicture, setProfilePicture] = useState("");
-  const [userIsFollowing, setUserIsFollowing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
   const [userNameData, setUserNameData] = useState({
     firstName: "",
     lastName: "",
     username: "",
     profilePicture: "",
+    otherUserId: "",
   });
 
   const [getBlogByTitle, { data, isSuccess: success, isError, error }] =
     useGetBlogByTitleMutation();
   const [getUserById, { data: user, isSuccess }] =
     useGetUserProfileByIdMutation();
+  const [followUser, { isSuccess: followSuccess, data: followData }] =
+    useFollowUserMutation();
 
   const { user: currentUser } = useSelector((state) => state.userState);
 
@@ -50,7 +53,7 @@ const SingleBlog = () => {
     };
 
     onGetUserUsername();
-  }, [success, data?.data]);
+  }, [success, data?.data, followSuccess]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -59,10 +62,42 @@ const SingleBlog = () => {
         lastName: user?.data?.lastName,
         username: user?.data?.username,
         profilePicture: user?.data?.profilePicture,
+        otherUserId: user?.data?._id,
       });
     }
-  }, [isSuccess]);
 
+    if (currentUser) {
+      setIsFollowing(
+        user?.data?.followers.find(
+          (fData) => fData.userId === currentUser.data._id
+        )
+      );
+    }
+  }, [isSuccess, user?.data]);
+
+  console.log(userNameData);
+
+  // useEffect(() => {
+  //   if (currentUser) {
+  //     const followingState = userNameData.followers.find(
+  //       (fData) => fData.userId === currentUser?.data?._id
+  //     );
+
+  //     console.log(followingState);
+  //     if (followingState) {
+  //       setIsFollowing(true);
+  //     } else {
+  //       setIsFollowing(false);
+  //     }
+  //   }
+  // }, [followSuccess, currentUser]);
+
+  console.log(isFollowing);
+
+  const followUserHandler = async () => {
+    const followData = { otherUserId: userNameData.otherUserId };
+    await followUser(followData);
+  };
   return (
     <div className="mt-150 mb-150 mt-5">
       <div className="container">
@@ -116,9 +151,8 @@ const SingleBlog = () => {
                       <button
                         type="submit"
                         className="btn-success d-inline ml-2"
-                        // onClick={followUserHandler}
-                      >
-                        {userIsFollowing ? "unfollow" : "follow"}
+                        onClick={followUserHandler}>
+                        {isFollowing ? "unfollow" : "follow"}
                       </button>
                     )}
                 </div>

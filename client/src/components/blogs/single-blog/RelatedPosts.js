@@ -34,8 +34,6 @@ const RelatedPosts = ({ userId }) => {
     }
   }, [indexOfFirstRecord, indexOfLastRecord, userId, isSuccess]);
 
-  console.log(data);
-
   return (
     <ul>
       {recentBlogs?.map((blog) => {

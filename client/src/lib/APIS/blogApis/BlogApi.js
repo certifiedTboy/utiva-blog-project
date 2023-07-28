@@ -7,7 +7,7 @@ export const blogApi = createApi({
   endpoints: (builder) => ({
     getAllBlogs: builder.mutation({
       query: (pageNum) => ({
-        url: `blogs/published-blogs?page=${pageNum}&limit=3`,
+        url: `blogs/published-blogs?page=${pageNum}&limit=5`,
         method: "GET",
       }),
     }),
@@ -47,12 +47,6 @@ export const blogApi = createApi({
         body: blogData,
         credentials: "include",
       }),
-      async onQueryStarted(args, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setBlog(data));
-        } catch (error) {}
-      },
     }),
 
     checkBlogAlreadyCreated: builder.mutation({

@@ -6,7 +6,7 @@ import { useGetUserProfileByIdMutation } from "../../../lib/APIS/userApi/userApi
 import DescriptionPopUp from "./DescriptionPopUp";
 import blogImg from "../../../Assets/news-bg-1.png";
 
-const BasicExample = ({ title, description, blogId, createdAt, userId }) => {
+const BlogCard = ({ title, description, blogId, createdAt, userId }) => {
   const [showA, setShowA] = useState({ state: false, key: "" });
   const [userNameData, setUserNameData] = useState({
     firstName: "",
@@ -70,4 +70,4 @@ const BasicExample = ({ title, description, blogId, createdAt, userId }) => {
   );
 };
 
-export default BasicExample;
+export default BlogCard;

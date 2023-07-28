@@ -1,12 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useGetAllBlogsMutation } from "../../lib/APIS/blogApis/BlogApi";
 
 const UseOptions = (pageNumber) => {
-  const blogs = [];
+  const [blogs, setBlogs] = useState([]);
   const [getAllBlogs, { isSuccess, data }] = useGetAllBlogsMutation();
 
   useEffect(() => {
-    console.log("i run");
     const onGetAllBlogs = async () => {
       await getAllBlogs();
     };
@@ -15,20 +14,21 @@ const UseOptions = (pageNumber) => {
   }, []);
 
   useEffect(() => {
+    console.log(data);
     if (isSuccess) {
-      data?.data?.map((blog) => {
+      const blogData = data?.data?.map((blog) => {
         let newBlogData = {
           text: blog.title,
           value: blog.title,
-          url: `http://localhost:3000/api/v1/blogs/${blog._id}`,
+          url: `http://localhost:3000/blogs/${blog._id}`,
         };
 
-        return blogs.push(newBlogData);
+        return newBlogData;
       });
+
+      return setBlogs(blogData);
     }
   }, [isSuccess, data?.data]);
-
-  console.log(blogs);
 
   const toolbar = {
     inline: { inDropdown: true },

@@ -86,7 +86,7 @@ const AllBlogs = () => {
     <div>
       {blogContent}
       {isLoading && !hasMore && !isError && <LoadingPlaceHolder />}
-      {isError && <DataError errorMessage={errorMessage} />}
+      {isError && <DataError errorMessage={errorMessage} path={"/blogs"} />}
     </div>
   );
 };

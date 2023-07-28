@@ -48,18 +48,24 @@ const RecentTopic = () => {
         <div className="row">
           <div className="col-12 text-center">
             {isLoading && loadingData}
-            {isError && <DataError errorMessage={"Something went wrong"} />}
+            {isError && (
+              <DataError
+                errorMessage={error.data.message || "Something went wrong"}
+                path={"/home"}
+              />
+            )}
           </div>
           {!isLoading &&
             data &&
             recentBlogs.map((blog) => {
               return (
-                <div className="col-lg-4 col-md-6" key={blog.id}>
+                <div className="col-lg-4 col-md-6" key={blog._id}>
                   <BlogCard
                     title={blog.title}
                     description={blog.description}
                     blogId={blog._id}
                     createdAt={blog.createdAt}
+                    userId={blog.user.userId}
                   />
                 </div>
               );

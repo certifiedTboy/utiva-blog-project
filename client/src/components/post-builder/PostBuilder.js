@@ -1,7 +1,7 @@
 import React, { Fragment, useState, useRef, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { EditorState, convertToRaw, ContentState } from "draft-js";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Editor } from "react-draft-wysiwyg";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
@@ -12,6 +12,7 @@ import {
   useUpdatedBlogMutation,
 } from "../../lib/APIS/blogApis/BlogApi";
 import UseOptions from "./UseOptions";
+import { clearBlog } from "../../lib/APIS/blogApis/redux/BlogSlice";
 import PreviewModal from "./PreviewModal";
 
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
@@ -33,6 +34,8 @@ const PostBuilder = () => {
 
   const params = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
 
   const { blog } = useSelector((state) => state.blogState);
 
@@ -40,11 +43,7 @@ const PostBuilder = () => {
 
   const [
     checkBlogAlreadyCreated,
-    {
-      isSuccess: isAlreadyCreated,
-      isError: notCreated,
-      data: blogCreatedResponse,
-    },
+    { isSuccess: isAlreadyCreated, isError: notCreated },
   ] = useCheckBlogAlreadyCreatedMutation();
 
   const [
@@ -52,7 +51,8 @@ const PostBuilder = () => {
     { isSuccess: createdSuccess, isLoading: createLoading },
   ] = useCreateNewBlogMutation();
 
-  const [publishBlog, { isSuccess: publishSuccess }] = usePublishBlogMutation();
+  const [publishBlog, { isSuccess: publishSuccess, data: publishResponse }] =
+    usePublishBlogMutation();
 
   const [updateBlog, { isSuccess: updateSuccess }] = useUpdatedBlogMutation();
 
@@ -137,17 +137,17 @@ const PostBuilder = () => {
     if (updateSuccess || createdSuccess) {
       return setIsSaved(true);
     }
-  }, [updateSuccess, createdSuccess, blog?.data]);
+  }, [updateSuccess, createdSuccess]);
 
   useEffect(() => {
     if (publishSuccess) {
-      if (blog?.data?.isPublished) {
+      if (publishResponse?.data?.isPublished) {
         return setIsPublished(true);
+      } else {
+        return setIsPublished(false);
       }
-
-      setIsPublished(false);
     }
-  }, [publishSuccess, blog?.data]);
+  }, [publishSuccess]);
 
   useEffect(() => {
     //   if blog does not exist
@@ -157,8 +157,22 @@ const PostBuilder = () => {
       return navigate("/blog/create-blog");
     }
 
+    // clear data content if user navigates to create blog
+    if (location.pathname === "/blog/create-blog") {
+      dispatch(clearBlog());
+      setTitle("");
+      setDescription("");
+      const contentBlock = htmlToDraft("");
+      const contentState = ContentState.createFromBlockArray(
+        contentBlock.contentBlocks
+      );
+      return setEditorState(() => EditorState.createWithContent(contentState));
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
     // update article state with existing blog
-    if (blogCreatedResponse?.data) {
+    if (blog?.data) {
       setTitle(blog?.data?.title);
       setDescription(blog?.data?.description);
       blog?.data?.isPublished ? setIsPublished(true) : setIsPublished(false);
@@ -168,7 +182,7 @@ const PostBuilder = () => {
       );
       return setEditorState(() => EditorState.createWithContent(contentState));
     }
-  }, [isAlreadyCreated, blog, blogId]);
+  }, [blog]);
 
   return (
     <Fragment>
@@ -232,7 +246,7 @@ const PostBuilder = () => {
                   </svg>
                 </button>
               )}
-              {!blog?.data && (
+              {!blog && (
                 <button
                   type="submit"
                   className={`ml-2 d-inline float-right saveas-btn ${

@@ -35,7 +35,7 @@ const userLogin = async (req, res, next) => {
     if (data) {
       const jwtTokenOptions = {
         expires: data.userSession.expiresAt,
-        maxAge: 24 * 60 * 1000,
+        maxAge: 59 * 60 * 1000,
         httpOnly: true,
         sameSite: "lax",
         secure: true,

@@ -45,14 +45,12 @@ const userSchema = new Schema(
       {
         userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         username: String,
-        name: String,
       },
     ],
     following: [
       {
         userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         username: String,
-        name: String,
       },
     ],
     verificationToken: { type: String },

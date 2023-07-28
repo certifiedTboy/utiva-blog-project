@@ -8,6 +8,8 @@ const KeyWords = ({ title, description }) => {
     "a",
     "about",
     "an",
+    "am",
+    "another",
     "and",
     "are",
     "as",

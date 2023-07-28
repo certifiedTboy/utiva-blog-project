@@ -8,6 +8,7 @@ const {
   updateUserAbout,
 } = require("../services/userServices");
 const { verifyUserToken } = require("../services/verificationServices");
+const { updateUserFollower } = require("../services/followServices");
 
 const createUser = async (req, res, next) => {
   try {
@@ -115,6 +116,21 @@ const getUserById = async (req, res, next) => {
   }
 };
 
+const followUser = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { otherUserId } = req.body;
+
+    const followResponse = await updateUserFollower(userId, otherUserId);
+
+    if (followResponse) {
+      ResponseHandler.ok(res, followResponse, "success");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createUser,
   verifyUser,
@@ -123,4 +139,5 @@ module.exports = {
   getCurrentUser,
   getUserByUsername,
   getUserById,
+  followUser,
 };

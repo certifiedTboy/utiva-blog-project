@@ -63,14 +63,20 @@ export const userApi = createApi({
       },
     }),
 
-    // followUser: builder.mutation({
-    //   query: () => ({
-    //     url: ``,
-    //     method: "POST",
-    //     body: "",
-    //     credentials: "include",
-    //   }),
-    // }),
+    followUser: builder.mutation({
+      query: (payload) => ({
+        url: `user/follow-user`,
+        method: "POST",
+        body: payload,
+        credentials: "include",
+      }),
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setUser(data));
+        } catch (error) {}
+      },
+    }),
   }),
 });
 
@@ -80,5 +86,5 @@ export const {
   useChangeNameMutation,
   useUploadPictureMutation,
   useGetUserProfileByIdMutation,
-  // useFollowUserMutation
+  useFollowUserMutation,
 } = userApi;

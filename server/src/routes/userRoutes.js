@@ -7,6 +7,7 @@ const {
   getCurrentUser,
   getUserByUsername,
   getUserById,
+  followUser,
 } = require("../controllers/userController");
 const {
   checkEmailValidity,
@@ -32,6 +33,7 @@ router.post(
   createUser
 );
 router.post("/verify-user", verifyUser);
+router.post("/follow-user", Authenticate, followUser);
 
 router.put(
   "/upload-image",

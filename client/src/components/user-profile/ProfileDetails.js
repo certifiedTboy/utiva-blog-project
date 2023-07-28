@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import Moment from "react-moment";
 import About from "./About";
+import { useFollowUserMutation } from "../../lib/APIS/userApi/userApi";
 import BlogByUser from "./BlogsByUser";
 import ImageUploadModal from "./modal/ImageUploadModal";
 import NameUpdateModal from "./modal/NameUpdateModal";
@@ -14,7 +15,7 @@ const ProfileDetails = ({ user }) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [showAbout, setShowAbout] = useState(true);
   const [showStory, setShowStory] = useState(false);
-
+  const [followUser, { isSuccess }] = useFollowUserMutation();
   const { user: currentUser } = useSelector((state) => state.userState);
 
   const onShowModal = (event) => {
@@ -52,7 +53,12 @@ const ProfileDetails = ({ user }) => {
         )
       );
     }
-  }, [currentUser, user]);
+  }, [currentUser, user, isSuccess]);
+
+  const followUserHandler = async () => {
+    const followData = { otherUserId: user?.data?._id };
+    await followUser(followData);
+  };
 
   return (
     <>
@@ -121,10 +127,8 @@ const ProfileDetails = ({ user }) => {
               <button
                 type="submit"
                 className="btn-success d-inline ml-2"
-                // onClick={followUserHandler}
-              >
+                onClick={followUserHandler}>
                 {isFollowing ? "unfollow" : "follow"}
-                follow
               </button>
             )}
 
