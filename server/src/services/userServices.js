@@ -120,6 +120,15 @@ const checkUserForNewPassword = async (email) => {
   }
 };
 
+const checkUserForVerification = async (userId) => {
+  const user = await User.findById(userId).select("-password");
+  if (!user) {
+    throw new NotFoundError("invalid user token");
+  } else {
+    return user;
+  }
+};
+
 const deleteUserById = async (userId) => {
   return await User.findByIdAndRemove(userId);
 };
@@ -134,4 +143,5 @@ module.exports = {
   userNameUpdate,
   checkUserForNewPassword,
   checkThatUserExistByUsername,
+  checkUserForVerification,
 };

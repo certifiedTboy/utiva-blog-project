@@ -4,6 +4,7 @@ import { blogApi } from "../lib/APIS/blogApis/BlogApi";
 import { authApi } from "../lib/APIS/authApis/authApis";
 import { userApi } from "../lib/APIS/userApi/userApi";
 import UserSlice from "../lib/APIS/userApi/redux/UserSlice";
+import BlogSlice from "../lib/APIS/blogApis/redux/BlogSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
     userState: UserSlice,
+    blogState: BlogSlice,
   },
 
   middleware: (getDefaultMiddleware) =>

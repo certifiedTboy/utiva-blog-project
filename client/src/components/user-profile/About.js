@@ -7,7 +7,7 @@ const About = ({ user }) => {
       <div className="row">
         <div className="col-12">
           <div className={classes.about}>
-            <p>{user.data.about}</p>
+            <p>{user?.data?.about}</p>
           </div>
         </div>
       </div>

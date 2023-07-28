@@ -1,18 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { NavLink } from "react-router-dom";
 import Moment from "react-moment";
 import About from "./About";
+import BlogByUser from "./BlogsByUser";
 import ImageUploadModal from "./modal/ImageUploadModal";
 import NameUpdateModal from "./modal/NameUpdateModal";
-
-// import { onFollowUser } from "../../../lib/generaRequestRedux/FollowActions";
-
 import classes from "./Profile.module.css";
 
 const ProfileDetails = ({ user }) => {
-  const { user: currentUser } = useSelector((state) => state.userState);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [showAbout, setShowAbout] = useState(true);
+  const [showStory, setShowStory] = useState(false);
+
+  const { user: currentUser } = useSelector((state) => state.userState);
 
   const onShowModal = (event) => {
     if (!showUpdateModal) {
@@ -30,6 +33,27 @@ const ProfileDetails = ({ user }) => {
     }
   };
 
+  const navigateProfile = (event) => {
+    event.preventDefault();
+    if (showAbout) {
+      setShowAbout(false);
+      setShowStory(true);
+    } else {
+      setShowAbout(true);
+      setShowStory(false);
+    }
+  };
+
+  useEffect(() => {
+    if (currentUser) {
+      setIsFollowing(
+        user?.data?.followers.find(
+          (fData) => fData.userId === currentUser.data._id
+        )
+      );
+    }
+  }, [currentUser, user]);
+
   return (
     <>
       {showUpdateModal && <NameUpdateModal onShowModal={onShowModal} />}
@@ -41,10 +65,10 @@ const ProfileDetails = ({ user }) => {
             className={`${classes.user_details} d-sm-block d-md-none d-lg-none text-center`}>
             <img
               className={classes.profile_image}
-              src={`http://localhost:8000/${user.data.profilePicture}`}
+              src={`http://localhost:8000/${user?.data?.profilePicture}`}
               alt="profile_picture"
             />
-            {currentUser && user._id === currentUser._id && (
+            {currentUser && currentUser?.data?._id === user?.data?._id && (
               <div>
                 <a
                   className={classes.upload_btn2}
@@ -65,12 +89,12 @@ const ProfileDetails = ({ user }) => {
             )}
           </div>
           <h2>
-            {user.data.firstName} {user.data.lastName}
+            {user?.data?.firstName} {user?.data?.lastName}
           </h2>
-          <p>{user.data.email}</p>
+          <p>{user?.data?.email}</p>
 
           <div className="mb-2 d-lg-none d-md-none d-sm-block">
-            {currentUser && user._id === currentUser._id && (
+            {currentUser && user?.data?._id === currentUser?.data._id && (
               <a href="#" className={classes.edit_btn} onClick={onShowModal}>
                 Edit Profile
               </a>
@@ -82,24 +106,24 @@ const ProfileDetails = ({ user }) => {
             <button type="button" class="btn-primary mr-2">
               following{" "}
               <span className={`badge text-bg-secondary`}>
-                {/* {user.data.following.length} */}
+                {user?.data?.following.length}
               </span>
             </button>
 
             <button type="button" class="btn-primary">
               followers{" "}
               <span class="badge text-bg-secondary">
-                {/* {user.data.followers.length} */}
+                {user?.data?.followers.length}
               </span>
             </button>
 
-            {currentUser && user._id !== currentUser._id && (
+            {currentUser && currentUser?.data?._id !== user?.data?._id && (
               <button
                 type="submit"
                 className="btn-success d-inline ml-2"
-                //   onClick={followUserHandler}
+                // onClick={followUserHandler}
               >
-                {/* {userIsFollowing ? "unfollow" : "follow"} */}
+                {isFollowing ? "unfollow" : "follow"}
                 follow
               </button>
             )}
@@ -110,7 +134,7 @@ const ProfileDetails = ({ user }) => {
                 <p className={classes.date}>
                   Joined:{" "}
                   <Moment className="meta-own" fromNow>
-                    {user.data.createdAt}
+                    {user?.data?.createdAt}
                   </Moment>
                 </p>{" "}
               </div>
@@ -122,43 +146,43 @@ const ProfileDetails = ({ user }) => {
           <div style={{ width: "400px" }}>
             <ul class="nav nav-pills nav-justified">
               <li class="nav-item" style={{ textAlign: "left" }}>
-                <a
-                  //   className={`nav-link ${showAbout ? "disabled" : ""} ${
-                  //     classes.link
-                  //   }`}
+                <NavLink
+                  className={`nav-link ${classes.nav_link2}  ${
+                    showAbout ? "disabled" : ""
+                  } ${classes.link}`}
                   aria-current="page"
-                  href="#"
-                  //   onClick={navigateProfile}
-                >
+                  to="#"
+                  onClick={navigateProfile}>
                   About
-                </a>
+                </NavLink>
               </li>
-              <li class="nav-item" style={{ textAlign: "left" }}>
-                <a
-                  //   className={`nav-link ${showStory ? "disabled" : ""} ${
-                  //     classes.link
-                  //   }`}
+              <li className="nav-item" style={{ textAlign: "left" }}>
+                <NavLink
+                  className={`nav-link ${classes.nav_link2} ${
+                    showStory ? "disabled" : ""
+                  } ${classes.link}`}
                   aria-current="page"
-                  href="#"
-                  //   onClick={navigateProfile}
-                >
-                  Article
-                </a>
+                  to="#"
+                  onClick={navigateProfile}>
+                  Blogs
+                </NavLink>
               </li>
-              {/* {user && user.username === userData.username && ( */}
-              <li class="nav-item" style={{ textAlign: "left" }}>
-                <a
-                  className={`nav-link ${!user ? "disabled" : ""} ${
-                    classes.link
-                  }`}
-                  href="/write-article">
-                  Write Article
-                </a>
-              </li>
-              {/* )} */}
+              {currentUser && user?.data?._id === currentUser?.data?._id && (
+                <li class="nav-item" style={{ textAlign: "left" }}>
+                  <NavLink
+                    className={`nav-link ${!user ? "disabled" : ""} ${
+                      classes.link
+                    }`}
+                    to="/blog/create-blog">
+                    Create Blog
+                  </NavLink>
+                </li>
+              )}
             </ul>
           </div>
-          {user && <About user={user} />}
+          {showAbout && user && <About user={user} />}
+
+          {showStory && user && <BlogByUser userData={user} />}
         </div>
       </div>
     </>

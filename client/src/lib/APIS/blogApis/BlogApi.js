@@ -1,25 +1,113 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { setBlog } from "./redux/BlogSlice";
 
 export const blogApi = createApi({
   reducerPath: "blogApi",
   baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:8000/api/v1/" }),
   endpoints: (builder) => ({
     getAllBlogs: builder.mutation({
-      query: (payload) => ({
-        url: `blogs?page=${payload}&limit=3`,
+      query: (pageNum) => ({
+        url: `blogs/published-blogs?page=${pageNum}&limit=3`,
         method: "GET",
       }),
     }),
 
     createNewBlog: builder.mutation({
+      query: (blogData) => ({
+        url: "/blogs/create-blog",
+        method: "POST",
+        body: blogData,
+        credentials: "include",
+      }),
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setBlog(data));
+        } catch (error) {}
+      },
+    }),
+    publishBlog: builder.mutation({
       query: (payload) => ({
-        url: "/blogs",
+        url: `/blogs/publish-blog/${payload}`,
         method: "POST",
         body: payload,
+        credentials: "include",
+      }),
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setBlog(data));
+        } catch (error) {}
+      },
+    }),
+    updatedBlog: builder.mutation({
+      query: ({ blogData, blogId }) => ({
+        url: `/blogs/edit-blog/${blogId}`,
+        method: "PUT",
+        body: blogData,
+        credentials: "include",
+      }),
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setBlog(data));
+        } catch (error) {}
+      },
+    }),
+
+    checkBlogAlreadyCreated: builder.mutation({
+      query: (blogId) => ({
+        url: `/blogs/user-blog-by-id/${blogId}`,
+        method: "GET",
+        credentials: "include",
+      }),
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setBlog(data));
+        } catch (error) {}
+      },
+    }),
+
+    getBlogByUser: builder.mutation({
+      query: (userId) => ({
+        url: `/blogs/blogs-by-user/${userId}`,
+        method: "GET",
+      }),
+    }),
+    reactToBlog: builder.mutation({
+      query: (blogId) => ({
+        url: `/blogs/react-to-blog/${blogId}`,
+        method: "POST",
+        body: { reaction: "like" },
+        credentials: "include",
+      }),
+    }),
+
+    getBlogByTitle: builder.mutation({
+      query: (title) => ({
+        url: `/blogs/${title}`,
+        method: "GET",
+      }),
+    }),
+    deleteBlog: builder.mutation({
+      query: (blogId) => ({
+        url: `/blogs/delete-blog/${blogId}`,
+        method: "DELETE",
         credentials: "include",
       }),
     }),
   }),
 });
 
-export const { useGetAllBlogsMutation, useCreateNewBlogMutation } = blogApi;
+export const {
+  useGetAllBlogsMutation,
+  useCreateNewBlogMutation,
+  useGetBlogByTitleMutation,
+  useGetBlogByUserMutation,
+  useReactToBlogMutation,
+  useCheckBlogAlreadyCreatedMutation,
+  usePublishBlogMutation,
+  useUpdatedBlogMutation,
+  useDeleteBlogMutation,
+} = blogApi;

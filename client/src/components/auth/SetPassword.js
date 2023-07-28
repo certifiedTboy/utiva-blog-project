@@ -123,7 +123,7 @@ const SetPassword = () => {
 
   useEffect(() => {
     if (__isSuccess) {
-      navigate("/get-started/login");
+      navigate("/get-started/sign-n");
     }
   }, [__isSuccess]);
 

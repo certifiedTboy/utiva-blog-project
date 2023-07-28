@@ -42,6 +42,11 @@ const Layout = (props) => {
       title: "WebDev - Get Started",
       metaDescription: "Sign up on webdev blog to get started",
     };
+  } else if (pathname === "/blog/create-blog") {
+    titleData = {
+      title: "WebDev - Create new blog",
+      metaDescription: "Create new blog with our post builder",
+    };
   } else if (
     pathname === `/get-started/auth/account/verify/${pathname.split("/")[5]}`
   ) {
@@ -66,11 +71,11 @@ const Layout = (props) => {
         pathname.split("/")[2]
       } on webdev blog`,
     };
-    //   } else if (pathname === `/auth/account/verify/${pathname.split("/")[4]}`) {
-    //     titleData = {
-    //       title: `WebDev - Email verification`,
-    //       metaDescription: "Webdev blog email verification ",
-    //     };
+  } else if (pathname === `/blogs/${pathname.split("/")[2]}`) {
+    titleData = {
+      title: `WebDev - blogs/${pathname.split("/")[2]}`,
+      metaDescription: `${pathname.split("/")[2]}`,
+    };
   } else {
     titleData = {
       title: "404 Error - Page not found",

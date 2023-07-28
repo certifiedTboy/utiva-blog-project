@@ -1,10 +1,16 @@
-const { checkThatUserExistById, deleteUserById } = require("./userServices");
+const {
+  checkThatUserExistById,
+  deleteUserById,
+  checkUserForVerification,
+} = require("./userServices");
 const UnprocessableError = require("../lib/errorInstances/UnprocessableError");
 const ConflictError = require("../lib/errorInstances/ConflictError");
 const NotFoundError = require("../lib/errorInstances/NotFoundError");
 
 const verifyUserToken = async (userId, verificationToken) => {
-  const user = await checkThatUserExistById(userId);
+  const user = await checkUserForVerification(userId);
+
+  console.log(user);
 
   if (user) {
     if (!user.verificationToken) {

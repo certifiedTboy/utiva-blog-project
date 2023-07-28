@@ -62,6 +62,15 @@ export const userApi = createApi({
         } catch (error) {}
       },
     }),
+
+    // followUser: builder.mutation({
+    //   query: () => ({
+    //     url: ``,
+    //     method: "POST",
+    //     body: "",
+    //     credentials: "include",
+    //   }),
+    // }),
   }),
 });
 
@@ -71,4 +80,5 @@ export const {
   useChangeNameMutation,
   useUploadPictureMutation,
   useGetUserProfileByIdMutation,
+  // useFollowUserMutation
 } = userApi;

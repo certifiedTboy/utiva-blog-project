@@ -13,8 +13,10 @@ const createNewBlog = async (title, description, content, userId) => {
 
 const allBlogs = async (skip, limit) => {
   const blogs = await Blog.find({}, { __v: 0 }).skip(skip).limit(limit);
+  const sortedBlogs = blogs.sort((a, b) => a.createdAt - b.createdAt);
 
-  return blogs;
+  // console.log(sortedBlogs);
+  return sortedBlogs;
 };
 
 const publishedBlogs = async (skip, limit) => {

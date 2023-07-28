@@ -7,6 +7,7 @@ const {
   updateBlogPublishState,
   publishedBlogs,
   blogsByAUser,
+  checkBlogExistById,
 } = require("../services/blogServices");
 const getPagination = require("../helpers/pagination/pagination");
 const { updateReactionToBlog } = require("../services/reactionServices");
@@ -76,7 +77,7 @@ const getAllPublishedBlogs = async (req, res, next) => {
 };
 
 const getBlogsByAUser = async (req, res, next) => {
-  const userId = req.user.id;
+  const { userId } = req.params;
   try {
     const { skip, limit } = getPagination(req.query);
     const userBlogs = await blogsByAUser(userId, skip, limit);
@@ -91,6 +92,20 @@ const getBlogByTitle = async (req, res, next) => {
     const { blogTitle } = req.params;
 
     const blog = await checkBlogExistByTitle(blogTitle);
+
+    if (blog) {
+      ResponseHandler.ok(res, blog, "success");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getBlogById = async (req, res, next) => {
+  try {
+    const { blogId } = req.params;
+
+    const blog = await checkBlogExistById(blogId);
 
     if (blog) {
       ResponseHandler.ok(res, blog, "success");
@@ -200,4 +215,5 @@ module.exports = {
   publishBlog,
   getAllPublishedBlogs,
   getBlogsByAUser,
+  getBlogById,
 };

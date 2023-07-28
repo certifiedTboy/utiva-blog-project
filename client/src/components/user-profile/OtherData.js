@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ImageUploadModal from "./modal/ImageUploadModal";
 import { useSelector } from "react-redux";
 import NameUpdateModal from "./modal/NameUpdateModal";
@@ -37,7 +37,7 @@ const OtherData = ({ user }) => {
             src={`http://localhost:8000/${user?.data?.profilePicture}`}
             alt="profile_picture"
           />
-          {currentUser && user._id === currentUser._id && (
+          {currentUser && user?.data?._id === currentUser.data._id && (
             <div>
               <a
                 className={classes.upload_btn}
@@ -67,7 +67,7 @@ const OtherData = ({ user }) => {
         </div>
 
         <div className="mt-3 mb-5">
-          {currentUser && user._id === currentUser._id && (
+          {currentUser && user?.data?._id === currentUser.data._id && (
             <a href="#" className={classes.edit_btn} onClick={onShowModal}>
               Edit Profile
             </a>

@@ -80,11 +80,13 @@ const AllBlogs = () => {
       );
     });
 
+  const errorMessage = error?.data?.message || "something went wrong";
+
   return (
     <div>
       {blogContent}
       {isLoading && !hasMore && !isError && <LoadingPlaceHolder />}
-      {isError && <DataError errorMessage={error.data.message} />}
+      {isError && <DataError errorMessage={errorMessage} />}
     </div>
   );
 };

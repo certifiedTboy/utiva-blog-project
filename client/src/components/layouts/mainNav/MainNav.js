@@ -1,14 +1,11 @@
 import React, { useEffect } from "react";
-import { Link, animateScroll as scroll } from "react-scroll";
 import { NavLink, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useGetCurrentUserMutation } from "../../../lib/APIS/userApi/userApi";
 import classes from "./MainNav.module.css";
 
 const MainNav = ({ scrollTop }) => {
-  const [getCurrentUser] = useGetCurrentUserMutation({
-    refetchOnMountOrArgChange: true,
-  });
+  const [getCurrentUser] = useGetCurrentUserMutation();
 
   const { user } = useSelector((state) => state.userState);
 

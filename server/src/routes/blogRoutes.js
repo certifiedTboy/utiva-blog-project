@@ -8,6 +8,7 @@ const {
   publishBlog,
   getAllPublishedBlogs,
   getBlogsByAUser,
+  getBlogById,
   reactToBlog,
   commentToBlog,
   editComment,
@@ -25,10 +26,21 @@ const {
 const router = express.Router();
 
 router.post("/create-blog", checkBlogDataValidity, Authenticate, createBlog);
-router.post("/:blogId", Authenticate, checkBlogOwnership, publishBlog);
+router.post(
+  "/publish-blog/:blogId",
+  Authenticate,
+  checkBlogOwnership,
+  publishBlog
+);
 router.get("/", getAllBlogs);
 router.get("/published-blogs", getAllPublishedBlogs);
-router.get("blogs-by-user", Authenticate, getBlogsByAUser);
+router.get("/blogs-by-user/:userId", getBlogsByAUser);
+router.get(
+  "/user-blog-by-id/:blogId",
+  Authenticate,
+  checkBlogOwnership,
+  getBlogById
+);
 router.get("/:blogTitle", getBlogByTitle);
 router.put(
   "/edit-blog/:blogId",
