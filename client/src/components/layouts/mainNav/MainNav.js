@@ -2,10 +2,12 @@ import React, { useEffect } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useGetCurrentUserMutation } from "../../../lib/APIS/userApi/userApi";
+import { useLogoutUserMutation } from "../../../lib/APIS/authApis/authApis";
 import classes from "./MainNav.module.css";
 
 const MainNav = ({ scrollTop }) => {
   const [getCurrentUser] = useGetCurrentUserMutation();
+  const [logoutUser] = useLogoutUserMutation();
 
   const { user } = useSelector((state) => state.userState);
 
@@ -19,6 +21,10 @@ const MainNav = ({ scrollTop }) => {
 
     getCurrentUserData();
   }, [username, getCurrentUser]);
+
+  const onLogoutUser = () => {
+    logoutUser();
+  };
 
   return (
     <div
@@ -103,7 +109,9 @@ const MainNav = ({ scrollTop }) => {
                     </li>
                   )} */}
                   <li>
-                    <NavLink className="dropdown-item">Signout</NavLink>
+                    <NavLink className="dropdown-item" onClick={onLogoutUser}>
+                      Signout
+                    </NavLink>
                   </li>
                 </ul>
               </li>

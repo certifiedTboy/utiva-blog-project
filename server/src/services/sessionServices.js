@@ -2,6 +2,7 @@ const UserSession = require("../models/userSession");
 const User = require("../models/user");
 const dateTimeCalculator = require("../helpers/general/dateAndTimeCalculator");
 const { generateJWTToken } = require("../helpers/JWT/jwtHelpers");
+const NotFoundError = require("../lib/errorInstances/NotFoundError");
 
 const createOrUpdatePlatformSession = async (userId, ipAddress) => {
   let userSession = await getUserPlatformSession(userId);
@@ -29,6 +30,14 @@ const getUserPlatformSession = async (userId) => {
   return userSession;
 };
 
+const deleteSessionByUserId = async (userId) => {
+  const userSession = await UserSession.findOne({ userId });
+  if (!userSession) {
+    throw new NotFoundError("user session does not exist");
+  }
+  return await UserSession.findByIdAndRemove(userSession?._id.toString());
+};
+
 const getAuthToken = async (userId, ttlInHours) => {
   const user = await User.findById(userId);
   if (user) {
@@ -38,4 +47,4 @@ const getAuthToken = async (userId, ttlInHours) => {
   }
 };
 
-module.exports = createOrUpdatePlatformSession;
+module.exports = { createOrUpdatePlatformSession, deleteSessionByUserId };

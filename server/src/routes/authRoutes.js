@@ -3,6 +3,7 @@ const express = require("express");
 const {
   setUserPassword,
   userLogin,
+  userLogout,
   passwordResetRequest,
   verifyPasswordResetData,
 } = require("../controllers/authController");
@@ -21,6 +22,7 @@ router.post(
   setUserPassword
 );
 router.post("/login", checkEmailValidity, userLogin);
+router.get("/logout", userLogout);
 
 router.post(
   "/request-password-reset",

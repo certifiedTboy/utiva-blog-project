@@ -75,25 +75,6 @@ const SingleBlog = () => {
     }
   }, [isSuccess, user?.data]);
 
-  console.log(userNameData);
-
-  // useEffect(() => {
-  //   if (currentUser) {
-  //     const followingState = userNameData.followers.find(
-  //       (fData) => fData.userId === currentUser?.data?._id
-  //     );
-
-  //     console.log(followingState);
-  //     if (followingState) {
-  //       setIsFollowing(true);
-  //     } else {
-  //       setIsFollowing(false);
-  //     }
-  //   }
-  // }, [followSuccess, currentUser]);
-
-  console.log(isFollowing);
-
   const followUserHandler = async () => {
     const followData = { otherUserId: userNameData.otherUserId };
     await followUser(followData);

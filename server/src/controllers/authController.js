@@ -1,6 +1,7 @@
 const {
   updateUserPassword,
   loginUser,
+  logoutUser,
   requestPasswordReset,
 } = require("../services/authServices");
 const {
@@ -35,7 +36,7 @@ const userLogin = async (req, res, next) => {
     if (data) {
       const jwtTokenOptions = {
         expires: data.userSession.expiresAt,
-        maxAge: 59 * 60 * 1000,
+        maxAge: 59 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: "lax",
         secure: true,
@@ -47,6 +48,23 @@ const userLogin = async (req, res, next) => {
         jwtTokenOptions,
         "login success"
       );
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+const userLogout = async (req, res, next) => {
+  try {
+    const cookies = req.cookies;
+    const response = await logoutUser(cookies.authToken);
+    if (response) {
+      const jwtTokenOptions = {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+      };
+      ResponseHandler.clearCookie(res, {}, jwtTokenOptions, "logout success");
     }
   } catch (error) {
     next(error);
@@ -89,6 +107,7 @@ const verifyPasswordResetData = async (req, res, next) => {
 module.exports = {
   setUserPassword,
   userLogin,
+  userLogout,
   passwordResetRequest,
   verifyPasswordResetData,
 };

@@ -8,13 +8,22 @@ class ResponseHandler {
   }
 
   static auth(res, jwtTokenOptions, data, message = K.responseMessage.SUCCESS) {
-    res
-      .cookie("authToken", data.userSession.token, jwtTokenOptions)
-      .json({
-        message: message,
-        userData: data.userData,
-        authToken: data.userSession.token,
-      });
+    res.cookie("authToken", data.userSession.token, jwtTokenOptions).json({
+      message: message,
+      userData: data.userData,
+      authToken: data.userSession.token,
+    });
+  }
+
+  static clearCookie(
+    res,
+    jwtTokenOptions,
+    data,
+    message = K.responseMessage.SUCCESS
+  ) {
+    res.clearCookie("authToken", data, jwtTokenOptions).json({
+      message: message,
+    });
   }
 
   static ok(res, data, message = K.responseMessage.OK) {

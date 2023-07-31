@@ -6,8 +6,12 @@ const {
   hashPassword,
   verifyPassword,
 } = require("../helpers/general/passwordHelpers");
+const { verifyToken } = require("../helpers/JWT/jwtHelpers");
 const generatePasswordResetUrl = require("../helpers/url-generator/passwordResetUrl");
-const createOrUpdatePlatformSession = require("./sessionServices");
+const {
+  createOrUpdatePlatformSession,
+  deleteSessionByUserId,
+} = require("./sessionServices");
 const { sendPasswordResetUrl } = require("./emailServices");
 
 const updateUserPassword = async (email, password) => {
@@ -58,6 +62,11 @@ const loginUser = async (email, password, ipAddress) => {
   }
 };
 
+const logoutUser = async (refreshToken) => {
+  const authPayload = await verifyToken(refreshToken);
+  return await deleteSessionByUserId(authPayload?.id);
+};
+
 const requestPasswordReset = async (email) => {
   const user = await checkThatUserIsVerified(email);
 
@@ -82,4 +91,9 @@ const requestPasswordReset = async (email) => {
   }
 };
 
-module.exports = { updateUserPassword, loginUser, requestPasswordReset };
+module.exports = {
+  updateUserPassword,
+  loginUser,
+  requestPasswordReset,
+  logoutUser,
+};
