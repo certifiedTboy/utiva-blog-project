@@ -55,14 +55,6 @@
   }
   
 
-  
-.navbar.nav_sticky {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    box-shadow: 0 2px 5px rgba(177, 177, 177, 0.3);
-  }
-
 @media only screen and (max-width: 470px) {
    .mobile_a{
     font-size: 30px !important;
