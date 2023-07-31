@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router";
 import { Container, Row, Col } from "react-bootstrap";
 import { useGetUserProfileMutation } from "../../lib/APIS/userApi/userApi";
@@ -12,8 +12,7 @@ const Profile = () => {
 
   const { user: currentUser } = useSelector((state) => state.userState);
 
-  const [getUserProfile, { data: user, isError, error }] =
-    useGetUserProfileMutation();
+  const [getUserProfile, { data: user }] = useGetUserProfileMutation();
 
   useEffect(() => {
     const onGetUserProfile = async () => {

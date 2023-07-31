@@ -12,6 +12,8 @@ import SingleBlogPage from "../../pages/SingleBlogPage";
 import Login from "../auth/Login";
 import Register from "../auth/Register";
 import SetPassword from "../auth/SetPassword";
+import RequestResetPassword from "../auth/RequestResetPassword";
+import SetNewRequestPassword from "../auth/SetNewRequestPassword";
 import PostBuilderPage from "../../pages/PostBuilderPage";
 
 const GeneralRoutes = () => {
@@ -25,9 +27,14 @@ const GeneralRoutes = () => {
       <Route path="/get-started" element={<AuthPage />}>
         <Route path="sign-up" element={<Register />} />
         <Route path="sign-in" element={<Login />} />
+        <Route path="reset-password" element={<RequestResetPassword />} />
         <Route
           path="auth/account/verify/:verificationData"
           element={<SetPassword />}
+        />
+        <Route
+          path="auth/account/reset-password/:passwordResetData"
+          element={<SetNewRequestPassword />}
         />
       </Route>
 

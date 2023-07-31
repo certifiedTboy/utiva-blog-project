@@ -41,20 +41,31 @@ const PostBuilder = () => {
 
   const { blogId } = params;
 
-  const [
-    checkBlogAlreadyCreated,
-    { isSuccess: isAlreadyCreated, isError: notCreated },
-  ] = useCheckBlogAlreadyCreatedMutation();
+  const [checkBlogAlreadyCreated, { isError: notCreated }] =
+    useCheckBlogAlreadyCreatedMutation();
 
   const [
     createNewBlog,
-    { isSuccess: createdSuccess, isLoading: createLoading },
+    {
+      isSuccess: createdSuccess,
+      isLoading: createLoading,
+      isError: createError,
+    },
   ] = useCreateNewBlogMutation();
 
-  const [publishBlog, { isSuccess: publishSuccess, data: publishResponse }] =
-    usePublishBlogMutation();
+  const [
+    publishBlog,
+    { isSuccess: publishSuccess, data: publishResponse, isError: publishError },
+  ] = usePublishBlogMutation();
 
-  const [updateBlog, { isSuccess: updateSuccess }] = useUpdatedBlogMutation();
+  const [updateBlog, { isSuccess: updateSuccess, isError: updateError }] =
+    useUpdatedBlogMutation();
+
+  useEffect(() => {
+    if (publishError || createError || updateError) {
+      setErrorMessage("something went wrong");
+    }
+  }, [publishError, createError, updateError]);
 
   //blog input handlers
   const titleChangeHandler = (event) => {
@@ -97,7 +108,11 @@ const PostBuilder = () => {
       );
     }
 
-    if (title === "" || description === "" || contentRef.current.value === "") {
+    if (
+      title.trim().length === 0 ||
+      description.trim().length === 0 ||
+      contentRef.current.value === ""
+    ) {
       return setErrorMessage("Blog inputs can't be empty");
     }
 

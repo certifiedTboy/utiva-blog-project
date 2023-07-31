@@ -79,7 +79,7 @@ const Register = () => {
           {" "}
           {isError && (
             <div className="alert alert-danger text-center" role="alert">
-              {error.data.message || generalError || "Something went wrong"}
+              {error?.data?.message || "Something went wrong"}
             </div>
           )}
           {generalError && (

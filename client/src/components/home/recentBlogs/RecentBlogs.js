@@ -12,7 +12,6 @@ const RecentTopic = () => {
 
   const [recordsPerPage] = useState(3);
   const [recentBlogs, setRecentBlogs] = useState([]);
-
   const indexOfLastRecord = 1 * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
 
@@ -50,7 +49,7 @@ const RecentTopic = () => {
             {isLoading && loadingData}
             {isError && (
               <DataError
-                errorMessage={error.data.message || "Something went wrong"}
+                errorMessage={error?.data?.message || "Something went wrong"}
                 path={"/home"}
               />
             )}

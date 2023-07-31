@@ -42,6 +42,11 @@ const Layout = (props) => {
       title: "WebDev - Get Started",
       metaDescription: "Sign up on webdev blog to get started",
     };
+  } else if (pathname === "/get-started/reset-password") {
+    titleData = {
+      title: "WebDev - Reset Password",
+      metaDescription: "Request password reset change",
+    };
   } else if (pathname === "/blog/create-blog") {
     titleData = {
       title: "WebDev - Create new blog",
@@ -54,16 +59,14 @@ const Layout = (props) => {
       title: "WebDev - Set new user password",
       metaDescription: "set new password for newly created account",
     };
-    //   } else if (pathname === `/blogs/${pathname.split("/")[2]}`) {
-    //     titleData = {
-    //       title: `WebDev - blogs/${pathname.split("/")[2]}`,
-    //       metaDescription: `${pathname.split("/")[2]}`,
-    //     };
-    // } else if (pathname === `${pathname}`) {
-    //   titleData = {
-    //     title: `WebDev - Edit-Blog`,
-    //     metaDescription: `Edit blog`,
-    //   };
+  } else if (
+    pathname ===
+    `/get-started/auth/account/reset-password/${pathname.split("/")[5]}`
+  ) {
+    titleData = {
+      title: "WebDev - Set new user password",
+      metaDescription: "set new password for newly created account",
+    };
   } else if (pathname === `/w-d/${pathname.split("/")[2]}`) {
     titleData = {
       title: `WebDev - webdev/${pathname.split("/")[2]}`,

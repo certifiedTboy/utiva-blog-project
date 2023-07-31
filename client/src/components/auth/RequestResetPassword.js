@@ -1,45 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
-import { NavLink, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useLoginUserMutation } from "../../lib/APIS/authApis/authApis";
+import { NavLink } from "react-router-dom";
+import { useRequestPasswordResetMutation } from "../../lib/APIS/authApis/authApis";
 
-const Login = () => {
+const RequestResetPassword = () => {
+  const [requestPasswordReset, { error, isError, data, isSuccess, isLoading }] =
+    useRequestPasswordResetMutation();
+
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loginUser, { isLoading, isError, error, isSuccess }] =
-    useLoginUserMutation();
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const { user } = useSelector((state) => state.userState);
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user) {
-      navigate("/home");
-    }
-  }, [user]);
-
-  const onLoginUser = async (event) => {
-    event.preventDefault();
-
-    if (
-      !email ||
-      !password ||
-      email.trim().length === 0 ||
-      password.trim().length === 0
-    ) {
-      return;
-    }
-    const loginData = { email, password };
-    await loginUser(loginData);
+  const emailChangeHandler = (event) => {
+    setErrorMessage("");
+    setEmail(event.target.value);
   };
-
-  useEffect(() => {
-    if (isSuccess) {
-      navigate("/home");
+  const passwordChangeRequest = async (event) => {
+    event.preventDefault();
+    if (email.trim().length === 0) {
+      return setErrorMessage("Email input field is required ");
     }
-  }, [isSuccess]);
+
+    let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+    if (!email.match(regex)) {
+      return setErrorMessage("Invalid email address");
+    }
+    const resetPasswordData = { email };
+    await requestPasswordReset(resetPasswordData);
+  };
 
   return (
     <Container className="mt-5">
@@ -66,20 +54,22 @@ const Login = () => {
               {error?.data?.message || "Something went wrong"}
             </div>
           )}
-          <Form onSubmit={onLoginUser}>
+          {errorMessage && (
+            <div className="alert alert-danger text-center" role="alert">
+              {errorMessage}
+            </div>
+          )}
+          {isSuccess && (
+            <div className="alert alert-success text-center" role="alert">
+              {data?.message}
+            </div>
+          )}
+          <Form onSubmit={passwordChangeRequest}>
             <Form.Group className="mb-3">
               <Form.Control
-                type="email"
+                type="text"
                 placeholder="Enter Email"
-                onChange={(event) => setEmail(event.target.value)}
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Control
-                type="password"
-                placeholder="Enter Password"
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={emailChangeHandler}
               />
             </Form.Group>
 
@@ -90,7 +80,7 @@ const Login = () => {
               className={`${isLoading ? "disabled" : ""}`}>
               {" "}
               <span style={{ fontWeight: "700" }}>
-                {`${isLoading ? "Please wait ..." : "Login"}`}{" "}
+                {`${isLoading ? "Please wait ..." : "Reset Password"}`}{" "}
               </span>
               {!isLoading && !isError && (
                 <lord-icon
@@ -121,12 +111,6 @@ const Login = () => {
               Don't have an account ?{" "}
               <NavLink to="/get-started/sign-up">Sign up</NavLink>
             </p>
-
-            <p className="d-inline ml-4">
-              <NavLink to="/get-started/reset-password">
-                Forgot password
-              </NavLink>
-            </p>
           </div>
         </Col>
         <Col lg={4} md={3} sm={2} xs={1}></Col>
@@ -135,4 +119,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default RequestResetPassword;

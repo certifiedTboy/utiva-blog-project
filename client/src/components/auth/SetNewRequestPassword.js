@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { NavLink, useParams, useNavigate } from "react-router-dom";
 import {
-  useVerifyUserMutation,
+  useVerifyPasswordResetTokenMutation,
   useSetNewPasswordMutation,
 } from "../../lib/APIS/authApis/authApis";
 
-const SetPassword = () => {
+const SetNewRequestPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordValidityError, setPasswordValidityError] = useState("");
@@ -14,12 +14,14 @@ const SetPassword = () => {
   const params = useParams();
   const navigate = useNavigate();
 
-  const { verificationData } = params;
+  const { passwordResetData } = params;
 
-  const [verifyUser, response] = useVerifyUserMutation();
+  const [
+    verifyPasswordResetToken,
+    { isError, isSuccess, isLoading, error, data },
+  ] = useVerifyPasswordResetTokenMutation();
   const [setNewPassword, passwordResponse] = useSetNewPasswordMutation();
 
-  const { isError, isSuccess, isLoading, error, data } = response;
   const {
     isError: __isError,
     isSuccess: __isSuccess,
@@ -29,16 +31,17 @@ const SetPassword = () => {
 
   //user verification with token method
   useEffect(() => {
-    if (verificationData) {
-      const data = atob(verificationData).split(":");
-      const emailDataToVerify = {
+    if (passwordResetData) {
+      const data = atob(passwordResetData).split(":");
+      console.log(data);
+      const passwordDataToVerify = {
         userId: data[1],
-        verificationToken: data[0],
+        passwordResetToken: data[0],
       };
 
-      verifyUser(emailDataToVerify);
+      verifyPasswordResetToken(passwordDataToVerify);
     }
-  }, [verificationData]);
+  }, [passwordResetData]);
 
   //password input change handler
   const passwordChangeHandler = (event) => {
@@ -113,7 +116,7 @@ const SetPassword = () => {
       return;
     }
     const passwordData = {
-      email: response.data.data.email,
+      email: data?.data?.email,
       password,
       confirmPassword,
     };
@@ -239,4 +242,4 @@ const SetPassword = () => {
   );
 };
 
-export default SetPassword;
+export default SetNewRequestPassword;

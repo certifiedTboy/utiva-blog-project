@@ -12,6 +12,7 @@ const {
   createOrUpdatePlatformSession,
   deleteSessionByUserId,
 } = require("./sessionServices");
+const UnprocessableError = require("../lib/errorInstances/UnprocessableError");
 const { sendPasswordResetUrl } = require("./emailServices");
 
 const updateUserPassword = async (email, password) => {
@@ -30,12 +31,18 @@ const updateUserPassword = async (email, password) => {
         await user.save();
         return user;
       } else {
-        // user password update for password reset request
-        user.password = hashedPassword;
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpires = undefined;
-        await user.save();
-        return user;
+        if (user.resetPasswordToken) {
+          // user password update for password reset request
+          user.password = hashedPassword;
+          user.resetPasswordToken = undefined;
+          user.resetPasswordExpires = undefined;
+          await user.save();
+          return user;
+        } else {
+          throw new UnprocessableError(
+            "You have not requested for a password reset"
+          );
+        }
       }
     }
   }
@@ -80,10 +87,10 @@ const requestPasswordReset = async (email) => {
         user.resetPasswordToken = passwordResetData.passwordResetToken;
         user.resetPasswordExpires = passwordResetData.expiresAt;
         await user.save();
-        // await sendPasswordResetUrl(
-        //   user.email,
-        //   passwordResetData.passwordResetUrl
-        // );
+        await sendPasswordResetUrl(
+          user.email,
+          passwordResetData.passwordResetUrl
+        );
 
         return { email: user.email };
       }

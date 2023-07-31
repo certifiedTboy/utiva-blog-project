@@ -10,8 +10,6 @@ const NotFoundError = require("../lib/errorInstances/NotFoundError");
 const verifyUserToken = async (userId, verificationToken) => {
   const user = await checkUserForVerification(userId);
 
-  console.log(user);
-
   if (user) {
     if (!user.verificationToken) {
       throw new NotFoundError("token does not exist or is invalid");
@@ -33,6 +31,7 @@ const verifyUserToken = async (userId, verificationToken) => {
 };
 
 const verifyPasswordResetToken = async (userId, passwordResetToken) => {
+  console.log(passwordResetToken);
   const user = await checkThatUserExistById(userId);
   if (user) {
     if (!user.resetPasswordToken) {
@@ -50,7 +49,7 @@ const verifyPasswordResetToken = async (userId, passwordResetToken) => {
       throw new UnprocessableError("expired password reset token");
     }
 
-    if (user.resetPasswordToken !== passwordResetToken) {
+    if (user.resetPasswordToken !== `${passwordResetToken}:${userId}`) {
       throw new ConflictError("invalid password reset token");
     }
 
