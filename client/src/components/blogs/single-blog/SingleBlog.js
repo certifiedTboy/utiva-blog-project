@@ -149,18 +149,15 @@ const SingleBlog = () => {
               </div>
               {data?.data && <Reaction blogId={data?.data?._id} />}
 
-              {/* <div className="comments-list-wrap">
+               <div className="comments-list-wrap">
                 <h3 className="comment-count-title">3 Comments</h3>
                 <div className="comment-list">
                   <div className="single-comment-body">
-                    <div className="comment-user-avater">
-                      <img src="" alt="" />
-                    </div>
+                   
                     <div className="comment-text-body">
                       <h4>
                         Jenny Joe{" "}
                         <span className="comment-date">Aprl 26, 2020</span>{" "}
-                        <a href="#">reply</a>
                       </h4>
                       <p>
                         Nunc risus ex, tempus quis purus ac, tempor consequat
@@ -170,64 +167,21 @@ const SingleBlog = () => {
                         velit a eros porttitor, in interdum ante faucibus.
                       </p>
                     </div>
-                    <div className="single-comment-body child">
-                      <div className="comment-user-avater">
-                        <img src="" alt="" />
-                      </div>
-                      <div className="comment-text-body">
-                        <h4>
-                          Simon Soe{" "}
-                          <span className="comment-date">Aprl 27, 2020</span>{" "}
-                          <a href="#">reply</a>
-                        </h4>
-                        <p>
-                          Nunc risus ex, tempus quis purus ac, tempor consequat
-                          ex. Vivamus sem magna, maximus at est id, maximus
-                          aliquet nunc. Suspendisse lacinia velit a eros
-                          porttitor, in interdum ante faucibus.
-                        </p>
-                      </div>
-                    </div>
-                  </div> */}
-              {/* <div className="single-comment-body">
-                    <div className="comment-user-avater">
-                      <img src="" alt="" />
-                    </div>
-                    <div className="comment-text-body">
-                      <h4>
-                        Addy Aoe{" "}
-                        <span className="comment-date">May 12, 2020</span>{" "}
-                        <a href="#">reply</a>
-                      </h4>
-                      <p>
-                        Nunc risus ex, tempus quis purus ac, tempor consequat
-                        ex. Vivamus sem magna, maximus at est id, maximus
-                        aliquet nunc. Suspendisse lacinia velit a eros
-                        porttitor, in interdum ante faucibus Suspendisse lacinia
-                        velit a eros porttitor, in interdum ante faucibus.
-                      </p>
-                    </div>
-                  </div>
+                  </div> 
                 </div>
-              </div> */}
+              </div> 
 
-              {/* <div className="comment-template">
+              <div className="comment-template">
                 <h4>Leave a comment</h4>
-                <p>
-                  If you have a comment dont feel hesitate to send us your
-                  opinion.
-                </p>
+               
                 <form>
-                  <p>
-                    <input type="text" placeholder="Your Name" />
-                    <input type="email" placeholder="Your Email" />
-                  </p>
+                  
                   <p>
                     <textarea
                       name="comment"
                       id="comment"
                       cols="30"
-                      rows="10"
+                      rows="3"
                       placeholder="Your Message"
                     ></textarea>
                   </p>
@@ -235,7 +189,7 @@ const SingleBlog = () => {
                     <input type="submit" value="Submit" />
                   </p>
                 </form>
-              </div> */}
+              </div> 
             </div>
           </div>
           <div className="col-md-4 d-none d-sm-none d-md-block">
