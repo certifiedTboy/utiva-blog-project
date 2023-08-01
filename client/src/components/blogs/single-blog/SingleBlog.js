@@ -92,7 +92,7 @@ const SingleBlog = () => {
                     <span className="author">
                       <img
                         className="user_image"
-                        src={`http://localhost:8000/${userNameData.profilePicture}`}
+                        src={`https://utivablog-project-server.onrender.com/${userNameData.profilePicture}`}
                       />
                       <i className="fas fa-user ml-2"></i>
                       <NavLink to={`/w-d/${userNameData.username}`}>
