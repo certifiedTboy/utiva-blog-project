@@ -71,7 +71,7 @@ const ProfileDetails = ({ user }) => {
             className={`${classes.user_details} d-sm-block d-md-none d-lg-none text-center`}>
             <img
               className={classes.profile_image}
-              src={`http://localhost:8000/${user?.data?.profilePicture}`}
+              src={`https://utivablog-project-server.onrender.com/${user?.data?.profilePicture}`}
               alt="profile_picture"
             />
             {currentUser && currentUser?.data?._id === user?.data?._id && (

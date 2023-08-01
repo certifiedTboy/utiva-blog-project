@@ -3,7 +3,7 @@ import { setUser } from "./redux/UserSlice";
 
 export const userApi = createApi({
   reducerPath: "userApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:8000/api/v1/" }),
+  baseQuery: fetchBaseQuery({ baseUrl: "https://utivablog-project-server.onrender.com/api/v1/" }),
   endpoints: (builder) => ({
     getCurrentUser: builder.mutation({
       query: () => ({

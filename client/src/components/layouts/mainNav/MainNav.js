@@ -49,7 +49,7 @@ const MainNav = ({ scrollTop }) => {
             {user && (
               <img
                 className={classes.mobile_img}
-                src={`http://localhost:8000/${user.data.profilePicture}`}
+                src={`https://utivablog-project-server.onrender.com/${user.data.profilePicture}`}
                 alt="profile_picture"
               />
             )}
@@ -120,7 +120,7 @@ const MainNav = ({ scrollTop }) => {
                   data-bs-toggle="dropdown"
                   aria-expanded="false">
                   <img
-                    src={`http://localhost:8000/${user.data.profilePicture}`}
+                    src={`https://utivablog-project-server.onrender.com/${user.data.profilePicture}`}
                     alt="profile_picture"
                   />
                 </NavLink>
