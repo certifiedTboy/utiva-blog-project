@@ -114,14 +114,14 @@ const MainNav = ({ scrollTop }) => {
                 </NavLink>
               </li>
             )}
-            <form className="d-flex d-none d-sm-none d-md-block" role="search">
+            {/* <form className="d-flex d-none d-sm-none d-md-block" role="search">
               <input
                 class="form-control me-2 d-none d-sm-none d-md-block"
                 type="search"
                 placeholder="Search"
                 aria-label="Search"
               />
-            </form>
+            </form> */}
 
             {user && (
               <li
@@ -158,6 +158,7 @@ const MainNav = ({ scrollTop }) => {
           </div>
         </div>
       </div>
+
       <div
         className="fixed-top d-md-none d-lg-none d-sm-block"
         style={{
@@ -168,7 +169,7 @@ const MainNav = ({ scrollTop }) => {
         <ul className="nav nav-tabs nav-fill">
           {!show && (
             <li className="nav-item">
-              <NavLink className="nav-link" aria-current="page" to="/home">
+              <NavLink className={`nav-link ${classes.nav_link}`} aria-current="page" to="/home">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="26"
@@ -185,7 +186,7 @@ const MainNav = ({ scrollTop }) => {
 
           {!show && (
             <li className="nav-item">
-              <NavLink className="nav-link" to="/about">
+              <NavLink className={`nav-link  ${classes.nav_link}`} to="/about">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="26"
@@ -201,7 +202,7 @@ const MainNav = ({ scrollTop }) => {
 
           {!show && (
             <li className="nav-item">
-              <NavLink className="nav-link" to="/blogs">
+              <NavLink className={`nav-link ${classes.nav_link}`} to="/blogs">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="26"
@@ -219,7 +220,7 @@ const MainNav = ({ scrollTop }) => {
             <li className="nav-item">
               <Link
                 activeClass="active"
-                className={`nav-item nav-link ${classes.mousePoint}`}
+                className={`nav-item nav-link ${classes.mousePoint} ${classes.nav_link}`}
                 to="contact"
                 spy={true}
                 smooth={true}
@@ -245,7 +246,7 @@ const MainNav = ({ scrollTop }) => {
           {!show && (
             <li className="nav-item dropdown">
               <Nav.Link
-                className="nav-link dropdown-toggle"
+                className={`nav-link dropdown-toggle ${classes.nav_link}`}
                 data-bs-toggle="dropdown"
                 href="#"
                 role="button"
@@ -297,7 +298,7 @@ const MainNav = ({ scrollTop }) => {
             <input
               placeholder="Search"
               className={`form-control ${
-                !show ? classes.form_control : classes.form_control2
+                !show ? classes.form_control_nav : classes.form_control2
               }`}
               onFocus={() => setShow(true)}
               onBlur={() => setShow(false)}
