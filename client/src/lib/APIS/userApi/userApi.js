@@ -7,7 +7,7 @@ export const userApi = createApi({
   endpoints: (builder) => ({
     getCurrentUser: builder.mutation({
       query: () => ({
-        url: "user/me",
+        url: "/user/me",
         method: "GET",
         credentials: "include",
       }),
@@ -21,14 +21,14 @@ export const userApi = createApi({
 
     getUserProfile: builder.mutation({
       query: (username) => ({
-        url: `user/${username}`,
+        url: `/user/${username}`,
         method: "GET",
       }),
     }),
 
     getUserProfileById: builder.mutation({
       query: (userId) => ({
-        url: `user/profile/${userId}`,
+        url: `/user/profile/${userId}`,
         method: "GET",
       }),
     }),

@@ -7,7 +7,7 @@ export const authApi = createApi({
   endpoints: (builder) => ({
     loginUser: builder.mutation({
       query: (payload) => ({
-        url: "auth/login",
+        url: "/auth/login",
         method: "POST",
         body: payload,
         credentials: "include",
@@ -22,7 +22,7 @@ export const authApi = createApi({
 
     logoutUser: builder.mutation({
       query: () => ({
-        url: "auth/logout",
+        url: "/auth/logout",
         method: "GET",
         credentials: "include",
       }),
@@ -36,7 +36,7 @@ export const authApi = createApi({
 
     registerUser: builder.mutation({
       query: (payload) => ({
-        url: "user/create-user",
+        url: "/user/create-user",
         method: "POST",
         body: payload,
       }),
@@ -44,7 +44,7 @@ export const authApi = createApi({
 
     verifyUser: builder.mutation({
       query: (payload) => ({
-        url: "user/verify-user",
+        url: "/user/verify-user",
         method: "POST",
         body: payload,
       }),
@@ -52,7 +52,7 @@ export const authApi = createApi({
 
     setNewPassword: builder.mutation({
       query: (payload) => ({
-        url: "auth/set-password",
+        url: "/auth/set-password",
         method: "POST",
         body: payload,
       }),
@@ -60,7 +60,7 @@ export const authApi = createApi({
 
     requestPasswordReset: builder.mutation({
       query: (payload) => ({
-        url: "auth/request-password-reset",
+        url: "/auth/request-password-reset",
         method: "POST",
         body: payload,
       }),
@@ -68,7 +68,7 @@ export const authApi = createApi({
 
     verifyPasswordResetToken: builder.mutation({
       query: (payload) => ({
-        url: "auth/verify-password-reset-token",
+        url: "/auth/verify-password-reset-token",
         method: "POST",
         body: payload,
       }),
