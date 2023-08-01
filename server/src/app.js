@@ -8,7 +8,7 @@ const apiV1 = require("./routes/apiV1");
 const GlobalErrorHandler = require("./lib/errorInstances/GlobalErrorHandler");
 const app = express();
 
-const allowedOrigins = ["http://localhost:3000"];
+const allowedOrigins = ["http://localhost:3000", "https://utivablog-project-server.onrender.com"];
 const expressOptions = {
   urlencodExtended: true,
   requestSizeLimit: "20mb",
