@@ -10,11 +10,10 @@ import classes from "./MainNav.module.css";
 
 const MainNav = ({ scrollTop }) => {
   const [show, setShow] = useState(false);
-  const [getCurrentUser] = useGetCurrentUserMutation();
+  const [getCurrentUser, {data}] = useGetCurrentUserMutation();
   const [logoutUser] = useLogoutUserMutation();
 
   const { user } = useSelector((state) => state.userState);
-
   const params = useParams();
 
   const { username } = params;
