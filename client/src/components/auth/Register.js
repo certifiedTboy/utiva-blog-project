@@ -133,7 +133,7 @@ const Register = () => {
               style={{ width: "100%" }}
               className={isLoading ? "disabled" : ""}>
               <span style={{ fontWeight: "700" }}>
-                {!isLoading ? "Login" : "Please wait..."}
+                {!isLoading ? "Create Acount" : "Please wait..."}
               </span>
               <lord-icon
                 src="https://cdn.lordicon.com/jxwksgwv.json"
