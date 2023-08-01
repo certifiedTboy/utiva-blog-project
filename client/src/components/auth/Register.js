@@ -135,15 +135,28 @@ const Register = () => {
               <span style={{ fontWeight: "700" }}>
                 {!isLoading ? "Create Acount" : "Please wait..."}
               </span>
-              <lord-icon
-                src="https://cdn.lordicon.com/jxwksgwv.json"
-                trigger="hover"
-                colors="primary:#121331"
-                style={{
-                  width: "30px",
-                  height: "30px",
-                  marginBottom: "-10px",
-                }}></lord-icon>
+              {!isLoading && !isError && (
+                <lord-icon
+                  src="https://cdn.lordicon.com/jxwksgwv.json"
+                  trigger="hover"
+                  colors="primary:#121331"
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                    marginBottom: "-10px",
+                  }}></lord-icon>
+              )}
+              {isError && (
+                <lord-icon
+                  src="https://cdn.lordicon.com/vacmyjrh.json"
+                  trigger="hover"
+                  colors="primary:#121331"
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                    marginBottom: "-10px",
+                  }}></lord-icon>
+              )}
             </Button>
           </Form>{" "}
           <div className="mt-3">
