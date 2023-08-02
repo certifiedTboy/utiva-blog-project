@@ -86,7 +86,7 @@ const SingleBlog = () => {
       );
     }
   }, [isSuccess, user?.data]);
-  console.log(data?.data);
+
   const followUserHandler = async () => {
     const followData = { otherUserId: userNameData.otherUserId };
     await followUser(followData);
