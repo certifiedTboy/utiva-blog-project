@@ -86,7 +86,7 @@ const SingleBlog = () => {
       );
     }
   }, [isSuccess, user?.data]);
-
+  console.log(data?.data);
   const followUserHandler = async () => {
     const followData = { otherUserId: userNameData.otherUserId };
     await followUser(followData);
@@ -185,10 +185,11 @@ const SingleBlog = () => {
                           {" "}
                           <div className="comment-text-body">
                             <h4>
-                              {comment.user.firstName} {comment.user.lastName}
+                              {comment?.user?.firstName}{" "}
+                              {comment?.user?.lastName}
                               <span className="comment-date">
                                 <Moment className="meta-own" fromNow>
-                                  {comment.createdAt}
+                                  {comment?.createdAt}
                                 </Moment>
                               </span>{" "}
                             </h4>
