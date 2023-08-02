@@ -1,9 +1,12 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { userApi } from "../userApi/userApi";
 import { logout } from "../userApi/redux/UserSlice";
+
 export const authApi = createApi({
   reducerPath: "authApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "https://utivablog-project-server.onrender.com/api/v1/" }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: "https://utivablog-project-server.onrender.com/api/v1/",
+  }),
   endpoints: (builder) => ({
     loginUser: builder.mutation({
       query: (payload) => ({

@@ -3,7 +3,9 @@ import { setBlog } from "./redux/BlogSlice";
 
 export const blogApi = createApi({
   reducerPath: "blogApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "https://utivablog-project-server.onrender.com/api/v1/" }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: "https://utivablog-project-server.onrender.com/api/v1/",
+  }),
   endpoints: (builder) => ({
     getAllBlogs: builder.mutation({
       query: (pageNum) => ({
@@ -91,6 +93,14 @@ export const blogApi = createApi({
         credentials: "include",
       }),
     }),
+    commentToBlog: builder.mutation({
+      query: ({ commentData, blogId }) => ({
+        url: `/blogs/add-comment/${blogId}`,
+        method: "POST",
+        body: commentData,
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -104,4 +114,5 @@ export const {
   usePublishBlogMutation,
   useUpdatedBlogMutation,
   useDeleteBlogMutation,
+  useCommentToBlogMutation,
 } = blogApi;

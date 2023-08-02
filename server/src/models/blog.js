@@ -30,8 +30,9 @@ const blogSchema = new Schema(
     ],
     comments: [
       {
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        user: { userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, firstName: String, lastName: String},
         text: String,
+        createdAt: {type:Date, default: Date.now()}
       },
     ],
     totalRead: {

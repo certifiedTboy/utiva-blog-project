@@ -1,10 +1,16 @@
 const { checkBlogExistById } = require("./blogServices");
+const { checkThatUserExistById } = require("./userServices");
 
 const addCommentsToBlog = async (blogId, userId, text) => {
   const blog = await checkBlogExistById(blogId);
+  const user = await checkThatUserExistById(userId);
   const commentData = {
     text,
-    userId,
+    user: {
+      userId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    },
   };
   if (blog) {
     blog.comments.push(commentData);
@@ -15,6 +21,7 @@ const addCommentsToBlog = async (blogId, userId, text) => {
 
 const updateBlogComment = async (blogId, commentId, text) => {
   const blog = await checkBlogExistById(blogId);
+
   if (blog) {
     const commentToUpdate = blog.comments.find(
       (comment) => comment._id.toString() === commentId

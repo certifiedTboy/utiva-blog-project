@@ -66,6 +66,7 @@ router.post(
   Authenticate,
   commentToBlog
 );
+
 router.put(
   "/edit-comment/:blogId/:commentId",
   checkCommentDataValidity,

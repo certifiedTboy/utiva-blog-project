@@ -38,6 +38,8 @@ const checkCommentDataValidity = async (req, res, next) => {
         "comments should not be longer than 1000 characters"
       );
     }
+
+    next()
   } catch (error) {
     next(error);
   }
