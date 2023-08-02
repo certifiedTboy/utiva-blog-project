@@ -15,6 +15,7 @@ const {
   addCommentsToBlog,
   updateBlogComment,
   deleteBlogComment,
+  blogComments,
 } = require("../services/commentServices");
 const ResponseHandler = require("../lib/generalResponse/ResponseHandler");
 
@@ -202,6 +203,20 @@ const deleteComment = async (req, res, next) => {
     next(error);
   }
 };
+
+const getBlogComments = async (req, res, next) => {
+  try {
+    const { blogId } = req.params;
+
+    const comments = await blogComments(blogId);
+
+    if (comments) {
+      ResponseHandler.ok(res, comments, "success");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   createBlog,
   getAllBlogs,
@@ -216,4 +231,5 @@ module.exports = {
   getAllPublishedBlogs,
   getBlogsByAUser,
   getBlogById,
+  getBlogComments,
 };

@@ -101,6 +101,13 @@ export const blogApi = createApi({
         credentials: "include",
       }),
     }),
+
+    getBlogComments: builder.mutation({
+      query: (blogId) => ({
+        url: `/blogs/blog/comments/${blogId}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -115,4 +122,5 @@ export const {
   useUpdatedBlogMutation,
   useDeleteBlogMutation,
   useCommentToBlogMutation,
+  useGetBlogCommentsMutation,
 } = blogApi;

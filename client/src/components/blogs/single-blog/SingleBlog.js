@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import {
   useGetBlogByTitleMutation,
   useCommentToBlogMutation,
+  useGetBlogCommentsMutation,
 } from "../../../lib/APIS/blogApis/BlogApi";
 import {
   useGetUserProfileByIdMutation,
@@ -38,6 +39,8 @@ const SingleBlog = () => {
   const [commentToBlog, { isSuccess: commentSuccess, isError: commentError }] =
     useCommentToBlogMutation();
 
+  const [getBlogComments, { data: comments }] = useGetBlogCommentsMutation();
+
   const { user: currentUser } = useSelector((state) => state.userState);
 
   const params = useParams();
@@ -54,8 +57,7 @@ const SingleBlog = () => {
     };
 
     onGetBlogByTitle();
-    setText("");
-  }, [blogTitle, commentSuccess, commentError]);
+  }, [blogTitle]);
 
   useEffect(() => {
     const onGetUserUsername = async () => {
@@ -91,6 +93,16 @@ const SingleBlog = () => {
     const followData = { otherUserId: userNameData.otherUserId };
     await followUser(followData);
   };
+
+  useEffect(() => {
+    const onGetBlogComments = async () => {
+      await getBlogComments(data?.data?._id);
+    };
+    if (data?.data) {
+      onGetBlogComments();
+    }
+    setText("");
+  }, [blogTitle, data?.data, commentSuccess]);
 
   const onCommentToBlog = async (event) => {
     event.preventDefault();
@@ -174,12 +186,12 @@ const SingleBlog = () => {
               <div className="comments-list-wrap">
                 {data?.data && (
                   <h3 className="comment-count-title">
-                    {data?.data?.comments.length} Comments
+                    {comments?.data?.length} Comments
                   </h3>
                 )}
                 <div className="comment-list">
-                  {data?.data &&
-                    data?.data?.comments.map((comment) => {
+                  {comments?.data &&
+                    comments?.data?.map((comment) => {
                       return (
                         <div className="single-comment-body" key={comment._id}>
                           {" "}

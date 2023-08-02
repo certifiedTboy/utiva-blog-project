@@ -13,6 +13,7 @@ const {
   commentToBlog,
   editComment,
   deleteComment,
+  getBlogComments,
 } = require("../controllers/blogController");
 const Authenticate = require("../middlewares/authorization/Authenticate");
 const {
@@ -78,5 +79,7 @@ router.delete(
   Authenticate,
   deleteComment
 );
+
+router.get("/blog/comments/:blogId", getBlogComments);
 
 module.exports = router;
