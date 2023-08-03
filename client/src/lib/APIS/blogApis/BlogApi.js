@@ -4,12 +4,12 @@ import { setBlog } from "./redux/BlogSlice";
 export const blogApi = createApi({
   reducerPath: "blogApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:8000/api/v1/",
+    baseUrl: "https://utivablog-project-server.onrender.com/api/v1/",
   }),
   endpoints: (builder) => ({
     getAllBlogs: builder.mutation({
       query: (pageNum) => ({
-        url: `blogs/published-blogs?page=${pageNum}&limit=3`,
+        url: `blogs/published-blogs?page=${pageNum}&limit=2`,
         method: "GET",
       }),
     }),

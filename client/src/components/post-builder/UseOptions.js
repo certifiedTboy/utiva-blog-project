@@ -1,26 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { useGetAllBlogsMutation } from "../../lib/APIS/blogApis/BlogApi";
 
-const UseOptions = (pageNumber) => {
+const UseOptions = () => {
   const [blogs, setBlogs] = useState([]);
   const [getAllBlogs, { isSuccess, data }] = useGetAllBlogsMutation();
 
   useEffect(() => {
     const onGetAllBlogs = async () => {
+      console.log("i run");
       await getAllBlogs();
     };
 
-    onGetAllBlogs();
+    const timer = setTimeout(() => {
+      onGetAllBlogs();
+    }, 1000);
+    return () => {
+      clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {
-    console.log(data);
     if (isSuccess) {
       const blogData = data?.data?.map((blog) => {
         let newBlogData = {
           text: blog.title,
           value: blog.title,
-          url: `http://localhost:3000/blogs/${blog._id}`,
+          url: `https://utivablog-project-server.onrender.com/api/v1/blogs/${blog._id}`,
         };
 
         return newBlogData;

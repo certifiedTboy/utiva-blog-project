@@ -17,8 +17,7 @@ const AllBlogs = () => {
     // onscroll even observer
     // checks if current value of scroll up event + client height is greater than scrollHeight
 
-    (event) => {
-      event.preventDefault();
+    () => {
       const scrollTop = document.documentElement.scrollTop;
       const scrollHeight = document.documentElement.scrollHeight;
       const clientHeight = document.documentElement.clientHeight;
