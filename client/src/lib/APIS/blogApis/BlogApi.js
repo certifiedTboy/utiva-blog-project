@@ -9,7 +9,7 @@ export const blogApi = createApi({
   endpoints: (builder) => ({
     getAllBlogs: builder.mutation({
       query: (pageNum) => ({
-        url: `blogs/published-blogs?page=${pageNum}&limit=2`,
+        url: `blogs/published-blogs?page=${pageNum}&limit=5`,
         method: "GET",
       }),
     }),
