@@ -13,9 +13,9 @@ const MainNav = ({ scrollTop }) => {
   const [getCurrentUser, { data }] = useGetCurrentUserMutation();
   const [logoutUser] = useLogoutUserMutation();
 
-  const BASE_URL = "http://localhost:8000";
+  const BASE_URL = "https://utivablog-project-server.onrender.com";
 
-  // https://utivablog-project-server.onrender.com
+  // "http://localhost:8000"
 
   const { user } = useSelector((state) => state.userState);
   const params = useParams();

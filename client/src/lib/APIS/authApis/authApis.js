@@ -5,8 +5,9 @@ import { logout } from "../userApi/redux/UserSlice";
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:8000/api/v1/",
-    // "https://utivablog-project-server.onrender.com/api/v1/",
+    baseUrl: "https://utivablog-project-server.onrender.com/api/v1/",
+
+    // "http://localhost:8000/api/v1/"
   }),
   endpoints: (builder) => ({
     loginUser: builder.mutation({
