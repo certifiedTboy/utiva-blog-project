@@ -1,6 +1,7 @@
 const {
   checkThatUserIsVerified,
   checkUserForNewPassword,
+  checkThatUserAlreadyExist,
 } = require("./userServices");
 const {
   hashPassword,
@@ -13,7 +14,9 @@ const {
   deleteSessionByUserId,
 } = require("./sessionServices");
 const UnprocessableError = require("../lib/errorInstances/UnprocessableError");
+const verifyGoogleToken = require("../helpers/JWT/googleJwt");
 const { sendPasswordResetUrl } = require("./emailServices");
+const User = require("../models/user");
 
 const updateUserPassword = async (email, password) => {
   const user = await checkUserForNewPassword(email);
@@ -51,7 +54,7 @@ const updateUserPassword = async (email, password) => {
 const loginUser = async (email, password, ipAddress) => {
   const user = await checkThatUserIsVerified(email);
   if (user) {
-    await verifyPassword(password, user.password);
+    verifyPassword(password, user.password);
 
     const userSession = await createOrUpdatePlatformSession(
       user._id.toString(),
@@ -69,8 +72,61 @@ const loginUser = async (email, password, ipAddress) => {
   }
 };
 
+const authenticateWithGoogle = async (token, ipAddress) => {
+  const decodedToken = decodeURIComponent(token);
+  const { firstName, lastName, email, profilePicture } =
+    await verifyGoogleToken(decodedToken);
+
+  if (firstName || lastName) {
+    const user = await checkThatUserAlreadyExist(email);
+
+    if (user) {
+      const userSession = await createOrUpdatePlatformSession(
+        user._id.toString(),
+        ipAddress
+      );
+      const userData = {
+        username: user.username,
+        userType: user.userType,
+      };
+      if (userSession) {
+        return { userData, userSession };
+      }
+    }
+
+    const uniqueSuffix = Math.round(Math.random() * 1e9);
+
+    const userData = {
+      firstName,
+      lastName,
+      email,
+      profilePicture,
+      username: email.split("@")[0] + "-" + uniqueSuffix,
+      isVerified: true,
+    };
+
+    const newUser = new User(userData);
+    await newUser.save();
+
+    if (newUser) {
+      const userSession = await createOrUpdatePlatformSession(
+        newUser._id.toString(),
+        ipAddress
+      );
+      const userData = {
+        username: newUser.username,
+        userType: newUser.userType,
+      };
+
+      if (userSession) {
+        return { userData, userSession };
+      }
+    }
+  }
+};
+
 const logoutUser = async (refreshToken) => {
-  const authPayload = await verifyToken(refreshToken);
+  const authPayload = verifyToken(refreshToken);
   return await deleteSessionByUserId(authPayload?.id);
 };
 
@@ -103,4 +159,5 @@ module.exports = {
   loginUser,
   requestPasswordReset,
   logoutUser,
+  authenticateWithGoogle,
 };

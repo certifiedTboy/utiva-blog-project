@@ -1,12 +1,12 @@
 const dotenv = require("dotenv");
 
 dotenv.config();
- 
+
 const { env } = process;
 
 const envVariable = {
   PORT: env.PORT,
-  MONGO_URL: env.MONGO_URL,
+  MONGO_URL: env.MONGO_URL || "mongodb://127.0.0.1:27017/utivablog",
   SMTP_HOST: env.SMTP_HOST,
   SMTP_USER: env.SMTP_USER,
   SMTP_PASSWORD: env.SMTP_PASSWORD,

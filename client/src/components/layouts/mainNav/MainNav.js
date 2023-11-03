@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Nav } from "react-bootstrap";
 import { NavLink, useParams } from "react-router-dom";
-import { Link } from "react-scroll";
 import { useSelector } from "react-redux";
 import webdevLogo from "../../../Assets/webdev_logo.jpg";
 import { useGetCurrentUserMutation } from "../../../lib/APIS/userApi/userApi";
@@ -10,8 +9,13 @@ import classes from "./MainNav.module.css";
 
 const MainNav = ({ scrollTop }) => {
   const [show, setShow] = useState(false);
-  const [getCurrentUser, {data}] = useGetCurrentUserMutation();
+  const [userImage, setUserImage] = useState("");
+  const [getCurrentUser, { data }] = useGetCurrentUserMutation();
   const [logoutUser] = useLogoutUserMutation();
+
+  const BASE_URL = "http://localhost:8000";
+
+  // https://utivablog-project-server.onrender.com
 
   const { user } = useSelector((state) => state.userState);
   const params = useParams();
@@ -25,6 +29,16 @@ const MainNav = ({ scrollTop }) => {
     getCurrentUserData();
   }, [username, getCurrentUser]);
 
+  useEffect(() => {
+    if (
+      user?.data?.profilePicture.split(":")[0] === "https" ||
+      user?.data?.profilePicture.split(":")[0] === "http"
+    ) {
+      return setUserImage(user?.data?.profilePicture);
+    } else {
+      return setUserImage(`${BASE_URL}/${user?.data?.profilePicture}`);
+    }
+  }, [user?.data]);
   const onLogoutUser = () => {
     logoutUser();
   };
@@ -35,7 +49,8 @@ const MainNav = ({ scrollTop }) => {
         // id="home"
         className={`navbar navbar-expand-md  navbar-light  ${
           scrollTop > 0 ? `nav-sticky` : ""
-        }`}>
+        }`}
+      >
         <div className="container-fluid">
           <a href="/" className={`navbar-brand bra ${classes.mobile_a}`}>
             WebDev Blog
@@ -44,11 +59,12 @@ const MainNav = ({ scrollTop }) => {
             style={{ border: "none" }}
             type="button"
             className="navbar-toggler"
-            data-toggle="collapse">
+            data-toggle="collapse"
+          >
             {user && (
               <img
                 className={classes.mobile_img}
-                src={`https://utivablog-project-server.onrender.com/${user.data.profilePicture}`}
+                src={userImage}
                 alt="profile_picture"
               />
             )}
@@ -64,30 +80,32 @@ const MainNav = ({ scrollTop }) => {
 
           <div
             className="collapse navbar-collapse justify-content-between"
-            id="navbarCollapse">
+            id="navbarCollapse"
+          >
             <div className="navbar-nav ml-auto">
               <NavLink
                 activeClass="active"
                 className={`nav-item nav-link ${classes.mousePoint} active d-none d-sm-none d-md-block`}
-                to="/home">
+                to="/home"
+              >
                 Home
               </NavLink>
 
               <NavLink
                 activeClass="active"
                 className={`nav-item nav-link ${classes.mousePoint} d-none d-sm-none d-md-block`}
-                to="/about">
+                to="/about"
+              >
                 About
               </NavLink>
 
               <NavLink
                 activeClass="active"
                 className={`nav-item nav-link ${classes.mousePoint} d-none d-sm-none d-md-block`}
-                to="/blogs">
+                to="/blogs"
+              >
                 Blogs
               </NavLink>
-
-        
             </div>
             {!user && (
               <li className={`nav-link nav-item d-none d-sm-none d-md-block`}>
@@ -95,7 +113,8 @@ const MainNav = ({ scrollTop }) => {
                   className={`${classes.dropDownLink}`}
                   to="/get-started/sign-in"
                   role="button"
-                  aria-expanded="false">
+                  aria-expanded="false"
+                >
                   Get Started
                 </NavLink>
               </li>
@@ -111,24 +130,24 @@ const MainNav = ({ scrollTop }) => {
 
             {user && (
               <li
-                className={`nav-link nav-item dropdown d-none d-sm-none d-md-block`}>
+                className={`nav-link nav-item dropdown d-none d-sm-none d-md-block`}
+              >
                 <NavLink
                   className={`${classes.dropDownLink} dropdown-toggle`}
                   to="#"
                   role="button"
                   data-bs-toggle="dropdown"
-                  aria-expanded="false">
-                  <img
-                    src={`https://utivablog-project-server.onrender.com/${user.data.profilePicture}`}
-                    alt="profile_picture"
-                  />
+                  aria-expanded="false"
+                >
+                  <img src={`${userImage}`} alt="profile_picture" />
                 </NavLink>
 
                 <ul className="dropdown-menu">
                   <li>
                     <NavLink
                       className="dropdown-item"
-                      to={`/w-d/${user.data.username}`}>
+                      to={`/w-d/${user.data.username}`}
+                    >
                       Profile
                     </NavLink>
                   </li>
@@ -151,18 +170,24 @@ const MainNav = ({ scrollTop }) => {
           marginTop: "70px",
           background: "#07212e",
           paddingTop: "5px",
-        }}>
+        }}
+      >
         <ul className="nav nav-tabs nav-fill">
           {!show && (
             <li className="nav-item">
-              <NavLink className={`nav-link ${classes.nav_link}`} aria-current="page" to="/home">
+              <NavLink
+                className={`nav-link ${classes.nav_link}`}
+                aria-current="page"
+                to="/home"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="26"
                   height="26"
                   fill="#F28123"
                   class="bi bi-house-heart-fill"
-                  viewBox="0 0 16 16">
+                  viewBox="0 0 16 16"
+                >
                   <path d="M7.293 1.5a1 1 0 0 1 1.414 0L11 3.793V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v3.293l2.354 2.353a.5.5 0 0 1-.708.707L8 2.207 1.354 8.853a.5.5 0 1 1-.708-.707L7.293 1.5Z" />
                   <path d="m14 9.293-6-6-6 6V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V9.293Zm-6-.811c1.664-1.673 5.825 1.254 0 5.018-5.825-3.764-1.664-6.691 0-5.018Z" />
                 </svg>
@@ -179,7 +204,8 @@ const MainNav = ({ scrollTop }) => {
                   height="26"
                   fill="#F28123"
                   class="bi bi-info-square-fill"
-                  viewBox="0 0 16 16">
+                  viewBox="0 0 16 16"
+                >
                   <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm8.93 4.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
                 </svg>
               </NavLink>
@@ -195,14 +221,14 @@ const MainNav = ({ scrollTop }) => {
                   height="26"
                   fill="#F28123"
                   className="bi bi-rss-fill"
-                  viewBox="0 0 16 16">
+                  viewBox="0 0 16 16"
+                >
                   <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm1.5 2.5c5.523 0 10 4.477 10 10a1 1 0 1 1-2 0 8 8 0 0 0-8-8 1 1 0 0 1 0-2zm0 4a6 6 0 0 1 6 6 1 1 0 1 1-2 0 4 4 0 0 0-4-4 1 1 0 0 1 0-2zm.5 7a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
                 </svg>
               </NavLink>
             </li>
           )}
 
-          
           {!show && (
             <li className="nav-item dropdown">
               <Nav.Link
@@ -210,7 +236,8 @@ const MainNav = ({ scrollTop }) => {
                 data-bs-toggle="dropdown"
                 href="#"
                 role="button"
-                aria-expanded="false">
+                aria-expanded="false"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="26"
@@ -218,7 +245,8 @@ const MainNav = ({ scrollTop }) => {
                   s
                   fill="#F28123"
                   className="bi bi-person-bounding-box"
-                  viewBox="0 0 16 16">
+                  viewBox="0 0 16 16"
+                >
                   <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5z" />
                   <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
                 </svg>
@@ -228,7 +256,8 @@ const MainNav = ({ scrollTop }) => {
                   <li>
                     <NavLink
                       className="dropdown-item"
-                      to="/get-started/sign-in">
+                      to="/get-started/sign-in"
+                    >
                       Login
                     </NavLink>
                   </li>
@@ -239,7 +268,8 @@ const MainNav = ({ scrollTop }) => {
                   <li>
                     <NavLink
                       className="dropdown-item"
-                      to={`/w-d/${user.data.username}`}>
+                      to={`/w-d/${user.data.username}`}
+                    >
                       Profile
                     </NavLink>
                   </li>

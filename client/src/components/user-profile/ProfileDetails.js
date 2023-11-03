@@ -15,8 +15,11 @@ const ProfileDetails = ({ user }) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [showAbout, setShowAbout] = useState(true);
   const [showStory, setShowStory] = useState(false);
+  const [userImage, setUserImage] = useState("");
   const [followUser, { isSuccess }] = useFollowUserMutation();
   const { user: currentUser } = useSelector((state) => state.userState);
+
+  const BASE_URL = "http://localhost:8000";
 
   const onShowModal = (event) => {
     if (!showUpdateModal) {
@@ -46,6 +49,17 @@ const ProfileDetails = ({ user }) => {
   };
 
   useEffect(() => {
+    if (
+      user?.data?.profilePicture.split(":")[0] === "https" ||
+      user?.data?.profilePicture.split(":")[0] === "http"
+    ) {
+      return setUserImage(user?.data?.profilePicture);
+    } else {
+      return setUserImage(`${BASE_URL}/${user?.data?.profilePicture}`);
+    }
+  }, [user?.data]);
+
+  useEffect(() => {
     if (currentUser) {
       setIsFollowing(
         user?.data?.followers.find(
@@ -68,10 +82,11 @@ const ProfileDetails = ({ user }) => {
       <div className={classes.user_story}>
         <div className={classes.move_center}>
           <div
-            className={`${classes.user_details} d-sm-block d-md-none d-lg-none text-center`}>
+            className={`${classes.user_details} d-sm-block d-md-none d-lg-none text-center`}
+          >
             <img
               className={classes.profile_image}
-              src={`https://utivablog-project-server.onrender.com/${user?.data?.profilePicture}`}
+              src={userImage}
               alt="profile_picture"
             />
             {currentUser && currentUser?.data?._id === user?.data?._id && (
@@ -79,14 +94,16 @@ const ProfileDetails = ({ user }) => {
                 <a
                   className={classes.upload_btn2}
                   href="#"
-                  onClick={onShowProfileModal}>
+                  onClick={onShowProfileModal}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="30"
                     height="30"
                     fill="currentColor"
                     className="bi bi-camera-fill"
-                    viewBox="0 0 16 16">
+                    viewBox="0 0 16 16"
+                  >
                     <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
                     <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z" />
                   </svg>
@@ -127,7 +144,8 @@ const ProfileDetails = ({ user }) => {
               <button
                 type="submit"
                 className="btn-success d-inline ml-2"
-                onClick={followUserHandler}>
+                onClick={followUserHandler}
+              >
                 {isFollowing ? "unfollow" : "follow"}
               </button>
             )}
@@ -156,7 +174,8 @@ const ProfileDetails = ({ user }) => {
                   } ${classes.link}`}
                   aria-current="page"
                   to="#"
-                  onClick={navigateProfile}>
+                  onClick={navigateProfile}
+                >
                   About
                 </NavLink>
               </li>
@@ -167,7 +186,8 @@ const ProfileDetails = ({ user }) => {
                   } ${classes.link}`}
                   aria-current="page"
                   to="#"
-                  onClick={navigateProfile}>
+                  onClick={navigateProfile}
+                >
                   Blogs
                 </NavLink>
               </li>
@@ -177,7 +197,8 @@ const ProfileDetails = ({ user }) => {
                     className={`nav-link ${!user ? "disabled" : ""} ${
                       classes.link
                     }`}
-                    to="/blog/create-blog">
+                    to="/blog/create-blog"
+                  >
                     Create Blog
                   </NavLink>
                 </li>

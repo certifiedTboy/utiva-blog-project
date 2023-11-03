@@ -4,7 +4,7 @@ const server = http.createServer(app);
 const envVariable = require("./config/config");
 const mongoConnect = require("./helpers/database/dbConfig");
 
-const { PORT } = envVariable || 8000;
+const PORT = envVariable.PORT || 8000;
 
 const startServer = async () => {
   await mongoConnect();

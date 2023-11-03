@@ -2,13 +2,22 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useLoginUserMutation } from "../../lib/APIS/authApis/authApis";
+import { GoogleLogin } from "@react-oauth/google";
+import {
+  useLoginUserMutation,
+  useLoginUserWithGoogleMutation,
+} from "../../lib/APIS/authApis/authApis";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginUser, { isLoading, isError, error, isSuccess }] =
     useLoginUserMutation();
+
+  const [
+    loginUserWithGoogle,
+    { isError: _isError, error: _error, isSuccess: _isSuccess },
+  ] = useLoginUserWithGoogleMutation();
 
   const { user } = useSelector((state) => state.userState);
 
@@ -35,8 +44,12 @@ const Login = () => {
     await loginUser(loginData);
   };
 
+  const successResponse = async (response) => {
+    await loginUserWithGoogle({ token: response.credential });
+  };
+
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccess || _isSuccess) {
       navigate("/home");
     }
   }, [isSuccess]);
@@ -66,6 +79,11 @@ const Login = () => {
               {error?.data?.message || "Something went wrong"}
             </div>
           )}
+          {_isError && (
+            <div className="alert alert-danger text-center" role="alert">
+              {_error?.data?.message || "Something went wrong"}
+            </div>
+          )}
           <Form onSubmit={onLoginUser}>
             <Form.Group className="mb-3">
               <Form.Control
@@ -87,7 +105,8 @@ const Login = () => {
               type="submit"
               variant="warning"
               style={{ width: "100%" }}
-              className={`${isLoading ? "disabled" : ""}`}>
+              className={`${isLoading ? "disabled" : ""}`}
+            >
               {" "}
               <span style={{ fontWeight: "700" }}>
                 {`${isLoading ? "Please wait ..." : "Login"}`}{" "}
@@ -101,7 +120,8 @@ const Login = () => {
                     width: "30px",
                     height: "30px",
                     marginBottom: "-10px",
-                  }}></lord-icon>
+                  }}
+                ></lord-icon>
               )}
               {isError && (
                 <lord-icon
@@ -112,10 +132,14 @@ const Login = () => {
                     width: "30px",
                     height: "30px",
                     marginBottom: "-10px",
-                  }}></lord-icon>
+                  }}
+                ></lord-icon>
               )}
             </Button>
           </Form>{" "}
+          <div className="mt-3">
+            <GoogleLogin onSuccess={successResponse} />
+          </div>
           <div className="mt-3">
             <p className="d-inline">
               Don't have an account ?{" "}

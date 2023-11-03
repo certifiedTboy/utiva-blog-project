@@ -6,6 +6,7 @@ const {
   userLogout,
   passwordResetRequest,
   verifyPasswordResetData,
+  loginWithGoogle,
 } = require("../controllers/authController");
 const {
   checkPasswordValidity,
@@ -22,6 +23,7 @@ router.post(
   setUserPassword
 );
 router.post("/login", checkEmailValidity, userLogin);
+router.post("/google/login", loginWithGoogle);
 router.get("/logout", userLogout);
 
 router.post(

@@ -5,12 +5,27 @@ import { logout } from "../userApi/redux/UserSlice";
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://utivablog-project-server.onrender.com/api/v1/",
+    baseUrl: "http://localhost:8000/api/v1/",
+    // "https://utivablog-project-server.onrender.com/api/v1/",
   }),
   endpoints: (builder) => ({
     loginUser: builder.mutation({
       query: (payload) => ({
         url: "/auth/login",
+        method: "POST",
+        body: payload,
+        credentials: "include",
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          await dispatch(userApi.endpoints.getCurrentUser.initiate(null));
+        } catch (error) {}
+      },
+    }),
+    loginUserWithGoogle: builder.mutation({
+      query: (payload) => ({
+        url: "/auth/google/login",
         method: "POST",
         body: payload,
         credentials: "include",
@@ -87,4 +102,5 @@ export const {
   useLogoutUserMutation,
   useRequestPasswordResetMutation,
   useVerifyPasswordResetTokenMutation,
+  useLoginUserWithGoogleMutation,
 } = authApi;
