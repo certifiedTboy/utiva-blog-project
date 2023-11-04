@@ -19,9 +19,9 @@ const ProfileDetails = ({ user }) => {
   const [followUser, { isSuccess }] = useFollowUserMutation();
   const { user: currentUser } = useSelector((state) => state.userState);
 
-  // const BASE_URL = "ttps://utivablog-project-server.onrender.com";
+  const BASE_URL = "ttps://utivablog-project-server.onrender.com";
 
-  const BASE_URL = "http://localhost:8000";
+  // const BASE_URL = "http://localhost:8000";
 
   const onShowModal = (event) => {
     if (!showUpdateModal) {
