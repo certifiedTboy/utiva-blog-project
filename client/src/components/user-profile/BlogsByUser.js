@@ -117,7 +117,6 @@ const BlogByUser = ({ userData }) => {
 
       if (!user || user?.data?.username !== username) {
         const publishedBlogs = blogs?.data?.filter((blog) => blog.isPublished);
-        console.log(publishedBlogs);
         setTotalPublishedBlogs(publishedBlogs);
         return setBlogByUser(
           publishedBlogs.slice(indexOfFirstRecord, indexOfLastRecord)
@@ -173,7 +172,8 @@ const BlogByUser = ({ userData }) => {
                           <button
                             value={blog._id}
                             className={`mr-1 ${classes.action_btn}`}
-                            onClick={onGetBlogById}>
+                            onClick={onGetBlogById}
+                          >
                             View
                           </button>
                         )}
@@ -181,7 +181,8 @@ const BlogByUser = ({ userData }) => {
                           <button
                             value={blog._id}
                             className={`mr-1 ${classes.action_btn}`}
-                            onClick={onPublishBlog}>
+                            onClick={onPublishBlog}
+                          >
                             {blog.isPublished ? "Unpublish" : "Publish"}
                           </button>
                         )}
@@ -189,14 +190,16 @@ const BlogByUser = ({ userData }) => {
                         {showEmailInput.btn_value !== blog._id && (
                           <NavLink
                             to={`/blog/edit-blog/${blog._id}`}
-                            className="mr-1">
+                            className="mr-1"
+                          >
                             Edit
                           </NavLink>
                         )}
                         <button
                           value={blog._id}
                           className={`${classes.delete_btn}`}
-                          onClick={confirmDeleteHandler}>
+                          onClick={confirmDeleteHandler}
+                        >
                           {showEmailInput.btn_value === blog._id
                             ? "Cancle"
                             : "Delete"}
@@ -213,7 +216,8 @@ const BlogByUser = ({ userData }) => {
                         <button
                           value={showEmailInput.btn_value}
                           className={`${classes.confirm_btn}`}
-                          onClick={onDeleteBlog}>
+                          onClick={onDeleteBlog}
+                        >
                           Confirm
                         </button>
                       </div>
