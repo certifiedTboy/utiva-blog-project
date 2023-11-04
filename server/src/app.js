@@ -8,7 +8,10 @@ const apiV1 = require("./routes/apiV1");
 const GlobalErrorHandler = require("./lib/errorInstances/GlobalErrorHandler");
 const app = express();
 
-const allowedOrigins = ["http://localhost:3000", "https://utiva-webdev-blog-project.vercel.app/"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://utiva-webdev-blog-project.vercel.app/",
+];
 const expressOptions = {
   urlencodExtended: true,
   requestSizeLimit: "20mb",
@@ -53,8 +56,8 @@ app.use(express.static(path.join(process.cwd(), "public")));
 app.use("/api/v1", apiV1);
 app.use(GlobalErrorHandler);
 
-// app.get("/", (req, res) => {
-//   res.send("server is live");
-// });
+app.get("/", (req, res) => {
+  res.send("server is live");
+});
 
 module.exports = app;

@@ -9,9 +9,9 @@ const OtherData = ({ user }) => {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [userImage, setUserImage] = useState("");
 
-  const BASE_URL = "https://utivablog-project-server.onrender.com";
+  // const BASE_URL = "https://utivablog-project-server.onrender.com";
 
-  // "http://localhost:8000"
+  const BASE_URL = "http://localhost:8000";
 
   const { user: currentUser } = useSelector((state) => state.userState);
 
