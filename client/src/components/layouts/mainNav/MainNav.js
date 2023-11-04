@@ -143,11 +143,16 @@ const MainNav = ({ scrollTop }) => {
                 </NavLink>
 
                 <ul className="dropdown-menu">
-                  <li>
-                    <NavLink className="dropdown-item" to={`/admin/dashboard`}>
-                      Dashboard
-                    </NavLink>
-                  </li>
+                  {user?.data?.userType === "Admin" && (
+                    <li>
+                      <NavLink
+                        className="dropdown-item"
+                        to={`/admin/dashboard`}
+                      >
+                        Dashboard
+                      </NavLink>
+                    </li>
+                  )}
                   <li>
                     <NavLink
                       className="dropdown-item"
@@ -270,11 +275,16 @@ const MainNav = ({ scrollTop }) => {
               )}
               {user && (
                 <ul className="dropdown-menu">
-                  <li>
-                    <NavLink className="dropdown-item" to={`/admin/dashboard`}>
-                      Dashboard
-                    </NavLink>
-                  </li>
+                  {user?.data?.userType === "Admin" && (
+                    <li>
+                      <NavLink
+                        className="dropdown-item"
+                        to={`/admin/dashboard`}
+                      >
+                        Dashboard
+                      </NavLink>
+                    </li>
+                  )}
                   <li>
                     <NavLink
                       className="dropdown-item"
