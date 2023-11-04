@@ -2,6 +2,7 @@ const {
   checkThatUserIsVerified,
   checkUserForNewPassword,
   checkThatUserAlreadyExist,
+  updateUserProfileImage,
 } = require("./userServices");
 const {
   hashPassword,
@@ -85,6 +86,7 @@ const authenticateWithGoogle = async (token, ipAddress) => {
         user._id.toString(),
         ipAddress
       );
+      await updateUserProfileImage(user._id, profilePicture);
       const userData = {
         username: user.username,
         userType: user.userType,

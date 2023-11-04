@@ -19,9 +19,9 @@ const ProfileDetails = ({ user }) => {
   const [followUser, { isSuccess }] = useFollowUserMutation();
   const { user: currentUser } = useSelector((state) => state.userState);
 
-  const BASE_URL = "ttps://utivablog-project-server.onrender.com";
+  // const BASE_URL = "ttps://utivablog-project-server.onrender.com";
 
-  // "http://localhost:8000";
+  const BASE_URL = "http://localhost:8000";
 
   const onShowModal = (event) => {
     if (!showUpdateModal) {
@@ -181,30 +181,38 @@ const ProfileDetails = ({ user }) => {
                   About
                 </NavLink>
               </li>
-              <li className="nav-item" style={{ textAlign: "left" }}>
-                <NavLink
-                  className={`nav-link ${classes.nav_link2} ${
-                    showStory ? "disabled" : ""
-                  } ${classes.link}`}
-                  aria-current="page"
-                  to="#"
-                  onClick={navigateProfile}
-                >
-                  Blogs
-                </NavLink>
-              </li>
-              {currentUser && user?.data?._id === currentUser?.data?._id && (
-                <li class="nav-item" style={{ textAlign: "left" }}>
-                  <NavLink
-                    className={`nav-link ${!user ? "disabled" : ""} ${
-                      classes.link
-                    }`}
-                    to="/blog/create-blog"
-                  >
-                    Create Blog
-                  </NavLink>
-                </li>
-              )}
+
+              {currentUser &&
+                currentUser.userType === "Admin" &&
+                user?.data?._id === currentUser?.data?._id && (
+                  <li className="nav-item" style={{ textAlign: "left" }}>
+                    <NavLink
+                      className={`nav-link ${classes.nav_link2} ${
+                        showStory ? "disabled" : ""
+                      } ${classes.link}`}
+                      aria-current="page"
+                      to="#"
+                      onClick={navigateProfile}
+                    >
+                      Blogs
+                    </NavLink>
+                  </li>
+                )}
+
+              {currentUser &&
+                currentUser.userType === "Admin" &&
+                user?.data?._id === currentUser?.data?._id && (
+                  <li class="nav-item" style={{ textAlign: "left" }}>
+                    <NavLink
+                      className={`nav-link ${!user ? "disabled" : ""} ${
+                        classes.link
+                      }`}
+                      to="/blog/create-blog"
+                    >
+                      Create Blog
+                    </NavLink>
+                  </li>
+                )}
             </ul>
           </div>
           {showAbout && user && <About user={user} />}
