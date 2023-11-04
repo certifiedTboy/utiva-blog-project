@@ -10,6 +10,13 @@ const hashPassword = (plainTextPasword) => {
 };
 
 const verifyPassword = (plainTextPasword, hashedPassword) => {
+  if (!hashedPassword) {
+    if ("" !== "") {
+      throw new UnauthenticatedError("Incorrect login credentials");
+    }
+
+    return;
+  }
   if (!bcrypt.compareSync(plainTextPasword, hashedPassword)) {
     throw new UnauthenticatedError("Incorrect login credentials");
   }
