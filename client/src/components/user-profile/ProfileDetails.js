@@ -200,7 +200,7 @@ const ProfileDetails = ({ user }) => {
                 )}
 
               {currentUser &&
-                currentUser.userType === "Admin" &&
+                currentUser?.data?.userType === "Admin" &&
                 user?.data?._id === currentUser?.data?._id && (
                   <li class="nav-item" style={{ textAlign: "left" }}>
                     <NavLink

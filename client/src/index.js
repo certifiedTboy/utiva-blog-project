@@ -10,6 +10,8 @@ import { store } from "./store/store";
 import reportWebVitals from "./reportWebVitals";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+// "124943341739-dqiq38k57kmpou8hrq0fbf654cp3r800.apps.googleusercontent.com"
+
 root.render(
   <GoogleOAuthProvider clientId="124943341739-dqiq38k57kmpou8hrq0fbf654cp3r800.apps.googleusercontent.com">
     <Provider store={store}>

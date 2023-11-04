@@ -1,0 +1,32 @@
+/* Side Nav */
+  .main_header {
+    background-color: rgb(39, 39, 83);
+    padding-bottom: 50px;
+    padding-top: 50px;
+  }
+
+  .inner_header {
+   background: none; 
+   border: none; 
+   line-height: 50px
+  }
+
+  .sidenav_list {
+        background: none;
+        color: rgb(213, 210, 241);
+        border: none;
+  }
+
+  .active{
+    color: white !important;
+}
+
+.sidenav_icon {
+    margin-right: 10px; 
+    font-size: 20px
+}
+
+.sidenav_link {
+   text-decoration: none;
+    color: inherit
+}

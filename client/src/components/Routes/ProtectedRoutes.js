@@ -2,11 +2,8 @@ import React from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 
 export const ProtectedRoutes = ({ user, children }) => {
-  if (!user) {
+  if (user?.data?.userType !== "Admin") {
     return <Navigate to="/get-started/sign-in" replace />;
-  }
-  if (user.userType !== "Admin") {
-    return <Navigate to="/home" replace />;
   }
 
   return children;
@@ -18,7 +15,7 @@ export const AdminProtectedRoutes = ({ user, children }) => {
     return <Navigate to="/get-started/sign-in" replace />;
   }
 
-  if (user.userType !== "Admin") {
+  if (user?.data?.userType !== "Admin") {
     return navigate(-1);
   }
 

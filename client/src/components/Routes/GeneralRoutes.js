@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { ProtectedRoutes } from "./ProtectedRoutes";
+import { ProtectedRoutes, AdminProtectedRoutes } from "./ProtectedRoutes";
 import HomePage from "../../pages/HomePage";
 import AboutPage from "../../pages/AboutPage";
 import ErrorPage from "../../pages/ErrorPage";
@@ -15,6 +15,7 @@ import SetPassword from "../auth/SetPassword";
 import RequestResetPassword from "../auth/RequestResetPassword";
 import SetNewRequestPassword from "../auth/SetNewRequestPassword";
 import PostBuilderPage from "../../pages/PostBuilderPage";
+import AdminPage from "../../pages/AdminPage";
 
 const GeneralRoutes = () => {
   const { user } = useSelector((state) => state.userState);
@@ -37,12 +38,10 @@ const GeneralRoutes = () => {
           element={<SetNewRequestPassword />}
         />
       </Route>
-
       <Route path="/about" element={<AboutPage />} />
       <Route path="/blogs" element={<AllBlogPage />} />
       <Route path="/w-d/:username" element={<ProfilePage />} />
       <Route path="/blogs/:blogTitle" element={<SingleBlogPage />} />
-
       <Route
         path="/blog/create-blog"
         element={
@@ -51,13 +50,20 @@ const GeneralRoutes = () => {
           </ProtectedRoutes>
         }
       />
-
       <Route
         path="/blog/edit-blog/:blogId"
         element={
           <ProtectedRoutes user={user}>
             <PostBuilderPage />{" "}
           </ProtectedRoutes>
+        }
+      />{" "}
+      <Route
+        path="/admin/dashboard"
+        element={
+          <AdminProtectedRoutes user={user}>
+            <AdminPage />{" "}
+          </AdminProtectedRoutes>
         }
       />
     </Routes>

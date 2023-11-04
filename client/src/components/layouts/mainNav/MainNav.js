@@ -15,7 +15,7 @@ const MainNav = ({ scrollTop }) => {
 
   const BASE_URL = "https://utivablog-project-server.onrender.com";
 
-  // "http://localhost:8000"
+  // const BASE_URL = "http://localhost:8000";
 
   const { user } = useSelector((state) => state.userState);
   const params = useParams();
@@ -144,6 +144,11 @@ const MainNav = ({ scrollTop }) => {
 
                 <ul className="dropdown-menu">
                   <li>
+                    <NavLink className="dropdown-item" to={`/admin/dashboard`}>
+                      Dashboard
+                    </NavLink>
+                  </li>
+                  <li>
                     <NavLink
                       className="dropdown-item"
                       to={`/w-d/${user.data.username}`}
@@ -265,6 +270,11 @@ const MainNav = ({ scrollTop }) => {
               )}
               {user && (
                 <ul className="dropdown-menu">
+                  <li>
+                    <NavLink className="dropdown-item" to={`/admin/dashboard`}>
+                      Dashboard
+                    </NavLink>
+                  </li>
                   <li>
                     <NavLink
                       className="dropdown-item"
