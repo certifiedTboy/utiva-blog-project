@@ -49,7 +49,7 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (isSuccess || data.message === "login success") {
+    if (isSuccess || data?.message === "login success") {
       navigate("/home");
     }
   }, [isSuccess, _isSuccess]);
@@ -84,9 +84,9 @@ const Login = () => {
               {_error?.data?.message || "Something went wrong"}
             </div>
           )}
-          {data && (
+          {data?.message && (
             <div className="alert alert-success text-center" role="alert">
-              {data.message}
+              {data?.message}
             </div>
           )}
           <Form onSubmit={onLoginUser}>
