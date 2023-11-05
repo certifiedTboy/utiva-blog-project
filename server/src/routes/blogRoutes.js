@@ -24,12 +24,22 @@ const {
 const {
   checkBlogOwnership,
 } = require("../middlewares/authorization/blogAuthorization");
+const {
+  checkUserIsAdmin,
+} = require("../middlewares/authorization/userAuthorization");
 const router = express.Router();
 
-router.post("/create-blog", checkBlogDataValidity, Authenticate, createBlog);
+router.post(
+  "/create-blog",
+  checkBlogDataValidity,
+  Authenticate,
+  checkUserIsAdmin,
+  createBlog
+);
 router.post(
   "/publish-blog/:blogId",
   Authenticate,
+  checkUserIsAdmin,
   checkBlogOwnership,
   publishBlog
 );
@@ -47,12 +57,14 @@ router.put(
   "/edit-blog/:blogId",
   checkBlogDataValidity,
   Authenticate,
+  checkUserIsAdmin,
   checkBlogOwnership,
   editBlog
 );
 router.delete(
   "/delete-blog/:blogId",
   Authenticate,
+  checkUserIsAdmin,
   checkBlogOwnership,
   deleteBlog
 );

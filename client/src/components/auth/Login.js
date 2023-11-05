@@ -16,7 +16,7 @@ const Login = () => {
 
   const [
     loginUserWithGoogle,
-    { isError: _isError, error: _error, isSuccess: _isSuccess },
+    { isError: _isError, error: _error, isSuccess: _isSuccess, data },
   ] = useLoginUserWithGoogleMutation();
 
   const { user } = useSelector((state) => state.userState);
@@ -49,10 +49,10 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (isSuccess || _isSuccess) {
+    if (isSuccess || data.message === "login success") {
       navigate("/home");
     }
-  }, [isSuccess]);
+  }, [isSuccess, _isSuccess]);
 
   return (
     <Container className="mt-5">
@@ -82,6 +82,11 @@ const Login = () => {
           {_isError && (
             <div className="alert alert-danger text-center" role="alert">
               {_error?.data?.message || "Something went wrong"}
+            </div>
+          )}
+          {data && (
+            <div className="alert alert-success text-center" role="alert">
+              {data.message}
             </div>
           )}
           <Form onSubmit={onLoginUser}>
