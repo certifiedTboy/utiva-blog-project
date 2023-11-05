@@ -21,7 +21,7 @@ export class TodoList extends Component {
         </div>
         <div className="row">
           <div className="col-lg-12">
-            <div className="card px-3">
+            <div className="card-admin px-3">
               <div className="card-body">
                 <h4 className="card-title">Todo List</h4>
                 <TodoListComponent />

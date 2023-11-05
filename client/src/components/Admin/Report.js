@@ -3,7 +3,7 @@ import React from "react";
 const Report = () => {
   return (
     <div className="col-12 grid-margin">
-      <div className="card">
+      <div className="card-admin">
         <div className="card-body">
           <h4 className="card-title">Reports</h4>
           <div className="table-responsive">

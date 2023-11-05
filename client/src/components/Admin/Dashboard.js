@@ -62,7 +62,7 @@ const Dashboard = () => {
     <div>
       <div className="row">
         <div className="col-xl-3 col-sm-6 grid-margin stretch-card">
-          <div className="card">
+          <div className="card-admin">
             <div className="card-body">
               <div className="row">
                 <div className="col-9">
@@ -86,7 +86,7 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="col-xl-3 col-sm-6 grid-margin stretch-card">
-          <div className="card">
+          <div className="card-admin">
             <div className="card-body">
               <div className="row">
                 <div className="col-9">
@@ -108,7 +108,7 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="col-xl-3 col-sm-6 grid-margin stretch-card">
-          <div className="card">
+          <div className="card-admin">
             <div className="card-body">
               <div className="row">
                 <div className="col-9">
@@ -130,7 +130,7 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="col-xl-3 col-sm-6 grid-margin stretch-card">
-          <div className="card">
+          <div className="card-admin">
             <div className="card-body">
               <div className="row">
                 <div className="col-9">
@@ -156,7 +156,7 @@ const Dashboard = () => {
       </div>
       <div className="row">
         <div className="col-md-12 grid-margin stretch-card">
-          <div className="card">
+          <div className="card-admin">
             <div className="card-body">
               <div className="d-flex flex-row justify-content-between">
                 <h4 className="card-title mb-1">All Articles</h4>
@@ -182,7 +182,7 @@ const Dashboard = () => {
       </div>
       <div className="row">
         <div className="col-sm-4 grid-margin">
-          <div className="card">
+          <div className="card-admin">
             <div className="card-body">
               <h5>Link Share</h5>
               <div className="row">
@@ -202,7 +202,7 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="col-sm-4 grid-margin">
-          <div className="card">
+          <div className="card-admin">
             <div className="card-body">
               <h5>Comments</h5>
               <div className="row">
@@ -222,7 +222,7 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="col-sm-4 grid-margin">
-          <div className="card">
+          <div className="card-admin">
             <div className="card-body">
               <h5>Reactions / Impressions</h5>
               <div className="row">
