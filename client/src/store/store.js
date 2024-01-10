@@ -15,6 +15,8 @@ export const store = configureStore({
     blogState: BlogSlice,
   },
 
+  devTools: process.env.NODE_ENV !== "production",
+
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       blogApi.middleware,
