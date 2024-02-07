@@ -65,6 +65,13 @@ const AllBlogs = () => {
     });
   }, [blogs]);
 
+  const noBlobMessage = updatedBlogs.length === 0 && (
+    <div>
+      {" "}
+      <h1>No blog created Yet</h1>
+    </div>
+  );
+
   const blogContent =
     updatedBlogs.length > 0 &&
     updatedBlogs.map((blog) => {
@@ -83,6 +90,7 @@ const AllBlogs = () => {
 
   return (
     <div>
+      {noBlobMessage}
       {blogContent}
       {isLoading && !hasMore && !isError && <LoadingPlaceHolder />}
       {isError && <DataError errorMessage={errorMessage} path={"/blogs"} />}

@@ -183,7 +183,7 @@ const ProfileDetails = ({ user }) => {
               </li>
 
               {currentUser &&
-                currentUser.userType === "Admin" &&
+                currentUser?.data?.userType === "Admin" &&
                 user?.data?._id === currentUser?.data?._id && (
                   <li className="nav-item" style={{ textAlign: "left" }}>
                     <NavLink
