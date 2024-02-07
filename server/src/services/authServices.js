@@ -15,8 +15,12 @@ const {
   deleteSessionByUserId,
 } = require("./sessionServices");
 const UnprocessableError = require("../lib/errorInstances/UnprocessableError");
+const generateVerificationUrl = require("../helpers/url-generator/verificationUrl");
 const verifyGoogleToken = require("../helpers/JWT/googleJwt");
-const { sendPasswordResetUrl } = require("./emailServices");
+const {
+  sendPasswordResetUrl,
+  sendVerificationUrl,
+} = require("./emailServices");
 const User = require("../models/user");
 
 const updateUserPassword = async (email, password) => {
@@ -73,6 +77,59 @@ const loginUser = async (email, password, ipAddress) => {
   }
 };
 
+// const authenticateWithGoogle = async (token, ipAddress) => {
+//   const decodedToken = decodeURIComponent(token);
+//   const { firstName, lastName, email, profilePicture } =
+//     await verifyGoogleToken(decodedToken);
+
+//   if (firstName || lastName) {
+//     const user = await checkThatUserAlreadyExist(email);
+
+//     if (user) {
+//       const userSession = await createOrUpdatePlatformSession(
+//         user._id.toString(),
+//         ipAddress
+//       );
+//       await updateUserProfileImage(user._id, profilePicture);
+//       const userData = {
+//         username: user.username,
+//         userType: user.userType,
+//       };
+//       if (userSession) {
+//         return { userData, userSession };
+//       }
+//     }
+
+//     const uniqueSuffix = Math.round(Math.random() * 1e9);
+
+//     const userData = {
+//       firstName,
+//       lastName,
+//       email,
+//       profilePicture,
+//       username: email.split("@")[0] + "-" + uniqueSuffix,
+//       isVerified: true,
+//     };
+
+//     const newUser = new User(userData);
+//     await newUser.save();
+
+//     if (newUser) {
+//       const userSession = await createOrUpdatePlatformSession(
+//         newUser._id.toString(),
+//         ipAddress
+//       );
+//       const userData = {
+//         username: newUser.username,
+//         userType: newUser.userType,
+//       };
+
+//       if (userSession) {
+//         return { userData, userSession };
+//       }
+//     }
+//   }
+// };
 const authenticateWithGoogle = async (token, ipAddress) => {
   const decodedToken = decodeURIComponent(token);
   const { firstName, lastName, email, profilePicture } =
@@ -86,6 +143,7 @@ const authenticateWithGoogle = async (token, ipAddress) => {
         user._id.toString(),
         ipAddress
       );
+
       await updateUserProfileImage(user._id, profilePicture);
       const userData = {
         username: user.username,
@@ -94,34 +152,35 @@ const authenticateWithGoogle = async (token, ipAddress) => {
       if (userSession) {
         return { userData, userSession };
       }
-    }
+    } else {
+      const uniqueSuffix = Math.round(Math.random() * 1e9);
 
-    const uniqueSuffix = Math.round(Math.random() * 1e9);
-
-    const userData = {
-      firstName,
-      lastName,
-      email,
-      profilePicture,
-      username: email.split("@")[0] + "-" + uniqueSuffix,
-      isVerified: true,
-    };
-
-    const newUser = new User(userData);
-    await newUser.save();
-
-    if (newUser) {
-      const userSession = await createOrUpdatePlatformSession(
-        newUser._id.toString(),
-        ipAddress
-      );
       const userData = {
-        username: newUser.username,
-        userType: newUser.userType,
+        firstName,
+        lastName,
+        email,
+        profilePicture,
+        username: email.split("@")[0] + "-" + uniqueSuffix,
       };
 
-      if (userSession) {
-        return { userData, userSession };
+      const newUser = new User(userData);
+      await newUser.save();
+
+      if (newUser) {
+        const verificationData = await generateVerificationUrl(
+          newUser._id.toString()
+        );
+        if (verificationData) {
+          newUser.verificationToken = verificationData.verificationToken;
+          newUser.verificationTokenExpiresAt = verificationData.expiresAt;
+          await newUser.save();
+          await sendVerificationUrl(
+            newUser?.email,
+            verificationData.verificationUrl
+          );
+
+          return { email: newUser.email };
+        }
       }
     }
   }
