@@ -26,16 +26,19 @@ const Team = () => {
                   <a
                     href="https://web.facebook.com/infiniteIdeas12"
                     target="_blank"
-                    rel="noreferrer">
+                    rel="noreferrer"
+                  >
                     <i className="fab fa-facebook-f"></i>
                   </a>
                 </li>
+
                 <li>
                   <a
-                    href="https://twitter.com/Certified_Tboy1"
+                    href="https://www.tiktok.com/@certifiedtboy"
                     target="_blank"
-                    rel="noreferrer">
-                    <i className="fab fa-twitter"></i>
+                    rel="noreferrer"
+                  >
+                    <i class="fa-brands fa-tiktok"></i>
                   </a>
                 </li>
               </ul>

@@ -1,11 +1,18 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { setBlog } from "./redux/BlogSlice";
 
+let baseUrl;
+
+if (process.env.NODE_ENV === "development") {
+  baseUrl = process.env.REACT_APP_API_DEV_BASE_URL;
+} else {
+  baseUrl = process.env.REACT_APP_API_PROD_BASE_URL;
+}
+
 export const blogApi = createApi({
   reducerPath: "blogApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://utivablog-project-server.onrender.com/api/v1/",
-    // baseUrl: "http://localhost:8000/api/v1/",
+    baseUrl,
   }),
   endpoints: (builder) => ({
     getAllBlogs: builder.mutation({

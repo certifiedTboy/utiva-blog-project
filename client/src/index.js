@@ -11,10 +11,16 @@ import reportWebVitals from "./reportWebVitals";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
-// "124943341739-0kflksgtp9ovj4gqao9fu1h411mp7pdd.apps.googleusercontent.com"
+let GOOGLE_CLIENT_ID;
+
+if (process.env.NODE_ENV === "development") {
+  GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_DEV_OAUTH_CLIENT_ID;
+} else {
+  GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_PROD_OAUTH_CLIENT_ID;
+}
 
 root.render(
-  <GoogleOAuthProvider clientId="124943341739-dqiq38k57kmpou8hrq0fbf654cp3r800.apps.googleusercontent.com">
+  <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     <Provider store={store}>
       <BrowserRouter>
         <App />
