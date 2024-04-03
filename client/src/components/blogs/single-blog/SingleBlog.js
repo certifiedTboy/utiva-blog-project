@@ -76,7 +76,8 @@ const SingleBlog = () => {
         lastName: user?.data?.lastName,
         username: user?.data?.username,
         profilePicture:
-          user?.data?.profilePicture.split(":")[0] === "https"
+          user?.data?.profilePicture.split(":")[0] === "https" ||
+          user?.data?.profilePicture.split(":")[0] === "http"
             ? user?.data?.profilePicture
             : `https://utivablog-project-server.onrender.com/${user?.data?.profilePicture}`,
         otherUserId: user?.data?._id,
@@ -129,7 +130,7 @@ const SingleBlog = () => {
                     <span className="author">
                       <img
                         className="user_image"
-                        src={`https://utivablog-project-server.onrender.com/${userNameData.profilePicture}`}
+                        src={userNameData.profilePicture}
                       />
                       <i className="fas fa-user ml-2"></i>
                       <NavLink to={`/w-d/${userNameData.username}`}>
