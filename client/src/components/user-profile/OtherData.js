@@ -9,9 +9,13 @@ const OtherData = ({ user }) => {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [userImage, setUserImage] = useState("");
 
-  const BASE_URL = "https://utivablog-project-server.onrender.com";
+  let BASE_URL;
 
-  // const BASE_URL = "http://localhost:8000";
+  if (process.env.NODE_ENV === "development") {
+    BASE_URL = process.env.REACT_APP_API_DEV_BASE_URL;
+  } else {
+    BASE_URL = process.env.REACT_APP_API_PROD_BASE_URL;
+  }
 
   const { user: currentUser } = useSelector((state) => state.userState);
 
