@@ -75,7 +75,10 @@ const SingleBlog = () => {
         firstName: user?.data?.firstName,
         lastName: user?.data?.lastName,
         username: user?.data?.username,
-        profilePicture: user?.data?.profilePicture,
+        profilePicture:
+          user?.data?.profilePicture.split(":")[0] === "https"
+            ? user?.data?.profilePicture
+            : `https://utivablog-project-server.onrender.com/${user?.data?.profilePicture}`,
         otherUserId: user?.data?._id,
       });
     }
@@ -166,7 +169,8 @@ const SingleBlog = () => {
                       <button
                         type="submit"
                         className="btn-success d-inline ml-2"
-                        onClick={followUserHandler}>
+                        onClick={followUserHandler}
+                      >
                         {isFollowing ? "unfollow" : "follow"}
                       </button>
                     )}
@@ -226,7 +230,8 @@ const SingleBlog = () => {
                         cols="30"
                         rows="3"
                         placeholder="Your Message"
-                        value={text}></textarea>
+                        value={text}
+                      ></textarea>
                     </p>
                     <p>
                       <input type="submit" value="Submit" />
