@@ -19,20 +19,18 @@ const blogSchema = new Schema(
       default: false,
     },
 
-    user: {
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
-    },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+
     reactions: [
       {
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        reaction: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "reaction",
       },
     ],
     comments: [
       {
-        user: { userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, firstName: String, lastName: String},
-        text: String,
-        createdAt: {type:Date, default: Date.now()}
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "comment",
       },
     ],
     totalRead: {

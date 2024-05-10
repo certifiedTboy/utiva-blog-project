@@ -57,7 +57,7 @@ const OtherData = ({ user }) => {
             src={userImage}
             alt="profile_picture"
           />
-          {currentUser && user?.data?._id === currentUser.data._id && (
+          {currentUser && user?.data?._id === currentUser._id && (
             <div>
               <a
                 className={classes.upload_btn}
@@ -89,7 +89,7 @@ const OtherData = ({ user }) => {
         </div>
 
         <div className="mt-3 mb-5">
-          {currentUser && user?.data?._id === currentUser.data._id && (
+          {currentUser && user?.data?._id === currentUser._id && (
             <a href="#" className={classes.edit_btn} onClick={onShowModal}>
               Edit Profile
             </a>

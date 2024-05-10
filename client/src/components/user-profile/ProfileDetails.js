@@ -68,9 +68,7 @@ const ProfileDetails = ({ user }) => {
   useEffect(() => {
     if (currentUser) {
       setIsFollowing(
-        user?.data?.followers.find(
-          (fData) => fData.userId === currentUser.data._id
-        )
+        user?.data?.followers.find((fData) => fData.userId === currentUser._id)
       );
     }
   }, [currentUser, user, isSuccess]);
@@ -95,7 +93,7 @@ const ProfileDetails = ({ user }) => {
               src={userImage}
               alt="profile_picture"
             />
-            {currentUser && currentUser?.data?._id === user?.data?._id && (
+            {currentUser && currentUser?._id === user?.data?._id && (
               <div>
                 <a
                   className={classes.upload_btn2}
@@ -123,7 +121,7 @@ const ProfileDetails = ({ user }) => {
           <p>{user?.data?.email}</p>
 
           <div className="mb-2 d-lg-none d-md-none d-sm-block">
-            {currentUser && user?.data?._id === currentUser?.data._id && (
+            {currentUser && user?.data?._id === currentUser?._id && (
               <a href="#" className={classes.edit_btn} onClick={onShowModal}>
                 Edit Profile
               </a>
@@ -146,7 +144,7 @@ const ProfileDetails = ({ user }) => {
               </span>
             </button>
 
-            {currentUser && currentUser?.data?._id !== user?.data?._id && (
+            {currentUser && currentUser?._id !== user?.data?._id && (
               <button
                 type="submit"
                 className="btn-success d-inline ml-2"
@@ -187,8 +185,8 @@ const ProfileDetails = ({ user }) => {
               </li>
 
               {currentUser &&
-                currentUser?.data?.userType === "Admin" &&
-                user?.data?._id === currentUser?.data?._id && (
+                currentUser?.userType === "Admin" &&
+                user?.data?._id === currentUser?._id && (
                   <li className="nav-item" style={{ textAlign: "left" }}>
                     <NavLink
                       className={`nav-link ${classes.nav_link2} ${
@@ -204,8 +202,8 @@ const ProfileDetails = ({ user }) => {
                 )}
 
               {currentUser &&
-                currentUser?.data?.userType === "Admin" &&
-                user?.data?._id === currentUser?.data?._id && (
+                currentUser?.userType === "Admin" &&
+                user?.data?._id === currentUser?._id && (
                   <li class="nav-item" style={{ textAlign: "left" }}>
                     <NavLink
                       className={`nav-link ${!user ? "disabled" : ""} ${

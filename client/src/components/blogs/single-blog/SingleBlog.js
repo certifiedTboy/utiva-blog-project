@@ -21,26 +21,15 @@ import Reaction from "./Reaction";
 const SingleBlog = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [text, setText] = useState("");
-  const [userNameData, setUserNameData] = useState({
-    firstName: "",
-    lastName: "",
-    username: "",
-    profilePicture: "",
-    otherUserId: "",
-  });
 
   const [getBlogByTitle, { data, isSuccess: success, isError, error }] =
     useGetBlogByTitleMutation();
 
-  const [getUserById, { data: user, isSuccess }] =
-    useGetUserProfileByIdMutation();
   const [followUser, { isSuccess: followSuccess, data: followData }] =
     useFollowUserMutation();
 
   const [commentToBlog, { isSuccess: commentSuccess, isError: commentError }] =
     useCommentToBlogMutation();
-
-  // const [getBlogComments, { data: comments }] = useGetBlogCommentsMutation();
 
   const { user: currentUser } = useSelector((state) => state.userState);
 
@@ -58,39 +47,18 @@ const SingleBlog = () => {
     };
 
     onGetBlogByTitle();
-  }, [blogTitle]);
+  }, [blogTitle, commentSuccess]);
 
   useEffect(() => {
-    const onGetUserUsername = async () => {
-      if (success) {
-        await getUserById(data?.data?.user.userId);
-      }
-    };
-
-    onGetUserUsername();
-  }, [success, data?.data, followSuccess]);
-
-  useEffect(() => {
-    if (isSuccess) {
-      setUserNameData({
-        firstName: data?.data?.user?.firstName,
-        lastName: data?.data?.user?.lastName,
-        username: data?.data?.user?.username,
-        otherUserId: user?.data?._id,
-      });
-    }
-
     if (currentUser) {
       setIsFollowing(
-        user?.data?.followers.find(
-          (fData) => fData.userId === currentUser.data._id
-        )
+        currentUser?.followers.find((fData) => fData.userId === currentUser._id)
       );
     }
-  }, [isSuccess, user?.data]);
+  }, []);
 
   const followUserHandler = async () => {
-    const followData = { otherUserId: userNameData.otherUserId };
+    const followData = { otherUserId: currentUser._id };
     await followUser(followData);
   };
 
@@ -101,7 +69,11 @@ const SingleBlog = () => {
     }
     const commentData = { text };
     await commentToBlog({ commentData, blogId: data?.data?._id });
+
+    return setText("");
   };
+
+  console.log(data);
 
   return (
     <div className="mt-150 mb-150 mt-5">
@@ -146,27 +118,26 @@ const SingleBlog = () => {
                   <button type="button" class="btn-primary mr-2">
                     following{" "}
                     <span className={`badge text-bg-secondary`}>
-                      {user?.data?.following.length}
+                      {currentUser?.following.length}
                     </span>
                   </button>
 
                   <button type="button" class="btn-primary">
                     followers{" "}
                     <span className="badge text-bg-secondary">
-                      {user?.data?.followers.length}
+                      {currentUser?.followers.length}
                     </span>
                   </button>
 
-                  {currentUser &&
-                    data?.data?.user._id !== currentUser.data._id && (
-                      <button
-                        type="submit"
-                        className="btn-success d-inline ml-2"
-                        onClick={followUserHandler}
-                      >
-                        {isFollowing ? "unfollow" : "follow"}
-                      </button>
-                    )}
+                  {currentUser && data?.data?.user._id !== currentUser._id && (
+                    <button
+                      type="submit"
+                      className="btn-success d-inline ml-2"
+                      onClick={followUserHandler}
+                    >
+                      {isFollowing ? "unfollow" : "follow"}
+                    </button>
+                  )}
                 </div>
 
                 {data?.data?.content && (
@@ -194,8 +165,23 @@ const SingleBlog = () => {
                           {" "}
                           <div className="comment-text-body">
                             <h4>
-                              {/* {comment?.user?.firstName}{" "}
-                              {comment?.user?.lastName} */}
+                              <span className="author mr-2">
+                                <img
+                                  className="user_image"
+                                  src={
+                                    comment.user.profilePicture.split(
+                                      ":"
+                                    )[0] === "https" ||
+                                    comment.user.profilePicture.split(
+                                      ":"
+                                    )[0] === "http"
+                                      ? comment.user.profilePicture
+                                      : `https://utivablog-project-server.onrender.com/${comment.user.profilePicture}`
+                                  }
+                                />
+                              </span>
+                              {comment?.user?.firstName}{" "}
+                              {comment?.user?.lastName}
                               <span className="comment-date">
                                 <Moment className="meta-own" fromNow>
                                   {comment?.createdAt}

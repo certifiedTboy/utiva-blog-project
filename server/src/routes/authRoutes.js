@@ -14,6 +14,8 @@ const {
   checkEmailValidity,
 } = require("../middlewares/validators/authDataValidator");
 
+const Authenticate = require("../middlewares/authorization/Authenticate");
+
 const router = express.Router();
 
 router.post(
@@ -24,7 +26,7 @@ router.post(
 );
 router.post("/login", checkEmailValidity, userLogin);
 router.post("/google/login", loginWithGoogle);
-router.get("/logout", userLogout);
+router.get("/logout", Authenticate, userLogout);
 
 router.post(
   "/request-password-reset",

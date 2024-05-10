@@ -30,14 +30,14 @@ const {
 const router = express.Router();
 
 router.post(
-  "/create-blog",
+  "/create",
   checkBlogDataValidity,
   Authenticate,
   checkUserIsAdmin,
   createBlog
 );
-router.post(
-  "/publish-blog/:blogId",
+router.put(
+  "/:blogId/publish",
   Authenticate,
   checkUserIsAdmin,
   checkBlogOwnership,
@@ -47,14 +47,14 @@ router.get("/", getAllBlogs);
 router.get("/published-blogs", getAllPublishedBlogs);
 router.get("/blogs-by-user/:userId", getBlogsByAUser);
 router.get(
-  "/user-blog-by-id/:blogId",
+  "/:blogId/user-blog-by-id",
   Authenticate,
   checkBlogOwnership,
   getBlogById
 );
 router.get("/:blogTitle", getBlogByTitle);
 router.put(
-  "/edit-blog/:blogId",
+  "/:blogId/edit",
   checkBlogDataValidity,
   Authenticate,
   checkUserIsAdmin,
@@ -62,7 +62,7 @@ router.put(
   editBlog
 );
 router.delete(
-  "/delete-blog/:blogId",
+  "/:blogId/delete",
   Authenticate,
   checkUserIsAdmin,
   checkBlogOwnership,
@@ -70,11 +70,11 @@ router.delete(
 );
 
 // reaction to blog route
-router.post("/react-to-blog/:blogId", Authenticate, reactToBlog);
+router.post("/:blogId/react", Authenticate, reactToBlog);
 
 // blog comment routes
 router.post(
-  "/add-comment/:blogId",
+  "/:blogId/comments",
   checkCommentDataValidity,
   Authenticate,
   commentToBlog
@@ -86,12 +86,8 @@ router.put(
   Authenticate,
   editComment
 );
-router.delete(
-  "/delete-comment/:blogId/:commentId",
-  Authenticate,
-  deleteComment
-);
+router.delete("/:blogId/comments/:commentId", Authenticate, deleteComment);
 
-router.get("/blog/comments/:blogId", getBlogComments);
+router.get("/blog/:blogId/comments", getBlogComments);
 
 module.exports = router;

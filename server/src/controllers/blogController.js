@@ -42,6 +42,7 @@ const createBlog = async (req, res, next) => {
 const publishBlog = async (req, res, next) => {
   try {
     const { blogId } = req.params;
+
     const blog = await updateBlogPublishState(blogId);
 
     if (blog) {
@@ -79,6 +80,7 @@ const getAllPublishedBlogs = async (req, res, next) => {
 
 const getBlogsByAUser = async (req, res, next) => {
   const { userId } = req.params;
+
   try {
     const { skip, limit } = getPagination(req.query);
     const userBlogs = await blogsByAUser(userId, skip, limit);

@@ -8,7 +8,7 @@ const checkBlogOwnership = async (req, res, next) => {
     if (req.user) {
       const blog = await Blog.findById(blogId);
 
-      if (blog.user.userId.toString() !== req.user.id) {
+      if (blog.user.toString() !== req.user.id) {
         throw new UnprocessableError("you are not authorized for this action");
       } else {
         next();

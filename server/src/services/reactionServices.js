@@ -1,13 +1,15 @@
 const { checkBlogExistById } = require("./blogServices");
+const Reaction = require("../models/reaction");
 
 const updateReactionToBlog = async (userId, blogId, reaction) => {
   const blog = await checkBlogExistById(blogId);
-  const userAlreadyReactedToAbout = await checkThatUserAlreadyReactToBlog(
+
+  const userAlreadyReactedToBlog = await checkThatUserAlreadyReactToBlog(
     blogId,
     userId
   );
 
-  if (!userAlreadyReactedToAbout) {
+  if (!userAlreadyReactedToBlog) {
     const reactionData = {
       userId,
       reaction,

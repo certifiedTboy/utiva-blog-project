@@ -2,7 +2,7 @@ const Blog = require("../models/blog");
 const NotFoundError = require("../lib/errorInstances/NotFoundError");
 
 const createNewBlog = async (title, description, content, userId) => {
-  const blogData = { title, description, content, user: { userId } };
+  const blogData = { title, description, content, user: userId };
 
   const blog = new Blog(blogData);
   await blog.save();
@@ -14,30 +14,45 @@ const createNewBlog = async (title, description, content, userId) => {
 const allBlogs = async (skip, limit) => {
   const blogs = await Blog.find({}, { __v: 0 }).skip(skip).limit(limit);
   const sortedBlogs = blogs.sort((a, b) => a.createdAt - b.createdAt);
-
-  // console.log(sortedBlogs);
   return sortedBlogs;
 };
 
 const publishedBlogs = async (skip, limit) => {
-  const blogs = await Blog.find({}, { __v: 0 }).skip(skip).limit(limit);
-  const publishedBlogs = blogs.filter((blog) => blog.isPublished);
+  const blogs = await Blog.find({ isPublished: true }, { __v: 0 })
+    .skip(skip)
+    .limit(limit)
+    .populate("user", "username email _id firstName lastName")
+    .exec();
 
-  return publishedBlogs;
+  return blogs;
 };
 
 const blogsByAUser = async (userId, skip, limit) => {
-  const blogs = await Blog.find({}, { __v: 0 }).skip(skip).limit(limit);
-
-  const userBlogs = blogs.filter(
-    (blog) => blog.user.userId.toString() === userId
-  );
-
-  return userBlogs;
+  const blogs = await Blog.find({ user: userId });
+  return blogs;
 };
 
 const checkBlogExistByTitle = async (blogTitle) => {
-  const blog = await Blog.findOne({ title: blogTitle });
+  const blog = await Blog.findOne({ title: blogTitle })
+    .populate({
+      path: "comments",
+      populate: {
+        path: "user",
+        select: "username email _id firstName lastName profilePicture",
+      },
+    })
+    .populate("user", "username email _id firstName lastName profilePicture")
+    .exec();
+
+  if (!blog) {
+    throw new NotFoundError("blog does not exist");
+  }
+
+  return blog;
+};
+
+const checkBlogExistById = async (blogId) => {
+  const blog = await Blog.findById(blogId);
 
   if (!blog) {
     throw new NotFoundError("blog does not exist");
@@ -60,16 +75,6 @@ const updateBlogPublishState = async (blogId) => {
       return blog;
     }
   }
-};
-
-const checkBlogExistById = async (blogId) => {
-  const blog = await Blog.findById(blogId);
-
-  if (!blog) {
-    throw new NotFoundError("blog does not exist");
-  }
-
-  return blog;
 };
 
 const updateBlogData = async (blogId, title, description, content) => {

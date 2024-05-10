@@ -9,11 +9,16 @@ import classes from "./MainNav.module.css";
 
 const MainNav = ({ scrollTop }) => {
   const [show, setShow] = useState(false);
-  const [userImage, setUserImage] = useState("");
   const [getCurrentUser, { data }] = useGetCurrentUserMutation();
   const [logoutUser] = useLogoutUserMutation();
 
-  const BASE_URL = "https://utivablog-project-server.onrender.com";
+  let BASE_URL;
+
+  if (process.env.NODE_ENV === "production") {
+    BASE_URL = "https://utivablog-project-server.onrender.com";
+  } else {
+    BASE_URL = "http://localhost:8000";
+  }
 
   // const BASE_URL = "http://localhost:8000";
 
@@ -29,16 +34,6 @@ const MainNav = ({ scrollTop }) => {
     getCurrentUserData();
   }, [username, getCurrentUser]);
 
-  useEffect(() => {
-    if (
-      user?.data?.profilePicture.split(":")[0] === "https" ||
-      user?.data?.profilePicture.split(":")[0] === "http"
-    ) {
-      return setUserImage(user?.data?.profilePicture);
-    } else {
-      return setUserImage(`${BASE_URL}/${user?.data?.profilePicture}`);
-    }
-  }, [user?.data]);
   const onLogoutUser = () => {
     logoutUser();
   };
@@ -64,7 +59,12 @@ const MainNav = ({ scrollTop }) => {
             {user && (
               <img
                 className={classes.mobile_img}
-                src={userImage}
+                src={
+                  user?.profilePicture.split(":")[0] === "https" ||
+                  user?.profilePicture.split(":")[0] === "http"
+                    ? user?.profilePicture
+                    : `https://utivablog-project-server.onrender.com/${user?.profilePicture}`
+                }
                 alt="profile_picture"
               />
             )}
@@ -139,11 +139,19 @@ const MainNav = ({ scrollTop }) => {
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  <img src={`${userImage}`} alt="profile_picture" />
+                  <img
+                    src={
+                      user?.profilePicture.split(":")[0] === "https" ||
+                      user?.profilePicture.split(":")[0] === "http"
+                        ? user?.profilePicture
+                        : `https://utivablog-project-server.onrender.com/${user?.profilePicture}`
+                    }
+                    alt="profile_picture"
+                  />
                 </NavLink>
 
                 <ul className="dropdown-menu">
-                  {user?.data?.userType === "Admin" && (
+                  {user?.userType === "Admin" && (
                     <li>
                       <NavLink
                         className="dropdown-item"
@@ -156,7 +164,7 @@ const MainNav = ({ scrollTop }) => {
                   <li>
                     <NavLink
                       className="dropdown-item"
-                      to={`/w-d/${user.data.username}`}
+                      to={`/w-d/${user.username}`}
                     >
                       Profile
                     </NavLink>
@@ -275,7 +283,7 @@ const MainNav = ({ scrollTop }) => {
               )}
               {user && (
                 <ul className="dropdown-menu">
-                  {user?.data?.userType === "Admin" && (
+                  {user?.userType === "Admin" && (
                     <li>
                       <NavLink
                         className="dropdown-item"
@@ -288,7 +296,7 @@ const MainNav = ({ scrollTop }) => {
                   <li>
                     <NavLink
                       className="dropdown-item"
-                      to={`/w-d/${user.data.username}`}
+                      to={`/w-d/${user.username}`}
                     >
                       Profile
                     </NavLink>

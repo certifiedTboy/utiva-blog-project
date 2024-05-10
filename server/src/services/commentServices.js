@@ -1,23 +1,22 @@
 const { checkBlogExistById } = require("./blogServices");
 const { checkThatUserExistById } = require("./userServices");
+const Comment = require("../models/comment");
 
 const addCommentsToBlog = async (blogId, userId, text) => {
   const blog = await checkBlogExistById(blogId);
-  const user = await checkThatUserExistById(userId);
 
-  if (blog || blog) {
+  if (blog) {
     const commentData = {
       text,
-      user: {
-        userId,
-        firstName: user.firstName,
-        lastName: user.lastName,
-      },
+      user: userId,
     };
 
-    blog.comments.push(commentData);
-    await blog.save();
-    return blog;
+    const comment = await Comment.create(commentData);
+    if (comment) {
+      blog.comments.push(comment._id);
+      await blog.save();
+      return blog;
+    }
   }
 };
 
@@ -29,32 +28,18 @@ const blogComments = async (blogId) => {
   }
 };
 
-const updateBlogComment = async (blogId, commentId, text) => {
-  const blog = await checkBlogExistById(blogId);
+const updateBlogComment = async (commentId, text) => {
+  const updatedComment = await Comment.findByIdAndUpdate(commentId, { text });
 
-  if (blog) {
-    const commentToUpdate = blog.comments.find(
-      (comment) => comment._id.toString() === commentId
-    );
-    commentToUpdate.text = text;
-
-    await blog.save();
-
-    return blog;
+  if (updatedComment) {
+    return updatedComment;
   }
 };
 
-const deleteBlogComment = async (blogId, commentId) => {
-  const blog = await checkBlogExistById(blogId);
-  if (blog) {
-    const blogCommentIndex = blog.comments.findIndex(
-      (comment) => comment._id.toString() === commentId
-    );
-    blog.comments.splice(blogCommentIndex, 1);
-
-    await blog.save();
-
-    return blog;
+const deleteBlogComment = async (commentId) => {
+  const removedComment = await Comment.findOneAndDelete(commentId);
+  if (removedComment) {
+    return removedComment;
   }
 };
 
