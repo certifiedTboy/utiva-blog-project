@@ -9,9 +9,9 @@ const NameUpdateModal = ({ onShowModal }) => {
     useChangeNameMutation();
   const { user } = useSelector((state) => state.userState);
 
-  const [firstName, setFirstName] = useState(user.data.firstName);
-  const [lastName, setLastName] = useState(user.data.lastName);
-  const [about, setAbout] = useState(user.data.about);
+  const [firstName, setFirstName] = useState(user.firstName);
+  const [lastName, setLastName] = useState(user.lastName);
+  const [about, setAbout] = useState(user.about);
   const [generalError, setGeneralError] = useState("");
 
   const firstNameChangeHandler = (event) => {
@@ -29,7 +29,6 @@ const NameUpdateModal = ({ onShowModal }) => {
   const onUpdateUserDetails = async (event) => {
     event.preventDefault();
 
-    console.log(firstName, lastName, about);
     if (!firstName || !lastName || !about) {
       return setGeneralError("All fields are required");
     }
