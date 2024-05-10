@@ -24,7 +24,7 @@ export const blogApi = createApi({
 
     createNewBlog: builder.mutation({
       query: (blogData) => ({
-        url: "/blogs/create-blog",
+        url: "/blogs/create",
         method: "POST",
         body: blogData,
         credentials: "include",
@@ -38,8 +38,8 @@ export const blogApi = createApi({
     }),
     publishBlog: builder.mutation({
       query: (payload) => ({
-        url: `/blogs/publish-blog/${payload}`,
-        method: "POST",
+        url: `/blogs/${payload}/publish`,
+        method: "PUT",
         body: payload,
         credentials: "include",
       }),
@@ -52,7 +52,7 @@ export const blogApi = createApi({
     }),
     updatedBlog: builder.mutation({
       query: ({ blogData, blogId }) => ({
-        url: `/blogs/edit-blog/${blogId}`,
+        url: `/blogs/${blogId}/edit`,
         method: "PUT",
         body: blogData,
         credentials: "include",
@@ -61,7 +61,7 @@ export const blogApi = createApi({
 
     checkBlogAlreadyCreated: builder.mutation({
       query: (blogId) => ({
-        url: `/blogs/user-blog-by-id/${blogId}`,
+        url: `/blogs/${blogId}/user-blog-by-id`,
         method: "GET",
         credentials: "include",
       }),
@@ -81,7 +81,7 @@ export const blogApi = createApi({
     }),
     reactToBlog: builder.mutation({
       query: (blogId) => ({
-        url: `/blogs/react-to-blog/${blogId}`,
+        url: `/blogs/${blogId}/react`,
         method: "POST",
         body: { reaction: "like" },
         credentials: "include",
@@ -96,14 +96,14 @@ export const blogApi = createApi({
     }),
     deleteBlog: builder.mutation({
       query: (blogId) => ({
-        url: `/blogs/delete-blog/${blogId}`,
+        url: `/blogs/${blogId}/delete`,
         method: "DELETE",
         credentials: "include",
       }),
     }),
     commentToBlog: builder.mutation({
       query: ({ commentData, blogId }) => ({
-        url: `/blogs/add-comment/${blogId}`,
+        url: `/blogs/${blogId}/comments`,
         method: "POST",
         body: commentData,
         credentials: "include",
@@ -112,7 +112,7 @@ export const blogApi = createApi({
 
     getBlogComments: builder.mutation({
       query: (blogId) => ({
-        url: `/blogs/blog/comments/${blogId}`,
+        url: `/blogs/${blogId}/comments`,
         method: "GET",
       }),
     }),

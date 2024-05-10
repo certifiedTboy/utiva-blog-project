@@ -68,6 +68,7 @@ const BlogByUser = ({ userData }) => {
   //publish created blog
   const onPublishBlog = async (event) => {
     event.preventDefault();
+
     await publishBlog(event.target.value);
   };
 
