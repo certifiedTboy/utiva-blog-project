@@ -167,7 +167,7 @@ const BlogByUser = ({ userData }) => {
                     <NavLink to={`/blogs/${blog.title}`}>{blog.title}</NavLink>
                   </div>
                   <div className={`${classes.card_body} card-body`}>
-                    {user && user?.data?.username === username && (
+                    {user && user?.username === username && (
                       <div className={classes.btn_container}>
                         {showEmailInput.btn_value !== blog._id && (
                           <button
@@ -227,7 +227,7 @@ const BlogByUser = ({ userData }) => {
                 </div>
               );
             })}
-            {user && user?.data?.username === username && (
+            {user && user?.username === username && (
               <div>
                 {blogByUser && (
                   <a href="#">
@@ -237,7 +237,7 @@ const BlogByUser = ({ userData }) => {
               </div>
             )}
 
-            {user && user?.data?.username !== username && (
+            {user && user?.username !== username && (
               <div>
                 {totalPublishBlogs && (
                   <a href="#">
