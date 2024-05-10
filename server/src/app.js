@@ -11,6 +11,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000",
   "https://utiva-webdev-blog-project.vercel.app/",
+  "https://webdev-blogg.vercel.app",
 ];
 const expressOptions = {
   urlencodExtended: true,
