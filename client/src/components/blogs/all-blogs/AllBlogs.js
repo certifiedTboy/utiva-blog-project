@@ -56,7 +56,7 @@ const AllBlogs = () => {
             description={blog.description}
             blogId={blog._id}
             createdAt={blog.createdAt}
-            userId={blog.user.userId}
+            userNameData={blog.user}
           />
         ))}
       </InfiniteScroll>

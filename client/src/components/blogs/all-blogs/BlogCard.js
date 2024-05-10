@@ -6,41 +6,16 @@ import { useGetUserProfileByIdMutation } from "../../../lib/APIS/userApi/userApi
 import DescriptionPopUp from "./DescriptionPopUp";
 import blogImg from "../../../Assets/news-bg-1.png";
 
-const BlogCard = ({ title, description, blogId, createdAt, userId }) => {
+const BlogCard = ({ title, description, blogId, createdAt, userNameData }) => {
   const [showA, setShowA] = useState({ state: false, key: "" });
-  const [userNameData, setUserNameData] = useState({
-    firstName: "",
-    lastName: "",
-    username: "",
-  });
-  const [getUserById, { data, isSuccess }] = useGetUserProfileByIdMutation();
-
-  useEffect(() => {
-    const onGetUserUsername = async () => {
-      if (userId) {
-        await getUserById(userId);
-      }
-    };
-
-    onGetUserUsername();
-  }, [userId]);
-
-  useEffect(() => {
-    if (isSuccess) {
-      setUserNameData({
-        firstName: data?.data?.firstName,
-        lastName: data?.data?.lastName,
-        username: data?.data?.username,
-      });
-    }
-  }, [isSuccess]);
 
   return (
     <Card
       style={{ width: "100%" }}
       onClick={() => setShowA({ state: false, key: "" })}
       key={blogId}
-      className="mt-5">
+      className="mt-5"
+    >
       <Card.Img variant="top" src={blogImg} />
       <Card.Body>
         <Card.Title>{title}</Card.Title>
@@ -59,7 +34,8 @@ const BlogCard = ({ title, description, blogId, createdAt, userId }) => {
         )}
         <Card.Text
           className="mt-3"
-          onMouseOver={() => setShowA({ state: true, key: blogId })}>
+          onMouseOver={() => setShowA({ state: true, key: blogId })}
+        >
           {description.substr(0, 38)}...
         </Card.Text>
         <NavLink to={`/blogs/${title}`} className="read-more-btn">

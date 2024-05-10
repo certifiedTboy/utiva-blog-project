@@ -31,6 +31,7 @@ const SingleBlog = () => {
 
   const [getBlogByTitle, { data, isSuccess: success, isError, error }] =
     useGetBlogByTitleMutation();
+
   const [getUserById, { data: user, isSuccess }] =
     useGetUserProfileByIdMutation();
   const [followUser, { isSuccess: followSuccess, data: followData }] =
@@ -39,7 +40,7 @@ const SingleBlog = () => {
   const [commentToBlog, { isSuccess: commentSuccess, isError: commentError }] =
     useCommentToBlogMutation();
 
-  const [getBlogComments, { data: comments }] = useGetBlogCommentsMutation();
+  // const [getBlogComments, { data: comments }] = useGetBlogCommentsMutation();
 
   const { user: currentUser } = useSelector((state) => state.userState);
 
@@ -72,14 +73,9 @@ const SingleBlog = () => {
   useEffect(() => {
     if (isSuccess) {
       setUserNameData({
-        firstName: user?.data?.firstName,
-        lastName: user?.data?.lastName,
-        username: user?.data?.username,
-        profilePicture:
-          user?.data?.profilePicture.split(":")[0] === "https" ||
-          user?.data?.profilePicture.split(":")[0] === "http"
-            ? user?.data?.profilePicture
-            : `https://utivablog-project-server.onrender.com/${user?.data?.profilePicture}`,
+        firstName: data?.data?.user?.firstName,
+        lastName: data?.data?.user?.lastName,
+        username: data?.data?.user?.username,
         otherUserId: user?.data?._id,
       });
     }
@@ -97,16 +93,6 @@ const SingleBlog = () => {
     const followData = { otherUserId: userNameData.otherUserId };
     await followUser(followData);
   };
-
-  useEffect(() => {
-    const onGetBlogComments = async () => {
-      await getBlogComments(data?.data?._id);
-    };
-    if (data?.data) {
-      onGetBlogComments();
-    }
-    setText("");
-  }, [blogTitle, data?.data, commentSuccess]);
 
   const onCommentToBlog = async (event) => {
     event.preventDefault();
@@ -126,22 +112,28 @@ const SingleBlog = () => {
               <div className="single-article-text">
                 <h2>{data?.data?.title}</h2>
                 <p className="blog-meta d-inline mr-2">
-                  {user && (
-                    <span className="author">
-                      <img
-                        className="user_image"
-                        src={userNameData.profilePicture}
-                      />
-                      <i className="fas fa-user ml-2"></i>
-                      <NavLink to={`/w-d/${userNameData.username}`}>
+                  <span className="author">
+                    <img
+                      className="user_image"
+                      src={
+                        data?.data?.user?.profilePicture.split(":")[0] ===
+                          "https" ||
+                        data?.data?.user?.profilePicture.split(":")[0] ===
+                          "http"
+                          ? data?.data?.user?.profilePicture
+                          : `https://utivablog-project-server.onrender.com/${data?.data?.user?.profilePicture}`
+                      }
+                    />
+                    <i className="fas fa-user ml-2"></i>
+                    <NavLink to={`/w-d/${data?.data?.user?.username}`}>
+                      {" "}
+                      <strong>
                         {" "}
-                        <strong>
-                          {" "}
-                          {userNameData.firstName} {userNameData.lastName}
-                        </strong>
-                      </NavLink>
-                    </span>
-                  )}
+                        {data?.data?.user?.firstName}{" "}
+                        {data?.data?.user?.lastName}
+                      </strong>
+                    </NavLink>
+                  </span>
 
                   <span className="date">
                     <i className="fas fa-calendar ml-2"></i>{" "}
@@ -166,7 +158,7 @@ const SingleBlog = () => {
                   </button>
 
                   {currentUser &&
-                    data?.data?.user.userId !== currentUser.data._id && (
+                    data?.data?.user._id !== currentUser.data._id && (
                       <button
                         type="submit"
                         className="btn-success d-inline ml-2"
@@ -191,19 +183,19 @@ const SingleBlog = () => {
               <div className="comments-list-wrap">
                 {data?.data && (
                   <h3 className="comment-count-title">
-                    {comments?.data?.length} Comments
+                    {data?.data?.comments?.length} Comments
                   </h3>
                 )}
                 <div className="comment-list">
-                  {comments?.data &&
-                    comments?.data?.map((comment) => {
+                  {data?.data?.comments &&
+                    data?.data?.comments?.map((comment) => {
                       return (
                         <div className="single-comment-body" key={comment._id}>
                           {" "}
                           <div className="comment-text-body">
                             <h4>
-                              {comment?.user?.firstName}{" "}
-                              {comment?.user?.lastName}
+                              {/* {comment?.user?.firstName}{" "}
+                              {comment?.user?.lastName} */}
                               <span className="comment-date">
                                 <Moment className="meta-own" fromNow>
                                   {comment?.createdAt}
@@ -246,7 +238,7 @@ const SingleBlog = () => {
             <div className="sidebar-section">
               <div className="recent-posts">
                 <h4>Recent Posts</h4>
-                {data && <RelatedPosts userId={data?.data?.user.userId} />}
+                {data && <RelatedPosts userId={data?.data?.user._id} />}
               </div>
 
               <div className="tag-section">

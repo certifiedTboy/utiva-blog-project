@@ -10,6 +10,8 @@ const RecentTopic = () => {
   const [getAllBlogs, { data, isError, error, isLoading }] =
     useGetAllBlogsMutation();
 
+  console.log(data);
+
   const [recordsPerPage] = useState(3);
   const [recentBlogs, setRecentBlogs] = useState([]);
   const indexOfLastRecord = 1 * recordsPerPage;
@@ -65,6 +67,7 @@ const RecentTopic = () => {
                     blogId={blog._id}
                     createdAt={blog.createdAt}
                     userId={blog.user.userId}
+                    userNameData={blog.user}
                   />
                 </div>
               );
