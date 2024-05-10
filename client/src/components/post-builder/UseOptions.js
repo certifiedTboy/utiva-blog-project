@@ -7,7 +7,6 @@ const UseOptions = () => {
 
   useEffect(() => {
     const onGetAllBlogs = async () => {
-      console.log("i run");
       await getAllBlogs();
     };
 
