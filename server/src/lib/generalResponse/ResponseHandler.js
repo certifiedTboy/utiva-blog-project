@@ -1,4 +1,3 @@
-const express = require("express");
 const K = require("../constants/index");
 const httpStatusCode = require("../constants/httpStatusCode");
 

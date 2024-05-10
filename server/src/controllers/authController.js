@@ -39,7 +39,7 @@ const userLogin = async (req, res, next) => {
         expires: data.userSession.expiresAt,
         maxAge: 59 * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "none",
         secure: true,
       };
 
@@ -60,12 +60,13 @@ const loginWithGoogle = async (req, res, next) => {
   const ipAddress = req.ip;
   try {
     const data = await authenticateWithGoogle(token, ipAddress);
+
     if (data) {
       const jwtTokenOptions = {
         expires: data.userSession.expiresAt,
         maxAge: 59 * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "none",
         secure: true,
       };
 
