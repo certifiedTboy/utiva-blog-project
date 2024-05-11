@@ -17,6 +17,7 @@ const Reaction = ({ blogId }) => {
   const [reactToBlog, { isSuccess }] = useReactToBlogMutation();
 
   const [getBlogByTitle, { data }] = useGetBlogByTitleMutation();
+
   const onReactToBlog = async (event) => {
     // const reaction = reactionRef.current.value;
     // const reactionData = { reaction };
@@ -40,7 +41,8 @@ const Reaction = ({ blogId }) => {
           class="btn-primary position-relative"
           value="like"
           // ref={reactionRef}
-          onClick={onReactToBlog}>
+          onClick={onReactToBlog}
+        >
           <span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -48,7 +50,8 @@ const Reaction = ({ blogId }) => {
               height="19"
               fill="white"
               class="bi bi-heart-fill"
-              viewBox="0 0 16 16">
+              viewBox="0 0 16 16"
+            >
               <path
                 fill-rule="evenodd"
                 d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"
@@ -69,7 +72,8 @@ const Reaction = ({ blogId }) => {
               height="19"
               fill="white"
               class="bi bi-heart-fill"
-              viewBox="0 0 16 16">
+              viewBox="0 0 16 16"
+            >
               <path
                 fill-rule="evenodd"
                 d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"

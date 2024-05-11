@@ -1,8 +1,16 @@
-const { checkBlogExistById } = require("./blogServices");
+const {
+  checkBlogExistByIdForReaction,
+  checkBlogExistById,
+} = require("./blogServices");
 const Reaction = require("../models/reaction");
+const NotFoundError = require("../lib/errorInstances/NotFoundError");
 
 const updateReactionToBlog = async (userId, blogId, reaction) => {
   const blog = await checkBlogExistById(blogId);
+
+  if (!blog) {
+    throw new NotFoundError("blog does not exist");
+  }
 
   const userAlreadyReactedToBlog = await checkThatUserAlreadyReactToBlog(
     blogId,
@@ -11,28 +19,35 @@ const updateReactionToBlog = async (userId, blogId, reaction) => {
 
   if (!userAlreadyReactedToBlog) {
     const reactionData = {
-      userId,
       reaction,
+      user: userId,
     };
-    blog.reactions.push(reactionData);
-    await blog.save();
+    const newReaction = await Reaction.create(reactionData);
+    if (newReaction) {
+      blog.reactions.push(newReaction._id);
+      await blog.save();
+      return blog;
+    }
+
     return blog;
   } else {
-    const blogReactionIndex = blog.reactions.findIndex(
-      (reaction) => reaction.userId.toString() === userId
-    );
-    blog.reactions.splice(blogReactionIndex, 1);
+    const deletedReaction = await Reaction.findOneAndDelete({
+      _id: userAlreadyReactedToBlog._id,
+    });
 
-    await blog.save();
+    if (deletedReaction) {
+      return blog;
+    }
+
     return blog;
   }
 };
 
 const checkThatUserAlreadyReactToBlog = async (blogId, userId) => {
-  const foundBlog = await checkBlogExistById(blogId);
+  const foundBlog = await checkBlogExistByIdForReaction(blogId);
 
   const userAlreadyReacted = foundBlog.reactions.find(
-    (reaction) => reaction.userId.toString() === userId
+    (reaction) => reaction.user._id.toString() === userId
   );
 
   return userAlreadyReacted;

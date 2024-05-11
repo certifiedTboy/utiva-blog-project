@@ -31,7 +31,6 @@ const verifyUserToken = async (userId, verificationToken) => {
 };
 
 const verifyPasswordResetToken = async (userId, passwordResetToken) => {
-  console.log(passwordResetToken);
   const user = await checkThatUserExistById(userId);
   if (user) {
     if (!user.resetPasswordToken) {

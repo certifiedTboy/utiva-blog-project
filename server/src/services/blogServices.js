@@ -22,6 +22,13 @@ const publishedBlogs = async (skip, limit) => {
     .skip(skip)
     .limit(limit)
     .populate("user", "username email _id firstName lastName")
+    .populate({
+      path: "reactions",
+      populate: {
+        path: "user",
+        select: "_id",
+      },
+    })
     .exec();
 
   return blogs;
@@ -41,6 +48,7 @@ const checkBlogExistByTitle = async (blogTitle) => {
         select: "username email _id firstName lastName profilePicture",
       },
     })
+    .populate("reactions")
     .populate("user", "username email _id firstName lastName profilePicture")
     .exec();
 
@@ -98,6 +106,22 @@ const removeBlog = async (blogId) => {
   }
 };
 
+const checkBlogExistByIdForReaction = async (blogId) => {
+  const blog = await Blog.findById(blogId).populate({
+    path: "reactions",
+    populate: {
+      path: "user",
+      select: "_id",
+    },
+  });
+
+  if (!blog) {
+    throw new NotFoundError("blog does not exist");
+  }
+
+  return blog;
+};
+
 module.exports = {
   createNewBlog,
   allBlogs,
@@ -108,4 +132,5 @@ module.exports = {
   updateBlogPublishState,
   publishedBlogs,
   blogsByAUser,
+  checkBlogExistByIdForReaction,
 };
