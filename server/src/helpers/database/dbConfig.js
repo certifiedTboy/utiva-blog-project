@@ -15,4 +15,8 @@ const mongoConnect = async () => {
   await mongoose.connect(MONGO_URL);
 };
 
-module.exports = mongoConnect;
+const mongoDbTransaction = async () => {
+  const session = await mongoose.startSession();
+  return session;
+};
+module.exports = { mongoConnect, mongoDbTransaction };

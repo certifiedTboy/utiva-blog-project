@@ -43,14 +43,14 @@ const userSchema = new Schema(
     },
     followers: [
       {
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
-        username: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
       },
     ],
     following: [
       {
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
-        username: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
       },
     ],
     verificationToken: { type: String },

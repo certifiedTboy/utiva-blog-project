@@ -78,57 +78,89 @@ const loginUser = async (email, password, ipAddress) => {
 };
 
 const authenticateWithGoogle = async (token, ipAddress) => {
+  // decode google authentication uri from client
   const decodedToken = decodeURIComponent(token);
+
+  // desctructure user data from decoded token
   const { firstName, lastName, email, profilePicture } =
     await verifyGoogleToken(decodedToken);
 
   if (firstName || lastName) {
+    // check if user already exist on database
     const user = await checkThatUserAlreadyExist(email);
 
     if (user) {
-      const userSession = await createOrUpdatePlatformSession(
-        user._id.toString(),
-        ipAddress
-      );
+      // check if user already verified after first sign up
+      if (user.isVerified) {
+        // generate new session data if user is verified
+        const userSession = await createOrUpdatePlatformSession(
+          user._id.toString(),
+          ipAddress
+        );
 
-      await updateUserProfileImage(user._id, profilePicture);
-      const userData = {
-        username: user.username,
-        userType: user.userType,
-      };
-      if (userSession) {
-        return { userData, userSession };
+        // update user profile image with current google profile image
+        await updateUserProfileImage(user._id, profilePicture);
+        const userData = {
+          username: user.username,
+          userType: user.userType,
+        };
+
+        // send back user data and session data if user is verified and logged in successfuly
+        if (userSession) {
+          return { userData, userSession };
+        }
+      } else {
+        // generate new verification url if user is not verified on first login with google
+        const verificationData = await generateVerificationUrl(
+          user._id.toString()
+        );
+        if (verificationData) {
+          // update user information with verification data
+          user.verificationToken = verificationData.verificationToken;
+          user.verificationTokenExpiresAt = verificationData.expiresAt;
+          await user.save();
+
+          // resend verification url to user email
+          await sendVerificationUrl(
+            user.email,
+            verificationData.verificationUrl
+          );
+
+          return { email: user.email };
+        }
       }
-    } else {
-      const uniqueSuffix = Math.round(Math.random() * 1e9);
+    }
 
-      const userData = {
-        firstName,
-        lastName,
-        email,
-        profilePicture,
-        username: email.split("@")[0] + "-" + uniqueSuffix,
-      };
+    // create new user profile for first time google authentication
+    const uniqueSuffix = Math.round(Math.random() * 1e9);
 
-      const newUser = new User(userData);
+    const userData = {
+      firstName,
+      lastName,
+      email,
+      profilePicture,
+      username: email.split("@")[0] + "-" + uniqueSuffix,
+    };
+
+    const newUser = new User(userData);
+
+    const verificationData = await generateVerificationUrl(
+      newUser._id.toString()
+    );
+
+    if (verificationData) {
+      newUser.verificationToken = verificationData?.verificationToken;
+      newUser.verificationTokenExpiresAt = verificationData?.expiresAt;
+
       await newUser.save();
 
       if (newUser) {
-        const verificationData = await generateVerificationUrl(
-          newUser._id.toString()
+        await sendVerificationUrl(
+          newUser?.email,
+          verificationData.verificationUrl
         );
 
-        if (verificationData) {
-          newUser.verificationToken = verificationData?.verificationToken;
-          newUser.verificationTokenExpiresAt = verificationData?.expiresAt;
-          await newUser.save();
-          // await sendVerificationUrl(
-          //   newUser?.email,
-          //   verificationData.verificationUrl
-          // );
-
-          return { email: newUser.email };
-        }
+        return { email: newUser.email };
       }
     }
   }

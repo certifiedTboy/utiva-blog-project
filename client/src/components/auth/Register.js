@@ -51,7 +51,12 @@ const Register = () => {
     };
 
     setGeneralError("");
+
     await registerUser(regData);
+
+    setEmail("");
+    setFirstName("");
+    return setLastName("");
   };
 
   const { isLoading, isError, error, data } = response;
@@ -98,6 +103,7 @@ const Register = () => {
                 type="text"
                 placeholder="Enter Email"
                 onChange={emailChangeHandler}
+                value={email}
               />
             </Form.Group>
 
@@ -106,6 +112,7 @@ const Register = () => {
                 type="text"
                 placeholder="First Name"
                 onChange={firstNameChangeHandler}
+                value={firstName}
               />
             </Form.Group>
 
@@ -114,6 +121,7 @@ const Register = () => {
                 type="text"
                 placeholder="Last Name"
                 onChange={lastNameChangeHandler}
+                value={lastName}
               />
             </Form.Group>
             <div className="mt-3">
@@ -121,6 +129,7 @@ const Register = () => {
                 type="checkbox"
                 className="d-inline mr-2"
                 onChange={(event) => setAcceptTerms(event.target.checked)}
+                value={acceptTerms}
               />
               <p className="d-inline">
                 I have read and agreed to the{" "}
@@ -131,7 +140,8 @@ const Register = () => {
               type="submit"
               variant="warning"
               style={{ width: "100%" }}
-              className={isLoading ? "disabled" : ""}>
+              className={isLoading ? "disabled" : ""}
+            >
               <span style={{ fontWeight: "700" }}>
                 {!isLoading ? "Create Acount" : "Please wait..."}
               </span>
@@ -144,7 +154,8 @@ const Register = () => {
                     width: "30px",
                     height: "30px",
                     marginBottom: "-10px",
-                  }}></lord-icon>
+                  }}
+                ></lord-icon>
               )}
               {isError && (
                 <lord-icon
@@ -155,7 +166,8 @@ const Register = () => {
                     width: "30px",
                     height: "30px",
                     marginBottom: "-10px",
-                  }}></lord-icon>
+                  }}
+                ></lord-icon>
               )}
             </Button>
           </Form>{" "}

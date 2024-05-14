@@ -5,6 +5,11 @@ const UnprocessableError = require("../lib/errorInstances/UnprocessableError");
 const NotFoundError = require("../lib/errorInstances/NotFoundError");
 const ConflictError = require("../lib/errorInstances/ConflictError");
 
+const checkThatUserAlreadyExist = async (email) => {
+  const user = await User.findOne({ email });
+  return user;
+};
+
 const newUser = async (email, firstName, lastName) => {
   const user = await checkThatUserAlreadyExist(email);
 
@@ -12,23 +17,24 @@ const newUser = async (email, firstName, lastName) => {
     const uniqueSuffix = Math.round(Math.random() * 1e9);
 
     const username = email.split("@")[0] + "-" + uniqueSuffix;
+
     const newUser = new User({ email, firstName, lastName, username });
 
+    const verificationData = await generateVerificationUrl(
+      newUser._id.toString()
+    );
+
+    newUser.verificationToken = verificationData.verificationToken;
+    newUser.verificationTokenExpiresAt = verificationData.expiresAt;
     await newUser.save();
 
     if (newUser) {
-      const verificationData = await generateVerificationUrl(
-        newUser._id.toString()
+      await sendVerificationUrl(
+        newUser.email,
+        verificationData.verificationUrl
       );
 
-      if (verificationData) {
-        newUser.verificationToken = verificationData.verificationToken;
-        newUser.verificationTokenExpiresAt = verificationData.expiresAt;
-        await newUser.save();
-        await sendVerificationUrl(user.email, verificationData.verificationUrl);
-
-        return { email: newUser.email };
-      }
+      return { email: newUser.email };
     }
   } else if (!user.isVerified) {
     const verificationData = await generateVerificationUrl(user._id.toString());
@@ -69,13 +75,12 @@ const userNameUpdate = async (userId, firstName, lastName, about) => {
   }
 };
 
-const checkThatUserAlreadyExist = async (email) => {
-  const user = await User.findOne({ email });
-  return user;
-};
-
 const checkThatUserExistById = async (userId) => {
-  const user = await User.findById(userId).select("-password");
+  const user = await User.findById(userId)
+    .select("-password")
+    .populate("followers", "_id")
+    .populate("following", "_id")
+    .exec();
   if (!user) {
     throw new NotFoundError("invalid user token");
   } else if (!user.isVerified) {
@@ -86,7 +91,11 @@ const checkThatUserExistById = async (userId) => {
 };
 
 const checkThatUserExistByUsername = async (username) => {
-  const user = await User.findOne({ username }).select("-password");
+  const user = await User.findOne({ username })
+    .select("-password")
+    .populate("followers", "_id")
+    .populate("following", "_id")
+    .exec();
   if (!user) {
     throw new NotFoundError("User does not exist");
   } else if (!user.isVerified) {

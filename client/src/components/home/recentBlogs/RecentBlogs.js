@@ -64,7 +64,7 @@ const RecentTopic = () => {
                     description={blog.description}
                     blogId={blog._id}
                     createdAt={blog.createdAt}
-                    userId={blog.user.userId}
+                    userId={blog.user?._id}
                     userNameData={blog.user}
                   />
                 </div>

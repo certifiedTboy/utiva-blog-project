@@ -61,7 +61,7 @@ const loginWithGoogle = async (req, res, next) => {
   try {
     const data = await authenticateWithGoogle(token, ipAddress);
 
-    if (data) {
+    if (data.userSession) {
       const jwtTokenOptions = {
         expires: data.userSession.expiresAt,
         maxAge: 59 * 60 * 60 * 1000,
@@ -75,6 +75,12 @@ const loginWithGoogle = async (req, res, next) => {
         data,
         jwtTokenOptions,
         "login success"
+      );
+    } else {
+      ResponseHandler.ok(
+        res,
+        data,
+        `A mail has been sent to ${data.email}, check your mail to complete registration`
       );
     }
   } catch (error) {

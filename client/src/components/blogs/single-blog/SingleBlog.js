@@ -73,8 +73,6 @@ const SingleBlog = () => {
     return setText("");
   };
 
-  console.log(data);
-
   return (
     <div className="mt-150 mb-150 mt-5">
       <div className="container">

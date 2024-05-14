@@ -15,7 +15,6 @@ const ProfileDetails = ({ user }) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [showAbout, setShowAbout] = useState(true);
   const [showStory, setShowStory] = useState(false);
-  const [userImage, setUserImage] = useState("");
   const [followUser, { isSuccess }] = useFollowUserMutation();
   const { user: currentUser } = useSelector((state) => state.userState);
 
@@ -55,20 +54,9 @@ const ProfileDetails = ({ user }) => {
   };
 
   useEffect(() => {
-    if (
-      user?.data?.profilePicture.split(":")[0] === "https" ||
-      user?.data?.profilePicture.split(":")[0] === "http"
-    ) {
-      return setUserImage(user?.data?.profilePicture);
-    } else {
-      return setUserImage(`${BASE_URL}/${user?.data?.profilePicture}`);
-    }
-  }, [user?.data]);
-
-  useEffect(() => {
     if (currentUser) {
       setIsFollowing(
-        user?.data?.followers.find((fData) => fData.userId === currentUser._id)
+        user?.data?.followers.find((fData) => fData._id === currentUser._id)
       );
     }
   }, [currentUser, user, isSuccess]);
@@ -90,7 +78,12 @@ const ProfileDetails = ({ user }) => {
           >
             <img
               className={classes.profile_image}
-              src={userImage}
+              src={
+                user?.data?.profilePicture.split(":")[0] === "https" ||
+                user?.data?.profilePicture.split(":")[0] === "http"
+                  ? user?.data?.profilePicture
+                  : `${BASE_URL}/${user?.data?.profilePicture}`
+              }
               alt="profile_picture"
             />
             {currentUser && currentUser?._id === user?.data?._id && (
