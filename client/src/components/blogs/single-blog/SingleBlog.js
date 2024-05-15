@@ -52,7 +52,7 @@ const SingleBlog = () => {
   useEffect(() => {
     if (currentUser) {
       setIsFollowing(
-        currentUser?.followers.find((fData) => fData.userId === currentUser._id)
+        currentUser?.followers.find((fData) => fData._id === currentUser._id)
       );
     }
   }, []);
