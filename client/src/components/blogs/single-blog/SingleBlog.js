@@ -99,8 +99,11 @@ const SingleBlog = () => {
                       {" "}
                       <strong>
                         {" "}
-                        {data?.data?.user?.firstName}{" "}
-                        {data?.data?.user?.lastName}
+                        <a href="">
+                          {" "}
+                          {data?.data?.user?.firstName}{" "}
+                          {data?.data?.user?.lastName}{" "}
+                        </a>
                       </strong>
                     </NavLink>
                   </span>

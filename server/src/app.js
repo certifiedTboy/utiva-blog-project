@@ -10,8 +10,9 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://utiva-webdev-blog-project.vercel.app/",
+  "https://utiva-webdev-blog-project.vercel.app",
   "https://webdev-blogg.vercel.app",
+  "https://www.webdevblog.live",
 ];
 const expressOptions = {
   urlencodExtended: true,
