@@ -6,11 +6,15 @@ const AllBlogPage = () => {
   return (
     <Container>
       <Row>
-        <Col lg={3} md={3} sm={2}></Col>
-        <Col lg={6} md={6} sm={8}>
+        <Col lg={8} md={8} sm={12}>
           <AllBlogs />
         </Col>
-        <Col lg={3} md={3} sm={2}></Col>
+        <Col
+          lg={4}
+          md={4}
+          sm={12}
+          className="d-none d-sm-none d-md-block"
+        ></Col>
       </Row>
     </Container>
   );

@@ -27,8 +27,8 @@ const router = express.Router();
 router.post(
   "/create-user",
   checkUserDataInputIsEmpty,
-  checkEmailValidity,
   checkAcceptTerms,
+  checkEmailValidity,
   checkNameDataLength,
   createUser
 );

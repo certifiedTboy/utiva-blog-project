@@ -64,7 +64,7 @@ const loginWithGoogle = async (req, res, next) => {
     if (data.userSession) {
       const jwtTokenOptions = {
         expires: data.userSession.expiresAt,
-        maxAge: 59 * 60 * 60 * 1000,
+        maxAge: 1 * 60 * 60 * 1000,
         httpOnly: true,
         sameSite: "none",
         secure: true,

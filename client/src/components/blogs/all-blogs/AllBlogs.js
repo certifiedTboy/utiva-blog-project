@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, Fragment } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useGetAllBlogsMutation } from "../../../lib/APIS/blogApis/BlogApi";
 import BlogCard from "./BlogCard";
@@ -54,7 +54,7 @@ const AllBlogs = () => {
           <BlogCard
             title={blog.title}
             description={blog.description}
-            blogId={blog._id}
+            key={blog._id}
             createdAt={blog.createdAt}
             userNameData={blog.user}
           />

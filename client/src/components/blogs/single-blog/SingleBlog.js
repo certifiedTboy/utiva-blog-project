@@ -6,12 +6,8 @@ import { useSelector } from "react-redux";
 import {
   useGetBlogByTitleMutation,
   useCommentToBlogMutation,
-  useGetBlogCommentsMutation,
 } from "../../../lib/APIS/blogApis/BlogApi";
-import {
-  useGetUserProfileByIdMutation,
-  useFollowUserMutation,
-} from "../../../lib/APIS/userApi/userApi";
+import { useFollowUserMutation } from "../../../lib/APIS/userApi/userApi";
 import { transform } from "./Transform";
 import RelatedPosts from "./RelatedPosts";
 import KeyWords from "./KeyWords";
@@ -21,6 +17,14 @@ import Reaction from "./Reaction";
 const SingleBlog = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [text, setText] = useState("");
+
+  let BASE_URL;
+
+  if (process.env.NODE_ENV === "development") {
+    BASE_URL = process.env.REACT_APP_DEV_IMAGE_URL;
+  } else {
+    BASE_URL = process.env.REACT_APP_PROD_IMAGE_URL;
+  }
 
   const [getBlogByTitle, { data, isSuccess: success, isError, error }] =
     useGetBlogByTitleMutation();
@@ -91,7 +95,7 @@ const SingleBlog = () => {
                         data?.data?.user?.profilePicture.split(":")[0] ===
                           "http"
                           ? data?.data?.user?.profilePicture
-                          : `https://utivablog-project-server.onrender.com/${data?.data?.user?.profilePicture}`
+                          : `${BASE_URL}/${data?.data?.user?.profilePicture}`
                       }
                     />
                     <i className="fas fa-user ml-2"></i>
@@ -177,7 +181,7 @@ const SingleBlog = () => {
                                       ":"
                                     )[0] === "http"
                                       ? comment.user.profilePicture
-                                      : `https://utivablog-project-server.onrender.com/${comment.user.profilePicture}`
+                                      : `${BASE_URL}/${comment.user.profilePicture}`
                                   }
                                 />
                               </span>

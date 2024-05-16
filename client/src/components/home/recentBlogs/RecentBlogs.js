@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import BlogCard from "../../blogs/all-blogs/BlogCard";
+import RecentBlogCard from "./RecentBlogCard";
 import { useGetAllBlogsMutation } from "../../../lib/APIS/blogApis/BlogApi";
 import DataError from "../../Error/DataError";
 import Loader from "../../UI/loader/Loader";
@@ -59,7 +59,7 @@ const RecentTopic = () => {
             recentBlogs.map((blog) => {
               return (
                 <div className="col-lg-4 col-md-6" key={blog._id}>
-                  <BlogCard
+                  <RecentBlogCard
                     title={blog.title}
                     description={blog.description}
                     blogId={blog._id}

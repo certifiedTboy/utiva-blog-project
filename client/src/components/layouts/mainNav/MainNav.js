@@ -14,10 +14,10 @@ const MainNav = ({ scrollTop }) => {
 
   let BASE_URL;
 
-  if (process.env.NODE_ENV === "production") {
-    BASE_URL = process.env.REACT_APP_API_PROD_BASE_URL;
+  if (process.env.NODE_ENV === "development") {
+    BASE_URL = process.env.REACT_APP_DEV_IMAGE_URL;
   } else {
-    BASE_URL = process.env.REACT_APP_API_DEV_BASE_URL;
+    BASE_URL = process.env.REACT_APP_PROD_IMAGE_URL;
   }
 
   const { user } = useSelector((state) => state.userState);
@@ -142,7 +142,7 @@ const MainNav = ({ scrollTop }) => {
                       user?.profilePicture.split(":")[0] === "https" ||
                       user?.profilePicture.split(":")[0] === "http"
                         ? user?.profilePicture
-                        : `https://utivablog-project-server.onrender.com/${user?.profilePicture}`
+                        : `${BASE_URL}/${user?.profilePicture}`
                     }
                     alt="profile_picture"
                   />

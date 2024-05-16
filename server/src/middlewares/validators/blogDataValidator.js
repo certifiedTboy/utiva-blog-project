@@ -8,13 +8,13 @@ const checkBlogDataValidity = async (req, res, next) => {
       throw new UnprocessableError("all blog input fields are require");
     }
 
-    if (title.length > 100) {
+    if (title.length > 50) {
       throw new UnprocessableError(
         "title can not be longer than 100 characters"
       );
     }
 
-    if (description.length > 250) {
+    if (description.length > 150) {
       throw new UnprocessableError(
         "description can not be longer than 250 characters"
       );
@@ -39,7 +39,7 @@ const checkCommentDataValidity = async (req, res, next) => {
       );
     }
 
-    next()
+    next();
   } catch (error) {
     next(error);
   }

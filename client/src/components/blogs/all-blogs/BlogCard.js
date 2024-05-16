@@ -1,47 +1,56 @@
-import React, { useState, useEffect } from "react";
 import Moment from "react-moment";
-import Card from "react-bootstrap/Card";
+import { Container, Row, Col, Card } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import { useGetUserProfileByIdMutation } from "../../../lib/APIS/userApi/userApi";
-import DescriptionPopUp from "./DescriptionPopUp";
 import blogImg from "../../../Assets/news-bg-1.png";
+import "../single-blog/SingleBlog.css";
 
-const BlogCard = ({ title, description, blogId, createdAt, userNameData }) => {
-  const [showA, setShowA] = useState({ state: false, key: "" });
+const BlogCard = ({ title, description, createdAt, userNameData }) => {
+  let BASE_URL;
+
+  if (process.env.NODE_ENV === "development") {
+    BASE_URL = process.env.REACT_APP_DEV_IMAGE_URL;
+  } else {
+    BASE_URL = process.env.REACT_APP_PROD_IMAGE_URL;
+  }
 
   return (
-    <Card
-      style={{ width: "100%" }}
-      onClick={() => setShowA({ state: false, key: "" })}
-      key={blogId}
-      className="mt-5"
-    >
-      <Card.Img variant="top" src={blogImg} />
-      <Card.Body>
-        <Card.Title>{title}</Card.Title>
-        <i className="fas fa-user"></i>{" "}
-        <NavLink to={`/w-d/${userNameData.username}`} className="mr-3">
-          {userNameData.firstName} {userNameData.lastName}
-        </NavLink>
-        <span className="date" style={{ float: "right" }}>
-          <i className="fas fa-calendar"></i>
-          <Moment className="ml-2" fromNow>
-            {createdAt}
-          </Moment>
-        </span>
-        {showA.key === blogId && (
-          <DescriptionPopUp showA={showA.state} description={description} />
-        )}
-        <Card.Text
-          className="mt-3"
-          onMouseOver={() => setShowA({ state: true, key: blogId })}
-        >
-          {description.substr(0, 38)}...
-        </Card.Text>
-        <NavLink to={`/blogs/${title}`} className="read-more-btn">
-          read more <i className="fas fa-angle-right"></i>
-        </NavLink>
-      </Card.Body>
+    <Card style={{ width: "100%" }} className="mt-5">
+      <Container>
+        <Row style={{ alignItems: "center" }}>
+          <Col lg={8} md={8} sm={8}>
+            <img
+              className="user_image"
+              src={
+                userNameData?.profilePicture.split(":")[0] === "https" ||
+                userNameData?.profilePicture.split(":")[0] === "http"
+                  ? userNameData?.profilePicture
+                  : `${BASE_URL}/${userNameData?.profilePicture}`
+              }
+            />
+            <i className="fas fa-user ml-2 mr-2"></i>
+            <NavLink to={`/w-d/${userNameData.username}`} className="mr-3">
+              {userNameData.firstName} {userNameData.lastName}
+            </NavLink>{" "}
+            <span className="date">
+              <i className="fas fa-calendar"></i>
+              <Moment className="ml-2" fromNow>
+                {createdAt}
+              </Moment>
+            </span>
+            <NavLink to={`/blogs/${title}`} className="read-more-btn">
+              <Card.Title className="title_text">{title}</Card.Title>
+              <Card.Text className="mt-3">
+                {description.substr(0, 38)}...
+              </Card.Text>
+            </NavLink>
+          </Col>
+          <Col lg={4} md={4} sm={4} xm={12}>
+            <NavLink to={`/blogs/${title}`} className="read-more-btn">
+              <Card.Img variant="top" src={blogImg} />
+            </NavLink>
+          </Col>
+        </Row>
+      </Container>
     </Card>
   );
 };

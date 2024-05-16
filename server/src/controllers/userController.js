@@ -45,6 +45,7 @@ const verifyUser = async (req, res, next) => {
 
 const uploadUserProfile = async (req, res, next) => {
   const userId = req.user.id;
+
   try {
     const imagePath = "uploads/" + req.file.filename;
 

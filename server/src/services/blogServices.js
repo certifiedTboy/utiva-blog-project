@@ -21,7 +21,7 @@ const publishedBlogs = async (skip, limit) => {
   const blogs = await Blog.find({ isPublished: true }, { __v: 0 })
     .skip(skip)
     .limit(limit)
-    .populate("user", "username email _id firstName lastName")
+    .populate("user", "username email _id firstName lastName profilePicture")
     .populate({
       path: "reactions",
       populate: {

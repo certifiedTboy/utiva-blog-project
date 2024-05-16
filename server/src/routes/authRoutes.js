@@ -24,7 +24,7 @@ router.post(
   checkPasswordMatch,
   setUserPassword
 );
-router.post("/login", checkEmailValidity, userLogin);
+router.post("/login", userLogin);
 router.post("/google/login", loginWithGoogle);
 router.get("/logout", Authenticate, userLogout);
 

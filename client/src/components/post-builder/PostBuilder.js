@@ -127,13 +127,17 @@ const PostBuilder = () => {
 
   // Update blog handler
   const saveBlog = async () => {
-    if (title === "" || description === "" || contentRef.current.value === "") {
+    if (
+      title === "" ||
+      description === "" ||
+      contentRef.current?.value === ""
+    ) {
       return setErrorMessage("Blog inputs can't be empty");
     }
     const blogData = {
       title,
       description,
-      content: contentRef.current.value,
+      content: contentRef.current?.value,
     };
 
     await updateBlog({ blogData, blogId: blog?.data?._id });
