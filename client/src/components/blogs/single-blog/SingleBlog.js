@@ -3,20 +3,17 @@ import { Interweave } from "interweave";
 import Moment from "react-moment";
 import { NavLink, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import {
-  useGetBlogByTitleMutation,
-  useCommentToBlogMutation,
-} from "../../../lib/APIS/blogApis/BlogApi";
+import { useGetBlogByTitleMutation } from "../../../lib/APIS/blogApis/BlogApi";
 import { useFollowUserMutation } from "../../../lib/APIS/userApi/userApi";
 import { transform } from "./Transform";
 import RelatedPosts from "./RelatedPosts";
 import KeyWords from "./KeyWords";
 import "./SingleBlog.css";
 import Reaction from "./Reaction";
+import BlogComments from "./BlogComments";
 
 const SingleBlog = () => {
   const [isFollowing, setIsFollowing] = useState(false);
-  const [text, setText] = useState("");
 
   let BASE_URL;
 
@@ -32,18 +29,11 @@ const SingleBlog = () => {
   const [followUser, { isSuccess: followSuccess, data: followData }] =
     useFollowUserMutation();
 
-  const [commentToBlog, { isSuccess: commentSuccess, isError: commentError }] =
-    useCommentToBlogMutation();
-
   const { user: currentUser } = useSelector((state) => state.userState);
 
   const params = useParams();
 
   const { blogTitle } = params;
-
-  const commentChangeHandler = (event) => {
-    setText(event.target.value);
-  };
 
   useEffect(() => {
     const onGetBlogByTitle = async () => {
@@ -51,7 +41,7 @@ const SingleBlog = () => {
     };
 
     onGetBlogByTitle();
-  }, [blogTitle, commentSuccess]);
+  }, []);
 
   useEffect(() => {
     if (currentUser) {
@@ -64,17 +54,6 @@ const SingleBlog = () => {
   const followUserHandler = async () => {
     const followData = { otherUserId: currentUser._id };
     await followUser(followData);
-  };
-
-  const onCommentToBlog = async (event) => {
-    event.preventDefault();
-    if (!text || text.trim().length === 0) {
-      return;
-    }
-    const commentData = { text };
-    await commentToBlog({ commentData, blogId: data?.data?._id });
-
-    return setText("");
   };
 
   return (
@@ -156,72 +135,8 @@ const SingleBlog = () => {
               </div>
               {data?.data && <Reaction blogId={data?.data?._id} />}
 
-              <div className="comments-list-wrap">
-                {data?.data && (
-                  <h3 className="comment-count-title">
-                    {data?.data?.comments?.length} Comments
-                  </h3>
-                )}
-                <div className="comment-list">
-                  {data?.data?.comments &&
-                    data?.data?.comments?.map((comment) => {
-                      return (
-                        <div className="single-comment-body" key={comment._id}>
-                          {" "}
-                          <div className="comment-text-body">
-                            <h4>
-                              <span className="author mr-2">
-                                <img
-                                  className="user_image"
-                                  src={
-                                    comment.user.profilePicture.split(
-                                      ":"
-                                    )[0] === "https" ||
-                                    comment.user.profilePicture.split(
-                                      ":"
-                                    )[0] === "http"
-                                      ? comment.user.profilePicture
-                                      : `${BASE_URL}/${comment.user.profilePicture}`
-                                  }
-                                />
-                              </span>
-                              {comment?.user?.firstName}{" "}
-                              {comment?.user?.lastName}
-                              <span className="comment-date">
-                                <Moment className="meta-own" fromNow>
-                                  {comment?.createdAt}
-                                </Moment>
-                              </span>{" "}
-                            </h4>
-                            <p>{comment.text}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                </div>
-              </div>
-
-              {currentUser && (
-                <div className="comment-template">
-                  <h4>Leave a comment</h4>
-
-                  <form onSubmit={onCommentToBlog}>
-                    <p>
-                      <textarea
-                        onChange={commentChangeHandler}
-                        name="comment"
-                        id="comment"
-                        cols="30"
-                        rows="3"
-                        placeholder="Your Message"
-                        value={text}
-                      ></textarea>
-                    </p>
-                    <p>
-                      <input type="submit" value="Submit" />
-                    </p>
-                  </form>
-                </div>
+              {data?.data?.comments && (
+                <BlogComments blogId={data?.data?._id} />
               )}
             </div>
           </div>

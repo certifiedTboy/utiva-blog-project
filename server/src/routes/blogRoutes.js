@@ -88,6 +88,6 @@ router.put(
 );
 router.delete("/:blogId/comments/:commentId", Authenticate, deleteComment);
 
-router.get("/blog/:blogId/comments", getBlogComments);
+router.get("/:blogId/comments", getBlogComments);
 
 module.exports = router;

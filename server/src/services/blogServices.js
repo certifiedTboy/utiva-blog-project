@@ -60,7 +60,13 @@ const checkBlogExistByTitle = async (blogTitle) => {
 };
 
 const checkBlogExistById = async (blogId) => {
-  const blog = await Blog.findById(blogId);
+  const blog = await Blog.findById(blogId).populate({
+    path: "comments",
+    populate: {
+      path: "user",
+      select: "username email _id firstName lastName profilePicture",
+    },
+  });
 
   if (!blog) {
     throw new NotFoundError("blog does not exist");
