@@ -15,10 +15,6 @@ const AllBlogs = () => {
     useGetAllBlogsMutation();
 
   useEffect(() => {
-    getAllBlogs(pageNum);
-  }, [pageNum]);
-
-  useEffect(() => {
     // update blog state on request success
     if (isSuccess) {
       setBlogs([...blogs, ...data?.data?.blogs]);
@@ -33,15 +29,19 @@ const AllBlogs = () => {
     }
   }, [isSuccess]);
 
-  const noBlobMessage = blogs.length === 0 && <h1>No blog created Yet</h1>;
-
-  const errorMessage = error?.data?.message || "something went wrong";
-
   const changePageNum = () => {
     if (hasMore) {
       setPageNum(pageNum + 1);
     }
   };
+
+  useEffect(() => {
+    getAllBlogs(pageNum);
+  }, [pageNum]);
+
+  const noBlobMessage = blogs.length === 0 && <h1>No blog created Yet</h1>;
+
+  const errorMessage = error?.data?.message || "something went wrong";
 
   return (
     <Fragment>
