@@ -60,6 +60,7 @@ const AllBlogs = () => {
           />
         ))}
       </InfiniteScroll>
+      {isLoading && <LoadingPlaceHolder />}
       {noBlobMessage}
 
       {isError && <DataError errorMessage={errorMessage} path={"/blogs"} />}
