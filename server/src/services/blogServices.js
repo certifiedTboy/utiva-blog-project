@@ -18,6 +18,19 @@ const allBlogs = async (skip, limit) => {
 };
 
 const publishedBlogs = async (skip, limit) => {
+  const cursor = await Blog.aggregate([
+    {
+      $match: {
+        isPublished: {
+          $eq: true,
+        },
+      },
+    },
+    {
+      $count: "title",
+    },
+  ]);
+
   const blogs = await Blog.find({ isPublished: true }, { __v: 0 })
     .skip(skip)
     .limit(limit)
@@ -31,7 +44,11 @@ const publishedBlogs = async (skip, limit) => {
     })
     .exec();
 
-  return blogs;
+  const total = cursor[0].title;
+
+  const pages = Math.abs(total / 5);
+
+  return { blogs, total, pages };
 };
 
 const blogsByAUser = async (userId, skip, limit) => {

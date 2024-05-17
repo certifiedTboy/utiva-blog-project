@@ -25,7 +25,9 @@ const RecentTopic = () => {
 
   useEffect(() => {
     if (data) {
-      setRecentBlogs(data.data.slice(indexOfFirstRecord, indexOfLastRecord));
+      setRecentBlogs(
+        data?.data?.blogs?.slice(indexOfFirstRecord, indexOfLastRecord)
+      );
     }
   }, [indexOfFirstRecord, indexOfLastRecord, data]);
 

@@ -9,6 +9,7 @@ const AllBlogs = () => {
   const [pageNum, setPageNum] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [blogs, setBlogs] = useState([]);
+  const [totalBlogs, setTotalBlogs] = useState(0);
 
   const [getAllBlogs, { data, isError, error, isLoading, isSuccess }] =
     useGetAllBlogsMutation();
@@ -20,11 +21,12 @@ const AllBlogs = () => {
   useEffect(() => {
     // update blog state on request success
     if (isSuccess) {
-      setBlogs([...blogs, ...data?.data]);
+      setBlogs([...blogs, ...data?.data?.blogs]);
+      setTotalBlogs(data?.data?.total);
     }
 
     // check if 0 data is returned from db to update hasMore
-    if (data?.data?.length > 0) {
+    if (data?.data?.blogs?.length > 0) {
       setHasMore(true);
     } else {
       setHasMore(false);
@@ -44,11 +46,12 @@ const AllBlogs = () => {
   return (
     <Fragment>
       <InfiniteScroll
-        dataLength={10000}
+        dataLength={totalBlogs}
         next={changePageNum}
         hasMore={hasMore}
         loader={<LoadingPlaceHolder />}
         style={{ overflow: "hidden" }}
+        endMessage={<p>Yay! You have seen it all!</p>}
       >
         {blogs.map((blog) => (
           <BlogCard
