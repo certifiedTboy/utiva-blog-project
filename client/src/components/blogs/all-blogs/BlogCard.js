@@ -14,7 +14,7 @@ const BlogCard = ({ title, description, createdAt, userNameData }) => {
   }
 
   return (
-    <Card style={{ width: "100%" }} className="mt-5">
+    <Card style={{ width: "100%" }} className="mt-5 py-3">
       <Container>
         <Row style={{ alignItems: "center" }}>
           <Col lg={8} md={8} sm={8} xs={8}>
