@@ -17,7 +17,7 @@ const BlogCard = ({ title, description, createdAt, userNameData }) => {
     <Card style={{ width: "100%" }} className="mt-5">
       <Container>
         <Row style={{ alignItems: "center" }}>
-          <Col lg={8} md={8} sm={8}>
+          <Col lg={8} md={8} sm={8} xs={8}>
             <img
               className="user_image"
               src={
@@ -44,9 +44,9 @@ const BlogCard = ({ title, description, createdAt, userNameData }) => {
               </Card.Text>
             </NavLink>
           </Col>
-          <Col lg={4} md={4} sm={4} xm={12}>
+          <Col lg={4} md={4} sm={4} xs={2}>
             <NavLink to={`/blogs/${title}`} className="read-more-btn">
-              <Card.Img variant="top" src={blogImg} />
+              <Card.Img variant="top" src={blogImg} style={{ width: "100%" }} />
             </NavLink>
           </Col>
         </Row>

@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import { useLocation } from "react-router-dom";
-import { SEO } from "../../lib/SEO/SEO";
+import { SEO } from "../../helpers/SEO/SEO";
 // import Footer from "./footer/Footer";
 // import BackToTop from "../UI/BackToTop/BackToTop";
 import MainNav from "./mainNav/MainNav";

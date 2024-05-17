@@ -153,6 +153,7 @@ const SingleBlog = () => {
                   <KeyWords
                     title={data?.data?.title}
                     description={data?.data?.description}
+                    content={data?.data?.content}
                   />
                 )}
               </div>
