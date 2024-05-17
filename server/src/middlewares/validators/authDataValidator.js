@@ -19,8 +19,8 @@ const checkEmailValidity = async (req, res, next) => {
     if (!email) {
       throw new UnprocessableError("email field is required");
     }
-    let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if (!email.match(regex)) {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!regex.test(email)) {
       throw new UnprocessableError("Invalid email address");
     } else {
       next();

@@ -32,11 +32,11 @@ const Register = () => {
       return setGeneralError("All input fields are required");
     }
 
-    // let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    let regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    // if (!email.match(regex)) {
-    //   return setGeneralError("Invalid email address");
-    // }
+    if (!regex.test(email)) {
+      return setGeneralError("Invalid email address");
+    }
 
     if (!acceptTerms) {
       return setGeneralError(
