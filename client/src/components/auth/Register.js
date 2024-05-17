@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { useRegisterUserMutation } from "../../lib/APIS/authApis/authApis";
@@ -32,7 +32,7 @@ const Register = () => {
       return setGeneralError("All input fields are required");
     }
 
-    let regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!regex.test(email)) {
       return setGeneralError("Invalid email address");
@@ -52,14 +52,18 @@ const Register = () => {
 
     setGeneralError("");
 
-    await registerUser(regData);
-
-    setEmail("");
-    setFirstName("");
-    return setLastName("");
+    return await registerUser(regData);
   };
 
-  const { isLoading, isError, error, data } = response;
+  const { isLoading, isError, error, data, isSuccess } = response;
+
+  useEffect(() => {
+    if (isSuccess) {
+      setEmail("");
+      setFirstName("");
+      setLastName("");
+    }
+  }, [isSuccess]);
 
   return (
     <Container className="mt-5">
