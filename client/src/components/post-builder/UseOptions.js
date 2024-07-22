@@ -5,6 +5,8 @@ const UseOptions = () => {
   const [blogs, setBlogs] = useState([]);
   const [getAllBlogs, { isSuccess, data }] = useGetAllBlogsMutation();
 
+  console.log(data);
+
   useEffect(() => {
     const onGetAllBlogs = async () => {
       await getAllBlogs();
@@ -20,7 +22,7 @@ const UseOptions = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      const blogData = data?.data?.map((blog) => {
+      const blogData = data?.blos?.map((blog) => {
         let newBlogData = {
           text: blog.title,
           value: blog.title,
