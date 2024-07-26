@@ -39,8 +39,6 @@ const AllBlogs = () => {
     getAllBlogs(pageNum);
   }, [pageNum]);
 
-  const noBlobMessage = blogs.length === 0 && <h1>No blog created Yet</h1>;
-
   const errorMessage = error?.data?.message || "something went wrong";
 
   return (
@@ -51,7 +49,7 @@ const AllBlogs = () => {
         hasMore={hasMore}
         loader={<LoadingPlaceHolder />}
         style={{ overflow: "hidden" }}
-        endMessage={<p>Yay! You have seen it all!</p>}
+        endMessage={<p></p>}
       >
         {blogs.map((blog) => (
           <BlogCard
@@ -64,7 +62,6 @@ const AllBlogs = () => {
         ))}
       </InfiniteScroll>
       {isLoading && <LoadingPlaceHolder />}
-      {noBlobMessage}
 
       {isError && <DataError errorMessage={errorMessage} path={"/blogs"} />}
     </Fragment>
