@@ -69,14 +69,14 @@ const Layout = (props) => {
     };
   } else if (pathname === `/w-d/${pathname.split("/")[2]}`) {
     titleData = {
-      title: `WebDev - webdev/${pathname.split("/")[2]}`,
+      title: `WebDev - ${decodeURIComponent(pathname.split("/")[2])}`,
       metaDescription: `profile details and activities of ${
         pathname.split("/")[2]
       } on webdev blog`,
     };
   } else if (pathname === `/blogs/${pathname.split("/")[2]}`) {
     titleData = {
-      title: `WebDev - blogs/${pathname.split("/")[2]}`,
+      title: `WebDev - ${decodeURIComponent(pathname.split("/")[2])}`,
       metaDescription: `${pathname.split("/")[2]}`,
     };
   } else {
