@@ -1,4 +1,4 @@
-const transport = require("../helpers/smtp/SMTPTransport");
+const transport = require("../helpers/smtp/gmailSMTP");
 const envVariable = require("../config/config");
 
 const { SMTP_USER } = envVariable;
