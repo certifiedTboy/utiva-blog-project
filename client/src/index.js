@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 root.render(
-  <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+  <GoogleOAuthProvider clientId="620166969775-lg6nauvvltv5b61l3uo065nv2li19fn8.apps.googleusercontent.com">
     <Provider store={store}>
       <BrowserRouter>
         <App />
