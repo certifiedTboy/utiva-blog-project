@@ -2,26 +2,48 @@ import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Search, Filter } from "lucide-react";
 import { POSTS, CATEGORIES, TAGS } from "@/lib/mock-data";
-import PostCard from "@/components/PostCard";
+import PostCard from "@/pages/blogs/post-card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 const PAGE_SIZE = 9;
 
 function BookOpenIcon({ className }: { className?: string }) {
-  return <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>;
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+      />
+    </svg>
+  );
 }
 
 export default function BlogPage() {
-  const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+  const params = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : "",
+  );
   const [search, setSearch] = useState(params.get("search") || "");
-  const [selectedCategory, setSelectedCategory] = useState(params.get("category") || "");
+  const [selectedCategory, setSelectedCategory] = useState(
+    params.get("category") || "",
+  );
   const [selectedTag, setSelectedTag] = useState(params.get("tag") || "");
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
-    return POSTS.filter(p => {
-      const matchSearch = !search || p.title.toLowerCase().includes(search.toLowerCase()) || p.excerpt?.toLowerCase().includes(search.toLowerCase());
+    return POSTS.filter((p) => {
+      const matchSearch =
+        !search ||
+        p.title.toLowerCase().includes(search.toLowerCase()) ||
+        p.excerpt?.toLowerCase().includes(search.toLowerCase());
       const matchCat = !selectedCategory || p.categoryName === selectedCategory;
       const matchTag = !selectedTag || p.tags.includes(selectedTag);
       return matchSearch && matchCat && matchTag;
@@ -34,21 +56,35 @@ export default function BlogPage() {
   return (
     <div className="min-h-screen pt-24 pb-20">
       <div className="max-w-7xl mx-auto px-4">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
-          <h1 className="font-serif text-4xl font-semibold text-foreground mb-2">The Blog</h1>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-10"
+        >
+          <h1 className="font-serif text-4xl font-semibold text-foreground mb-2">
+            The Blog
+          </h1>
           <p className="text-muted-foreground">
-            {filtered.length > 0 ? `${filtered.length} articles and counting` : "Discover great writing"}
+            {filtered.length > 0
+              ? `${filtered.length} articles and counting`
+              : "Discover great writing"}
           </p>
         </motion.div>
 
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex-1 min-w-0">
-            <form onSubmit={e => e.preventDefault()} className="relative mb-8">
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="relative mb-8"
+            >
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="search"
                 value={search}
-                onChange={e => { setSearch(e.target.value); setPage(1); }}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
                 placeholder="Search articles..."
                 className="w-full pl-10 pr-4 py-3 bg-card border border-card-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
                 data-testid="input-search"
@@ -57,25 +93,44 @@ export default function BlogPage() {
 
             {(selectedCategory || selectedTag || search) && (
               <div className="flex flex-wrap items-center gap-2 mb-6">
-                <span className="text-sm text-muted-foreground flex items-center gap-1"><Filter className="w-3.5 h-3.5" /> Filters:</span>
+                <span className="text-sm text-muted-foreground flex items-center gap-1">
+                  <Filter className="w-3.5 h-3.5" /> Filters:
+                </span>
                 {selectedCategory && (
-                  <Badge variant="secondary" className="cursor-pointer gap-1" onClick={() => setSelectedCategory("")}>
+                  <Badge
+                    variant="secondary"
+                    className="cursor-pointer gap-1"
+                    onClick={() => setSelectedCategory("")}
+                  >
                     {selectedCategory} ×
                   </Badge>
                 )}
                 {selectedTag && (
-                  <Badge variant="secondary" className="cursor-pointer gap-1" onClick={() => setSelectedTag("")}>
+                  <Badge
+                    variant="secondary"
+                    className="cursor-pointer gap-1"
+                    onClick={() => setSelectedTag("")}
+                  >
                     #{selectedTag} ×
                   </Badge>
                 )}
                 {search && (
-                  <Badge variant="secondary" className="cursor-pointer gap-1" onClick={() => setSearch("")}>
+                  <Badge
+                    variant="secondary"
+                    className="cursor-pointer gap-1"
+                    onClick={() => setSearch("")}
+                  >
                     "{search}" ×
                   </Badge>
                 )}
                 <button
                   className="text-xs text-muted-foreground hover:text-foreground underline"
-                  onClick={() => { setSelectedCategory(""); setSelectedTag(""); setSearch(""); setPage(1); }}
+                  onClick={() => {
+                    setSelectedCategory("");
+                    setSelectedTag("");
+                    setSearch("");
+                    setPage(1);
+                  }}
                 >
                   Clear all
                 </button>
@@ -92,7 +147,9 @@ export default function BlogPage() {
               <div className="text-center py-20 text-muted-foreground">
                 <BookOpenIcon className="w-12 h-12 mx-auto mb-4 opacity-30" />
                 <p className="text-lg font-medium">No articles found</p>
-                <p className="text-sm mt-1">Try adjusting your search or filters</p>
+                <p className="text-sm mt-1">
+                  Try adjusting your search or filters
+                </p>
               </div>
             )}
 
@@ -101,7 +158,7 @@ export default function BlogPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
                   data-testid="button-prev-page"
                 >
@@ -113,7 +170,7 @@ export default function BlogPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
                   data-testid="button-next-page"
                 >
@@ -130,20 +187,28 @@ export default function BlogPage() {
               transition={{ delay: 0.2 }}
               className="bg-card border border-card-border rounded-xl p-5"
             >
-              <h3 className="font-serif text-lg font-semibold text-foreground mb-4">Categories</h3>
+              <h3 className="font-serif text-lg font-semibold text-foreground mb-4">
+                Categories
+              </h3>
               <div className="space-y-1">
                 <button
                   className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${!selectedCategory ? "bg-primary text-primary-foreground" : "hover:bg-muted text-foreground"}`}
-                  onClick={() => { setSelectedCategory(""); setPage(1); }}
+                  onClick={() => {
+                    setSelectedCategory("");
+                    setPage(1);
+                  }}
                   data-testid="button-category-all"
                 >
                   All Topics
                 </button>
-                {CATEGORIES.map(cat => (
+                {CATEGORIES.map((cat) => (
                   <button
                     key={cat.id}
                     className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex justify-between ${selectedCategory === cat.name ? "bg-primary text-primary-foreground" : "hover:bg-muted text-foreground"}`}
-                    onClick={() => { setSelectedCategory(cat.name); setPage(1); }}
+                    onClick={() => {
+                      setSelectedCategory(cat.name);
+                      setPage(1);
+                    }}
                     data-testid={`button-category-${cat.id}`}
                   >
                     <span>{cat.name}</span>
@@ -159,14 +224,19 @@ export default function BlogPage() {
               transition={{ delay: 0.3 }}
               className="bg-card border border-card-border rounded-xl p-5"
             >
-              <h3 className="font-serif text-lg font-semibold text-foreground mb-4">Tags</h3>
+              <h3 className="font-serif text-lg font-semibold text-foreground mb-4">
+                Tags
+              </h3>
               <div className="flex flex-wrap gap-2">
-                {TAGS.map(tag => (
+                {TAGS.map((tag) => (
                   <Badge
                     key={tag.id}
                     variant={selectedTag === tag.name ? "default" : "secondary"}
                     className="cursor-pointer hover:bg-primary/20 transition-colors"
-                    onClick={() => { setSelectedTag(selectedTag === tag.name ? "" : tag.name); setPage(1); }}
+                    onClick={() => {
+                      setSelectedTag(selectedTag === tag.name ? "" : tag.name);
+                      setPage(1);
+                    }}
                     data-testid={`badge-tag-${tag.id}`}
                   >
                     #{tag.name}
