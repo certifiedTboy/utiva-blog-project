@@ -5,7 +5,7 @@ import Router from "./router";
 export default function Layout() {
   return (
     <div className="flex flex-col min-h-screen">
-      <header>
+      <header className="mbe-20">
         <Navbar />
       </header>
       <main className="flex-1">

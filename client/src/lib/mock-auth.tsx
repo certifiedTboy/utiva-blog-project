@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import { MOCK_USER } from "./mock-data";
 
 interface AuthState {
@@ -18,11 +18,22 @@ const AuthContext = createContext<AuthState>({
 export function MockAuthProvider({ children }: { children: ReactNode }) {
   const [isSignedIn, setIsSignedIn] = useState(false);
 
-  function signIn() { setIsSignedIn(true); }
-  function signOut() { setIsSignedIn(false); }
+  function signIn() {
+    setIsSignedIn(true);
+  }
+  function signOut() {
+    setIsSignedIn(false);
+  }
 
   return (
-    <AuthContext.Provider value={{ isSignedIn, user: isSignedIn ? MOCK_USER : null, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{
+        isSignedIn,
+        user: isSignedIn ? MOCK_USER : null,
+        signIn,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

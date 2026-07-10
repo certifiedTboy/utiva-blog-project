@@ -158,12 +158,7 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link href="/sign-in">
-                  <Button size="sm" variant="ghost" data-testid="link-sign-in">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/sign-up">
+                <Link href="/sign-up" className="hidden md:inline-block">
                   <Button size="sm" data-testid="link-sign-up">
                     Get Started
                   </Button>
@@ -226,7 +221,7 @@ export default function Navbar() {
                 <>
                   <Link href="/sign-in">
                     <span className="block text-sm font-medium text-muted-foreground py-2 flex items-center gap-2">
-                      <LogIn className="w-4 h-4" /> Sign In
+                      <LogIn className="w-4 h-4" /> Get Started
                     </span>
                   </Link>
                 </>
