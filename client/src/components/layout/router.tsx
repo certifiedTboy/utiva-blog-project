@@ -10,6 +10,9 @@ import AdminUsersPage from "@/pages/admin/admin-users-page";
 import AdminCommentsPage from "@/pages/admin/admin-comments-page";
 import SignInPage from "@/pages/auth/signin-page";
 import SignUpPage from "@/pages/auth/signup-page";
+import AccountVerificationPage from "@/pages/auth/account-verification-page";
+import PasswordResetRequestPage from "@/pages/auth/password-reset-request-page";
+import PasswordUpdatePage from "@/pages/auth/password-update-page";
 import GoogleCallbackPage from "@/pages/auth/google-callback-page";
 import NotFound from "@/pages/not-found";
 
@@ -29,6 +32,9 @@ export default function Router() {
       <Route path="/sign-in" component={SignInPage} />
       <Route path="/sign-in/:rest*" component={SignInPage} />
       <Route path="/sign-up" component={SignUpPage} />
+      <Route path="/account-verification" component={AccountVerificationPage} />
+      <Route path="/password-reset" component={PasswordResetRequestPage} />
+      <Route path="/password-update" component={PasswordUpdatePage} />
       <Route path="/auth/google/callback" component={GoogleCallbackPage} />
       <Route path="/sign-up/:rest*" component={SignUpPage} />
       <Route component={NotFound} />

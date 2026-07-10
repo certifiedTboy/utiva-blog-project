@@ -89,6 +89,13 @@ export default function SignInPage() {
                   )}
                 </button>
               </div>
+              <div className="text-right">
+                <Link href="/password-reset">
+                  <span className="text-sm text-primary hover:underline font-medium cursor-pointer">
+                    Forgot password?
+                  </span>
+                </Link>
+              </div>
             </div>
             <Button
               type="submit"
