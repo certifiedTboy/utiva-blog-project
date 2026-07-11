@@ -9,16 +9,22 @@
   "scripts": {
     "start": "node src/server.js",
     "build": "tsc",
-    "dev": "concurrently \"tsc -w\" \"nodemon dist/src/server.js\""
+    "copy-assets": "cpx --watch \"src/helpers/templates/**/*\" \"dist/src/helpers/templates\"",
+    "dev": "concurrently \"tsc -w\" \"npm:copy-assets\" \"nodemon dist/src/server.js\"",
+    "new": "ts-node src/server.ts"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
+    "cpx": "^1.5.0",
     "dotenv": "^17.4.2",
+    "ejs": "^6.0.1",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",
     "express-validator": "^7.3.2",
     "mongoose": "^9.7.4",
+    "node-cron": "^4.6.0",
+    "nodemailer": "^9.0.3",
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1",
     "winston": "^3.19.0"
@@ -26,9 +32,11 @@
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
+    "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.6",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^26.1.1",
+    "@types/nodemailer": "^8.0.1",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "@typescript/native": "npm:typescript@^7.0.2",

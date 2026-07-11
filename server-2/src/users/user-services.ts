@@ -2,6 +2,7 @@ import { HttpException } from "../lib/exceptions/http-exception.ts";
 import { type IUser } from "../lib/types.ts";
 import User from "./user.model.ts";
 import { AppHelpers } from "../helpers/app-helpers.ts";
+import eventEmitter from "../helpers/events.ts";
 
 /**
  * @class UserServices
@@ -11,22 +12,32 @@ export class UserServices {
   public static async createUser(userData: IUser) {
     const userExist = await this.checkIfUserExistByEmail(userData.email);
 
-    if (userExist) {
+    if (userExist && userExist?.verified) {
       throw new HttpException(409, "User already exist");
     }
 
-    const newUser = await User.create({
-      ...userData,
-      otp: AppHelpers.generateOTP(),
-      otpExpiry: new Date(Date.now() + 60 * 60 * 1000),
-      password: await AppHelpers.hashPassword(userData.password),
-    });
+    const newUser = await User.findOneAndUpdate(
+      { email: userData.email },
+      {
+        ...userData,
+        otp: AppHelpers.generateOTP(),
+        otpExpiry: new Date(Date.now() + 60 * 60 * 1000),
+        password: await AppHelpers.hashPassword(userData.password),
+      },
+      { returnDocument: "after", upsert: true },
+    );
 
     if (!newUser) {
       throw new HttpException(500, "error creating user");
     }
 
-    return newUser;
+    eventEmitter.emitEvent("new-user", {
+      email: newUser.email,
+      firstName: newUser.firstName,
+      otp: newUser.otp!,
+    });
+
+    return { email: newUser.email };
   }
 
   public static async verifyUser(otp: string) {

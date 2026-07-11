@@ -1,5 +1,5 @@
 import { body } from "express-validator";
-import { UserControllers } from "./user-controllers.js";
+import { UserControllers } from "./user-controllers.ts";
 import { AppRoutesHandler } from "../lib/app-routes-handler.ts";
 
 export class UserRoutes extends AppRoutesHandler {

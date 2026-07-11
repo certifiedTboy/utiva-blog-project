@@ -5,3 +5,9 @@ export interface IUser {
   password: string;
   confirmPassword?: string | undefined;
 }
+
+export interface IEventData {
+  email: string;
+  firstName: string;
+  otp: string;
+}

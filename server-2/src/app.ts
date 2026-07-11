@@ -1,4 +1,4 @@
-import { App } from "./lib/App.js";
+import { App } from "./lib/App.ts";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./helpers/swagger-spec.ts";
 import { UserRoutes } from "./users/user-routes.ts";
