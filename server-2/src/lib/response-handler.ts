@@ -40,7 +40,7 @@ export class ResponseHandler {
 
     return res
       .status(statusCode)
-      .cookie("accessToken", data?.accessToken, cookieOptions)
+      .cookie("authToken", data?.accessToken, cookieOptions)
       .json({ message, refreshToken: data?.refreshToken });
   }
 }

@@ -32,7 +32,7 @@ export class AuthServices {
       throw new HttpException(404, "user with email does not exist");
     }
 
-    if (userExist && !userExist?.verified) {
+    if (userExist && !userExist?.isVerified) {
       throw new HttpException(403, "user account is not verified");
     }
 
@@ -124,8 +124,7 @@ export class AuthServices {
       { otp },
       {
         password: hashedPassword,
-        otp: undefined,
-        otpExpiry: undefined,
+        $unset: { otp: 1, otpExpiry: 1 },
         isVerified: true,
       },
     );
