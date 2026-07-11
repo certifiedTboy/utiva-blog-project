@@ -1,5 +1,5 @@
 import swaggerJsDoc from "swagger-jsdoc";
-// import { userDocs } from "#/users/user-docs.js";
+import { userDocs } from "../users/user-docs.js";
 // import { authDocs } from "#/auth/auth-docs.js";
 
 const options = {
@@ -12,7 +12,7 @@ const options = {
     },
 
     paths: {
-      //   ...userDocs,
+      ...userDocs,
       //   ...authDocs,
     },
 
@@ -27,7 +27,7 @@ const options = {
         cookieAuth: {
           type: "apiKey",
           in: "cookie",
-          name: "accessToken",
+          name: "authToken",
         },
       },
     },

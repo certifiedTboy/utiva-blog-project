@@ -2,12 +2,22 @@ import { body } from "express-validator";
 import { UserControllers } from "./user-controllers.ts";
 import { AppRoutesHandler } from "../lib/app-routes-middlewares.ts";
 
+/**
+ * @class UserRoutes
+ * @extends AppRoutesHandler
+ * @description A class to handle user-related routes for the application.
+ * It sets up endpoints for creating a new user, verifying an account, and fetching a user profile.
+ */
 export class UserRoutes extends AppRoutesHandler {
   constructor() {
     super();
     this.featureRoutes();
   }
 
+  /**
+   * @private featureRoutes
+   * @description Sets up the specific routes for user features, including their validation and authentication middleware.
+   */
   private featureRoutes() {
     this.routes.post(
       "/",
@@ -29,6 +39,11 @@ export class UserRoutes extends AppRoutesHandler {
     );
   }
 
+  /**
+   * @private getCreateUserValidationRules
+   * @description Returns an array of validation rules for the user creation endpoint.
+   * @returns {Array} An array of express-validator middleware.
+   */
   private getCreateUserValidationRules() {
     return [
       body("firstName").notEmpty().withMessage("first name is required"),
@@ -61,6 +76,11 @@ export class UserRoutes extends AppRoutesHandler {
     ];
   }
 
+  /**
+   * @private getVerifyUserValidationRules
+   * @description Returns an array of validation rules for the user verification endpoint.
+   * @returns {Array} An array of express-validator middleware.
+   */
   private getVerifyUserValidationRules() {
     return [
       body("otp")

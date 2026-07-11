@@ -155,6 +155,26 @@ export class AppEvents extends EventEmitter {
         console.log(`Verification email sent to ${eventData.email}`);
         break;
 
+      case "password-reset":
+        await EmailService.sendEmail(
+          eventData?.email!,
+          "Password Reset Request",
+          "password-reset",
+          { name: eventData.firstName, otp: eventData.otp },
+        );
+        console.log(`Password reset email sent to ${eventData.email}`);
+        break;
+
+      case "password-changed":
+        await EmailService.sendEmail(
+          eventData?.email!,
+          "Your Password Has Been Changed",
+          "password-changed",
+          { name: eventData.firstName },
+        );
+        console.log(`Password changed confirmation sent to ${eventData.email}`);
+        break;
+
       default:
         break;
     }
