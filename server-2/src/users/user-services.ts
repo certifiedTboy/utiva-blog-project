@@ -32,9 +32,11 @@ export class UserServices {
     }
 
     eventEmitter.emitEvent("new-user", {
+      id: newUser.email,
       email: newUser.email,
       firstName: newUser.firstName,
       otp: newUser.otp!,
+      delayInMinutes: 0.5,
     });
 
     return { email: newUser.email };
@@ -55,13 +57,23 @@ export class UserServices {
       throw new HttpException(409, "otp expired");
     }
 
-    user.verified = true;
-    user.otp = undefined;
-    user.otpExpiry = undefined;
+    const updatedUser = await User.findOneAndUpdate(
+      { email: user.email },
+      {
+        ...user,
+        otp: undefined,
+        otpExpiry: undefined,
+      },
+      { returnDocument: "after", upsert: true },
+    );
 
-    await user.save();
-
-    return user;
+    eventEmitter.emitEvent("user-verified", {
+      id: updatedUser.email,
+      firstName: updatedUser.firstName,
+      email: updatedUser.email,
+      delayInMinutes: 0.5,
+    });
+    return { email: updatedUser?.email };
   }
 
   private static async checkIfUserExistByEmail(email: string) {

@@ -7,7 +7,23 @@ export interface IUser {
 }
 
 export interface IEventData {
+  id: string;
+  delayInMinutes: number;
+  firstName?: string;
+  email?: string;
+  otp?: string;
+}
+
+export type EventTypes =
+  | "new-user"
+  | "user-verified"
+  | "password-reset"
+  | "password-changed";
+
+export interface IJWTPayload {
+  id: string;
   email: string;
-  firstName: string;
-  otp: string;
+  role: string;
+  iat?: number;
+  exp?: number;
 }

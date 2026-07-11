@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 import { UserControllers } from "./user-controllers.ts";
-import { AppRoutesHandler } from "../lib/app-routes-handler.ts";
+import { AppRoutesHandler } from "../lib/app-routes-middlewares.ts";
 
 export class UserRoutes extends AppRoutesHandler {
   constructor() {
@@ -15,11 +15,17 @@ export class UserRoutes extends AppRoutesHandler {
       this.checkValidationResult,
       UserControllers.createNewUser,
     );
-    this.routes.post(
+    this.routes.put(
       "/verify",
       this.getVerifyUserValidationRules(),
       this.checkValidationResult,
       UserControllers.verifyUserAccount,
+    );
+
+    this.routes.get(
+      "/profile",
+      this.authGuard,
+      UserControllers.getCurrentUserProfile,
     );
   }
 

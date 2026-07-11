@@ -1,7 +1,7 @@
 import EventEmitter from "node:events";
 import cron from "node-cron";
 import EmailService from "./smtp.ts";
-import { type IEventData } from "../lib/types.ts";
+import { type IEventData, type EventTypes } from "../lib/types.ts";
 
 /**
  * @class AppEvents
@@ -15,7 +15,7 @@ export class AppEvents extends EventEmitter {
    * @property {string[]} events - A list of all valid event names that can be emitted or listened to within the application.
    * This acts as an allowlist to prevent typos and ensure only defined events are used.
    */
-  private readonly events: string[];
+  private readonly events: EventTypes[];
   /**
    * @property {Set<string>} activeJobs - A set to track emails for which a job (like sending a verification email) is currently
    * scheduled or running. This is used as a locking mechanism to prevent duplicate jobs for the same user,
@@ -38,11 +38,11 @@ export class AppEvents extends EventEmitter {
    * Emits an event with the given name and data.
    * It first validates if the event name is one of the predefined events.
    * @template T - The type of the event data payload.
-   * @param {string} name - The name of the event to emit. Must be one of the events in the `this.events` array.
+   * @param {EventTypes} name - The name of the event to emit. Must be one of the events in the `this.events` array.
    * @param {IEventData} eventData - The payload to send with the event.
    * @throws {Error} If the event name is not registered in the `this.events` array.
    */
-  emitEvent(name: string, eventData: IEventData) {
+  emitEvent(name: EventTypes, eventData: IEventData) {
     // prevents unauthorized events
     if (!this.events.includes(name)) {
       throw new Error(`Event ${name} does not exist`);
@@ -50,7 +50,7 @@ export class AppEvents extends EventEmitter {
 
     // Check if a job for this email is already in the queue.
     // This prevents sending multiple emails if the event is emitted multiple times for the same user.
-    if (this.activeJobs.has(eventData.email)) {
+    if (this.activeJobs.has(eventData.id)) {
       console.log(
         `Job for ${eventData.email} is already in the queue. Skipping.`,
       );
@@ -75,59 +75,89 @@ export class AppEvents extends EventEmitter {
   /**
    * Attaches a listener to a specific event. This method contains the logic for what should happen when an event is triggered.
    * Currently, it's configured to handle the 'new-user' event by scheduling a one-time email job.
-   * @param {string} name - The name of the event to listen for.
+   * @param {EventTypes} name - The name of the event to listen for.
    */
-  private listenToEvent(name: string) {
-    this.on(name, (user: { email: string; firstName: string; otp: string }) => {
-      // We only have logic for the 'new-user' event right now.
-      // Other events will be caught but will do nothing until logic is added here.
-      if (name === "new-user") {
-        // Define a delay for the job. Here, it's set to 0.3 minutes (18 seconds).
-        const delayInMinutes = 0.3;
-        const scheduledTime = new Date(Date.now() + delayInMinutes * 60 * 1000);
+  private listenToEvent(name: EventTypes) {
+    this.on(name, async (eventData: IEventData) => {
+      // Add the user's email to the active jobs set to lock it.
+      this.activeJobs.add(eventData.id);
 
-        console.log(
-          `Add event to queue for ${user.email} to run at ${scheduledTime.toLocaleTimeString()}`,
+      const cronPattern = this.calculateJobPattern(eventData);
+
+      await this.scheduleCronJob(eventData, cronPattern, name);
+    });
+  }
+
+  private calculateJobPattern(eventData: IEventData) {
+    // Define a delay for the job. Here, it's set to 0.3 minutes (18 seconds).
+    const scheduledTime = new Date(
+      Date.now() + eventData.delayInMinutes * 60 * 1000,
+    );
+
+    console.log(
+      `Add event to queue for ${eventData.id} to run at ${scheduledTime.toLocaleTimeString()}`,
+    );
+
+    // Dynamically create a cron pattern that matches the exact future time for one-time execution.
+    // The pattern is "seconds minutes hours day-of-month month day-of-week".
+    // The '*' for day-of-week means it will run regardless of the day.
+    return `${scheduledTime.getSeconds()} ${scheduledTime.getMinutes()} ${scheduledTime.getHours()} ${scheduledTime.getDate()} ${
+      scheduledTime.getMonth() + 1
+    } *`;
+  }
+
+  private async scheduleCronJob(
+    eventData: IEventData,
+    cronPattern: string,
+    name: EventTypes,
+  ) {
+    // Schedule the task with node-cron.
+    const task = cron.schedule(cronPattern, async () => {
+      console.log(`Executing one-time job for user: ${eventData.email}`);
+      try {
+        await this.runEvent(name, eventData);
+      } catch (error) {
+        // Log any errors that occur during email sending.
+        console.error(
+          `Failed to send verification email to ${eventData.email}:`,
+          error,
         );
-
-        // Dynamically create a cron pattern that matches the exact future time for one-time execution.
-        // The pattern is "seconds minutes hours day-of-month month day-of-week".
-        // The '*' for day-of-week means it will run regardless of the day.
-        const cronPattern = `${scheduledTime.getSeconds()} ${scheduledTime.getMinutes()} ${scheduledTime.getHours()} ${scheduledTime.getDate()} ${
-          scheduledTime.getMonth() + 1
-        } *`;
-
-        // Add the user's email to the active jobs set to lock it.
-        this.activeJobs.add(user.email);
-
-        // Schedule the task with node-cron.
-        const task = cron.schedule(cronPattern, async () => {
-          console.log(`Executing one-time job for user: ${user.email}`);
-          try {
-            // Use the EmailService to send a welcome email with the OTP.
-            await EmailService.sendEmail(
-              user.email,
-              "Welcome! Verify Your Account",
-              "create-account",
-              { name: user.firstName, otp: user.otp },
-            );
-            console.log(`Verification email sent to ${user.email}`);
-          } catch (error) {
-            // Log any errors that occur during email sending.
-            console.error(
-              `Failed to send verification email to ${user.email}:`,
-              error,
-            );
-          } finally {
-            // The `finally` block ensures that we clean up, regardless of success or failure.
-            // Remove the email from the active jobs set to unlock it for future jobs.
-            this.activeJobs.delete(user.email);
-            // Stop the cron job to ensure it doesn't run again and to free up resources.
-            task.stop();
-          }
-        });
+      } finally {
+        // The `finally` block ensures that we clean up, regardless of success or failure.
+        // Remove the email from the active jobs set to unlock it for future jobs.
+        this.activeJobs.delete(eventData.id);
+        // Stop the cron job to ensure it doesn't run again and to free up resources.
+        task.stop();
       }
     });
+  }
+
+  private async runEvent(name: EventTypes, eventData: IEventData) {
+    switch (name) {
+      case "new-user":
+        // Use the EmailService to send a welcome email with the OTP.
+        await EmailService.sendEmail(
+          eventData?.email!,
+          "Welcome! Verify Your Account",
+          "create-account",
+          { name: eventData.firstName, otp: eventData.otp },
+        );
+        console.log(`Verification email sent to ${eventData.email}`);
+        break;
+
+      case "user-verified":
+        await EmailService.sendEmail(
+          eventData?.email!,
+          "Account Verified!",
+          "account-verified",
+          { name: eventData.firstName },
+        );
+        console.log(`Verification email sent to ${eventData.email}`);
+        break;
+
+      default:
+        break;
+    }
   }
 }
 

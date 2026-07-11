@@ -53,4 +53,26 @@ export class UserControllers {
       next(error);
     }
   }
+
+  /**
+   * @static getCurrentUserProfile
+   * @description handles get current use profile request
+   */
+  public static async getCurrentUserProfile(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const email = req?.user?.email;
+
+      const result = await UserServices.checkIfUserExist({
+        email,
+      });
+
+      ResponseHandler.ok(res, 200, "user profile fetched successfully", result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
