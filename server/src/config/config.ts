@@ -1,4 +1,4 @@
-const dotenv = require("dotenv");
+import * as dotenv from "dotenv";
 
 dotenv.config();
 
@@ -27,4 +27,4 @@ const envVariable = {
   SMTP_HOST2: env.SMTP_HOST2,
 };
 
-module.exports = envVariable;
+export default envVariable;
