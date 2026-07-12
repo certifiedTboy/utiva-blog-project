@@ -46,4 +46,8 @@ export const userApis = createApi({
   }),
 });
 
-export const { useCreateUserMutation, useVerifyUserAccountMutation } = userApis;
+export const {
+  useCreateUserMutation,
+  useVerifyUserAccountMutation,
+  useGetUserProfileMutation,
+} = userApis;

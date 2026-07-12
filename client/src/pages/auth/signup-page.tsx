@@ -72,7 +72,10 @@ export default function SignUpPage() {
     if (googleIsSuccess) {
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("token", googleData?.refreshToken);
-      checkUserIsAuthenticated(googleData?.user);
+      checkUserIsAuthenticated({
+        ...googleData?.user,
+        name: `${googleData?.user?.firstName} ${googleData?.user?.lastName}`,
+      });
       navigate("/");
     }
 

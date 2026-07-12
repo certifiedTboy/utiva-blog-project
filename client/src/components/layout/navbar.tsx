@@ -13,16 +13,23 @@ import {
   LogIn,
 } from "lucide-react";
 import { useTheme } from "@/lib/theme";
-import { useAuth } from "@/lib/mock-auth";
+import { useAuth } from "@/features/context/auth-context";
+import { useGetUserProfileMutation } from "@/features/apis/user-apis";
 import { Button } from "@/components/ui/button";
+
+const navLinks = [
+  { href: "/", label: "Home" },
+  { href: "/blog", label: "Blog" },
+];
 
 export default function Navbar() {
   const { theme, toggle } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
-  const { isSignedIn, user, signOut } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const { isAuthenticated, user, checkUserIsAuthenticated } = useAuth();
+
+  const [getUserProfile, { data, isSuccess }] = useGetUserProfileMutation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -34,10 +41,20 @@ export default function Navbar() {
     setMenuOpen(false);
   }, [location]);
 
-  const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/blog", label: "Blog" },
-  ];
+  useEffect(() => {
+    if (!isAuthenticated) {
+      getUserProfile(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isSuccess && data) {
+      checkUserIsAuthenticated({
+        ...data?.data,
+        name: `${data?.data?.firstName} ${data?.data?.lastName}`,
+      });
+    }
+  }, [data, isSuccess]);
 
   return (
     <motion.header
@@ -86,7 +103,7 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             <button
               onClick={toggle}
-              className="p-2 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              className="p-2 rounded-md hover:bg-muted cursor-pointer transition-colors text-muted-foreground hover:text-foreground"
               aria-label="Toggle theme"
             >
               <AnimatePresence mode="wait">
@@ -106,49 +123,52 @@ export default function Navbar() {
               </AnimatePresence>
             </button>
 
-            {isSignedIn ? (
+            {isAuthenticated ? (
               <>
-                <Link href="/write">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="hidden sm:flex gap-2"
-                    data-testid="link-write"
-                  >
-                    <PenLine className="w-4 h-4" /> Write
-                  </Button>
-                </Link>
-                <Link href="/dashboard">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="hidden sm:flex gap-2 text-muted-foreground"
-                    data-testid="link-dashboard"
-                  >
-                    <LayoutDashboard className="w-4 h-4" />
-                  </Button>
-                </Link>
-                {isAdmin && (
-                  <Link href="/admin">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="hidden sm:flex gap-2 text-muted-foreground"
-                      data-testid="link-admin"
-                    >
-                      <Shield className="w-4 h-4" />
-                    </Button>
-                  </Link>
+                {user?.role === "admin" && (
+                  <>
+                    <Link href="/write">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="hidden sm:flex gap-2 cursor-pointer"
+                        data-testid="link-write"
+                      >
+                        <PenLine className="w-4 h-4" /> Write
+                      </Button>
+                    </Link>
+                    <Link href="/dashboard">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="hidden sm:flex gap-2 text-muted-foreground cursor-pointer"
+                        data-testid="link-dashboard"
+                      >
+                        <LayoutDashboard className="w-4 h-4" />
+                      </Button>
+                    </Link>
+
+                    <Link href="/admin">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="hidden sm:flex gap-2 text-muted-foreground cursor-pointer"
+                        data-testid="link-admin"
+                      >
+                        <Shield className="w-4 h-4" />
+                      </Button>
+                    </Link>
+                  </>
                 )}
                 <div className="flex items-center gap-2">
                   <img
-                    src={user?.imageUrl}
-                    alt={user?.fullName}
-                    className="w-8 h-8 rounded-full"
+                    src={user?.picture}
+                    alt={user?.name}
+                    className="w-8 h-8 rounded-full cursor-pointer"
                   />
                   <button
-                    onClick={signOut}
-                    className="p-2 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                    // onClick={signOut}
+                    className="p-2 rounded-md cursor-pointer hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
                     aria-label="Sign out"
                     data-testid="button-sign-out"
                   >
@@ -165,7 +185,7 @@ export default function Navbar() {
                   <Button
                     size="sm"
                     data-testid="link-sign-up"
-                    className="cursor-pointer"
+                    className="cursor-pointer cursor-pointer"
                   >
                     Get Started
                   </Button>
@@ -174,7 +194,7 @@ export default function Navbar() {
             )}
 
             <button
-              className="md:hidden p-2 rounded-md hover:bg-muted transition-colors"
+              className="md:hidden p-2 rounded-md cursor-pointer hover:bg-muted transition-colors"
               onClick={() => setMenuOpen((m) => !m)}
               data-testid="button-mobile-menu"
             >
@@ -205,7 +225,7 @@ export default function Navbar() {
                   </span>
                 </Link>
               ))}
-              {isSignedIn ? (
+              {isAuthenticated ? (
                 <>
                   <Link href="/write">
                     <span className="block text-sm font-medium text-primary py-2">
@@ -218,7 +238,7 @@ export default function Navbar() {
                     </span>
                   </Link>
                   <button
-                    onClick={signOut}
+                    // onClick={signOut}
                     className="text-left text-sm font-medium text-muted-foreground py-2"
                   >
                     Sign Out

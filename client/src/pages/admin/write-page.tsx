@@ -358,7 +358,7 @@ export default function WritePage() {
             <div className="flex items-center gap-3 pt-4 border-t border-border">
               <Button
                 type="submit"
-                className="gap-2"
+                className="gap-2 cursor-pointer"
                 data-testid="button-publish"
               >
                 <Send className="w-4 h-4" />{" "}
@@ -368,7 +368,7 @@ export default function WritePage() {
                 type="button"
                 variant="outline"
                 onClick={() => onSubmit(form.getValues(), true)}
-                className="gap-2"
+                className="gap-2 cursor-pointer"
                 data-testid="button-save-draft"
               >
                 <Save className="w-4 h-4" /> Save as Draft
@@ -378,6 +378,7 @@ export default function WritePage() {
                 variant="ghost"
                 onClick={() => navigate("/dashboard")}
                 data-testid="button-cancel"
+                className="cursor-pointer"
               >
                 Cancel
               </Button>
