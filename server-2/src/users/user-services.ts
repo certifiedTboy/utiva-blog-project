@@ -38,7 +38,7 @@ export class UserServices {
           ...userData,
           otp: AppHelpers.generateOTP(),
           otpExpiry: new Date(Date.now() + 60 * 60 * 1000),
-          password: await AppHelpers.hashPassword(userData.password),
+          password: await AppHelpers.hashPassword(userData?.password!),
         },
       );
 
@@ -57,7 +57,7 @@ export class UserServices {
       ...userData,
       otp: AppHelpers.generateOTP(),
       otpExpiry: new Date(Date.now() + 60 * 60 * 1000),
-      password: await AppHelpers.hashPassword(userData.password),
+      password: await AppHelpers.hashPassword(userData?.password!),
     });
 
     eventEmitter.emitEvent("new-user", {
@@ -74,6 +74,26 @@ export class UserServices {
   /**
    * @static
    * @async
+   * @method createGoogleUser
+   * @description Creates a new user for google loginnds a verification OTP.
+   * Otherwise, it creates a new user record in the database.
+   * @param {IUser} userData - The data for the new user, including name, email, and password.
+   * @returns {Promise<IUser>} A promise that resolves to an object containing the user's email.
+   * @throws {HttpException} If the user already exists and is verified.
+   */
+  public static async createGoogleUser(userData: IUser) {
+    const userExist = await this.checkIfUserExistByEmail(userData.email);
+
+    if (userExist) {
+      return userExist;
+    }
+
+    return await User.create(userData);
+  }
+
+  /**
+   * @static
+   * @async
    * @method verifyUser
    * @description Verifies a user's account using an OTP.
    * @param {string} otp - The One-Time Password submitted by the user.
@@ -84,7 +104,7 @@ export class UserServices {
     const user = await this.checkIfUserExist({ otp });
 
     if (!user) {
-      throw new HttpException(404, "user not found");
+      throw new HttpException(404, "invalid code");
     }
     if (user.isVerified) {
       throw new HttpException(409, "user already verified");

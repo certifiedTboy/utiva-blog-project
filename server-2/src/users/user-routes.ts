@@ -25,7 +25,7 @@ export class UserRoutes extends AppRoutesHandler {
       this.checkValidationResult,
       UserControllers.createNewUser,
     );
-    this.routes.put(
+    this.routes.patch(
       "/verify",
       this.getVerifyUserValidationRules(),
       this.checkValidationResult,

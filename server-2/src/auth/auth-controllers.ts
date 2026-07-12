@@ -42,6 +42,32 @@ export class AuthControllers {
   /**
    * @static
    * @async
+   * @method loginUserWithGoogle
+   * @description Handles the user login request with google.
+   * @param {Request} req - The Express request object.
+   * @param {Response} res - The Express response object.
+   * @param {NextFunction} next - The Express next middleware function.
+   */
+  public static async loginUserWithGoogle(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const { token } = req.body;
+
+      const result = await AuthServices.googleLogin(token);
+
+      ResponseHandler.auth(res, 201, "user created successfully", result);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+
+  /**
+   * @static
+   * @async
    * @method requestPasswordReset
    * @description Handles a request to initiate a password reset. It takes an email from the
    * request body, calls the service to send a reset OTP, and returns a success message.

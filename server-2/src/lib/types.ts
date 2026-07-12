@@ -2,7 +2,9 @@ export interface IUser {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
+  password?: string;
+  picture?: string;
+  role?: string;
   confirmPassword?: string | undefined;
 }
 

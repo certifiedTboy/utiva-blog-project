@@ -1,28 +1,92 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { PenLine, Eye, EyeOff } from "lucide-react";
+import { useFormik } from "formik";
+
+import { PenLine, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { useAuth } from "@/lib/mock-auth";
+import { GoogleLogin } from "@react-oauth/google";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useGoogleAuth } from "@/hooks/use-google-auth";
-import { GoogleIcon } from "@/components/ui/google-icon";
+import { useToast } from "@/hooks/use-toast";
+import {
+  useLoginUserMutation,
+  useLoginWithGoogleMutation,
+} from "@/features/apis/auth-apis";
+import { useAuth } from "@/features/context/auth-context";
+import { loginValidationSchema } from "@/helpers/form-validators";
 
 export default function SignInPage() {
   const [, navigate] = useLocation();
-  const { signIn } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { checkUserIsAuthenticated } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const { toast } = useToast();
 
-  const { handleGoogleSignIn, authData } = useGoogleAuth();
+  const [
+    loginWithGoogle,
+    {
+      isLoading: _googleIsLoading,
+      error: googleError,
+      isError: googleIsError,
+      data: googleData,
+      isSuccess: googleIsSuccess,
+    },
+  ] = useLoginWithGoogleMutation();
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    signIn();
-    navigate("/dashboard");
-  }
+  const [loginUser, { isLoading, error, data, isSuccess }] =
+    useLoginUserMutation();
+
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema: loginValidationSchema,
+    onSubmit: (values) => {
+      loginUser(values);
+    },
+  });
+
+  useEffect(() => {
+    if (isSuccess && data) {
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("token", data?.refreshToken);
+      checkUserIsAuthenticated(data?.user);
+      navigate("/");
+    }
+    if (error) {
+      const errorMessage =
+        (error as any).data?.message || "An error occurred during sign-in.";
+      toast({
+        title: "Sign-in Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+  }, [isSuccess, data, error, navigate, toast, checkUserIsAuthenticated]);
+
+  useEffect(() => {
+    if (googleIsSuccess) {
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("token", googleData?.refreshToken);
+      checkUserIsAuthenticated(googleData?.user);
+      navigate("/");
+    }
+
+    if (googleIsError) {
+      const errorMessage =
+        googleError &&
+        "data" in googleError &&
+        (googleError as any).data?.message
+          ? (googleError as any).data.message
+          : "Something went wrong";
+      toast({
+        title: "Google Sign-in Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+  }, [googleError, googleIsSuccess, googleIsError]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background to-amber-50/30 dark:to-amber-950/10 px-4 pt-16">
@@ -51,35 +115,42 @@ export default function SignInPage() {
           <h2 className="font-serif text-2xl font-semibold text-foreground mb-6">
             Sign in
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={formik.handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email address</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 placeholder="you@example.com"
-                required
                 data-testid="input-email"
               />
+              {formik.touched.email && formik.errors.email ? (
+                <div className="text-red-500 text-xs">
+                  {formik.errors.email}
+                </div>
+              ) : null}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Input
                   id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                   placeholder="••••••••"
-                  required
                   className="pr-10"
                   data-testid="input-password"
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 cursor-pointer -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   onClick={() => setShowPassword((s) => !s)}
                 >
                   {showPassword ? (
@@ -89,6 +160,11 @@ export default function SignInPage() {
                   )}
                 </button>
               </div>
+              {formik.touched.password && formik.errors.password ? (
+                <div className="text-red-500 text-xs">
+                  {formik.errors.password}
+                </div>
+              ) : null}
               <div className="text-right">
                 <Link href="/password-reset">
                   <span className="text-sm text-primary hover:underline font-medium cursor-pointer">
@@ -98,11 +174,15 @@ export default function SignInPage() {
               </div>
             </div>
             <Button
+              disabled={isLoading}
               type="submit"
-              className="w-full"
+              className="w-full cursor-pointer"
               size="lg"
               data-testid="button-sign-in"
             >
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
               Sign in
             </Button>
           </form>
@@ -116,14 +196,24 @@ export default function SignInPage() {
               </span>
             </div>
           </div>
-          <Button
-            variant="outline"
-            className="w-full gap-2"
-            onClick={handleGoogleSignIn}
-          >
-            <GoogleIcon className="w-5 h-5" />
-            Continue with Google
-          </Button>
+
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                loginWithGoogle({ token: credentialResponse.credential });
+              }}
+              onError={() => {
+                toast({
+                  title: "Google Sign-in Failed",
+                  description: "Something went wrong",
+                  variant: "destructive",
+                });
+              }}
+              theme="outline"
+              text="continue_with"
+              shape="rectangular"
+            />
+          </div>
           <div className="mt-6 text-center text-sm text-muted-foreground">
             Don't have an account?{" "}
             <Link href="/sign-up">

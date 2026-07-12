@@ -1,8 +1,10 @@
+import { OAuth2Client } from "google-auth-library";
 import { HttpException } from "../lib/exceptions/http-exception.ts";
 import { UserServices } from "../users/user-services.ts";
 import { newJwt } from "../lib/jwt.ts";
 import eventEmitter from "../helpers/events.ts";
 import { AppHelpers } from "../helpers/app-helpers.ts";
+import { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET } from "../lib/constants.ts";
 
 /**
  * @class AuthServices
@@ -36,25 +38,105 @@ export class AuthServices {
       throw new HttpException(403, "user account is not verified");
     }
 
+    // console.log(
+    //   "stored password:",
+    //   userExist.password,
+    //   "provided password:",
+    //   userData.password,
+    // );
+
     // Note: Password verification logic seems to be missing here.
     // You should compare the provided password with the stored hashed password.
     // For example:
-    // const isMatch = await AppHelpers.verifyPassword(userData.password, userExist.password);
-    // if (!isMatch) { throw new HttpException(401, "Invalid credentials"); }
+    const isMatch = await AppHelpers.verifyPassword(
+      userData.password,
+      userExist.password,
+    );
+    if (!isMatch) {
+      throw new HttpException(401, "Incorrect credentials");
+    }
 
     const accessToken = newJwt.generateAccessToken({
-      id: userExist.id,
+      id: userExist._id,
       email: userExist.email,
       role: userExist.role,
     });
 
     const refreshToken = newJwt.generateRefreshToken({
-      id: userExist.id,
+      id: userExist._id,
       email: userExist.email,
       role: userExist.role,
     });
 
-    return { accessToken, refreshToken };
+    return {
+      accessToken,
+      refreshToken,
+      user: {
+        firstName: userExist.firstName,
+        lastName: userExist.lastName,
+        email: userExist.email,
+        role: userExist.role || "user",
+        picture: userExist.picture || "",
+      },
+    };
+  }
+
+  /**
+   * @static
+   * @async
+   * @method googleLogin
+   * @description handle user login with google
+   * @param {string} googleJwtToken a jwt token provided by the google oauth server from the client side
+   * @return {Promise<IUser>}
+   * @throws {HttpException} if authentication fails, it throws and exception with the actual reason
+   */
+  public static async googleLogin(googleJwtToken: string) {
+    const oAuth2Client = new OAuth2Client(OAUTH_CLIENT_SECRET);
+
+    if (!googleJwtToken || !OAUTH_CLIENT_ID)
+      throw new HttpException(400, "invalid oauth credentials");
+
+    const result = await oAuth2Client.verifyIdToken({
+      idToken: googleJwtToken,
+      audience: OAUTH_CLIENT_ID!,
+    });
+
+    const payload = result.getPayload();
+
+    const userData = {
+      firstName: payload?.given_name!,
+      lastName: payload?.family_name!,
+      email: payload?.email!,
+      isVerified: payload?.email_verified!,
+      role: "user",
+      picture: payload?.picture!,
+    };
+
+    const user = await UserServices.createGoogleUser(userData);
+
+    const accessToken = newJwt.generateAccessToken({
+      id: user._id?.toString(),
+      email: user.email,
+      role: user.role,
+    });
+
+    const refreshToken = newJwt.generateRefreshToken({
+      id: user._id?.toString(),
+      email: user.email,
+      role: user.role,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role || "user",
+        picture: user.picture,
+      },
+    };
   }
 
   /**

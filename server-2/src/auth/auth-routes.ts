@@ -25,14 +25,21 @@ export class AuthRoutes extends AppRoutesHandler {
       this.checkValidationResult,
       AuthControllers.loginUserWithEmail,
     );
-    this.routes.put(
+
+    this.routes.post(
+      "/login/google",
+      this.getGoogleLoginValidationRules(),
+      this.checkValidationResult,
+      AuthControllers.loginUserWithGoogle,
+    );
+    this.routes.patch(
       "/password-reset",
       this.getPasswordResetValidationRules(),
       this.checkValidationResult,
       AuthControllers.requestPasswordReset,
     );
 
-    this.routes.put(
+    this.routes.patch(
       "/update-password",
       this.getUpdatePasswordValidationRules(),
       this.checkValidationResult,
@@ -103,5 +110,14 @@ export class AuthRoutes extends AppRoutesHandler {
         return true;
       }),
     ];
+  }
+
+  /**
+   * @private getGogleLoginValidationRules
+   * @description Returns an array of validation rules for the google login endpoin.
+   * @returns {Array} An array of express-validator middleware.
+   */
+  private getGoogleLoginValidationRules() {
+    return [body("token").notEmpty().withMessage("token is required")];
   }
 }

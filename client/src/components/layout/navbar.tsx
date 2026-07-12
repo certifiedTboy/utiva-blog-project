@@ -158,8 +158,15 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link href="/sign-up" className="hidden md:inline-block">
-                  <Button size="sm" data-testid="link-sign-up">
+                <Link
+                  href="/sign-up"
+                  className="hidden md:inline-block cursor-pointer"
+                >
+                  <Button
+                    size="sm"
+                    data-testid="link-sign-up"
+                    className="cursor-pointer"
+                  >
                     Get Started
                   </Button>
                 </Link>

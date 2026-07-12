@@ -1,20 +1,47 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { PenLine } from "lucide-react";
-import { Link } from "wouter";
-
+import { useFormik } from "formik";
+import { PenLine, Loader2 } from "lucide-react";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { useRequestPasswordResetMutation } from "@/features/apis/auth-apis";
+import { passwordResetRequestValidationSchema } from "@/helpers/form-validators";
 
 export default function PasswordResetRequestPage() {
-  const [email, setEmail] = useState("");
+  const { toast } = useToast();
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    // Handle password reset request logic here
-    console.log("Password reset requested for:", email);
-  }
+  const [_location, navigate] = useLocation();
+
+  const [requestPasswordReset, { isLoading, isSuccess, error }] =
+    useRequestPasswordResetMutation();
+
+  const formik = useFormik({
+    initialValues: { email: "" },
+    validationSchema: passwordResetRequestValidationSchema,
+    onSubmit: (values) => {
+      requestPasswordReset(values);
+    },
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      navigate("/password-update", { state: formik.values });
+    }
+    if (error) {
+      const errorMessage =
+        error && "data" in error && (error as any).data?.message
+          ? (error as any).data.message
+          : "Something went wrong";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+  }, [isSuccess, error, toast]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background to-amber-50/30 dark:to-amber-950/10 px-4 pt-16">
@@ -43,19 +70,31 @@ export default function PasswordResetRequestPage() {
           <p className="text-muted-foreground text-sm mb-6">
             Enter your email to receive a link to reset your password.
           </p>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={formik.handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email address</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 placeholder="you@example.com"
-                required
               />
+              {formik.touched.email && formik.errors.email ? (
+                <div className="text-red-500 text-xs">
+                  {formik.errors.email}
+                </div>
+              ) : null}
             </div>
-            <Button type="submit" className="w-full" size="lg">
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
+              size="lg"
+              disabled={isLoading}
+            >
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Reset Password
             </Button>
           </form>

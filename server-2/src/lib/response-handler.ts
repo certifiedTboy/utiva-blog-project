@@ -41,6 +41,6 @@ export class ResponseHandler {
     return res
       .status(statusCode)
       .cookie("authToken", data?.accessToken, cookieOptions)
-      .json({ message, refreshToken: data?.refreshToken });
+      .json({ message, refreshToken: data?.refreshToken, user: data?.user });
   }
 }

@@ -15,3 +15,6 @@ export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 export const ACCESS_TOKEN_EXPIRES_IN = process.env.ACCESS_TOKEN_EXPIRES_IN;
 export const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN;
+
+export const OAUTH_CLIENT_ID = process.env.OAUTH_CLIENT_ID;
+export const OAUTH_CLIENT_SECRET = process.env.OAUTH_CLIENT_SECRET;

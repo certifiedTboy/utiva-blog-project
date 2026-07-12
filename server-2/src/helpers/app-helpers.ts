@@ -76,7 +76,11 @@ export class AppHelpers {
   ): Promise<boolean> {
     const [hashedPassword, salt] = storedPassword.split(".");
 
+    console.log("hashed password:", hashedPassword);
+
     const buffer = (await scryptAsync(providedPassword, salt!, 64)) as Buffer;
+
+    console.log(buffer.toString("hex"));
 
     return buffer.toString("hex") === hashedPassword;
   }
