@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useAuth } from "@/lib/mock-auth";
+import { useAuth } from "@/features/context/auth-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -26,7 +26,7 @@ export default function CommentItem({
 }) {
   const [replying, setReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
-  const { isSignedIn } = useAuth();
+  const { isAuthenticated: isSignedIn } = useAuth();
 
   function submitReply() {
     if (!replyText.trim()) return;

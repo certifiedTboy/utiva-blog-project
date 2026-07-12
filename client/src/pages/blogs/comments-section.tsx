@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { COMMENTS } from "@/lib/mock-data";
-import { useAuth } from "@/lib/mock-auth";
+import { useAuth } from "@/features/context/auth-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
@@ -9,7 +9,7 @@ import type { Comment } from "@/lib/types";
 import CommentItem from "./comment-item";
 
 export default function CommentsSection({ postId }: { postId: number }) {
-  const { isSignedIn, user } = useAuth();
+  const { isAuthenticated: isSignedIn, user } = useAuth();
   const [comments, setComments] = useState<Comment[]>(
     () => COMMENTS[postId] ?? [],
   );
@@ -23,8 +23,8 @@ export default function CommentsSection({ postId }: { postId: number }) {
       id: nextId++,
       postId,
       content: newComment,
-      authorName: user?.fullName ?? "You",
-      authorAvatar: user?.imageUrl,
+      authorName: user?.name ?? "You",
+      authorAvatar: user?.picture,
       createdAt: new Date().toISOString(),
       replies: [],
     };
@@ -38,8 +38,8 @@ export default function CommentsSection({ postId }: { postId: number }) {
       id: nextId++,
       postId,
       content: text,
-      authorName: user?.fullName ?? "You",
-      authorAvatar: user?.imageUrl,
+      authorName: user?.name ?? "You",
+      authorAvatar: user?.picture,
       createdAt: new Date().toISOString(),
       parentId,
       replies: [],
@@ -74,6 +74,7 @@ export default function CommentsSection({ postId }: { postId: number }) {
           <Button
             onClick={submitComment}
             disabled={!newComment.trim()}
+            className="cursor-pointer"
             data-testid="button-submit-comment"
           >
             Post Comment

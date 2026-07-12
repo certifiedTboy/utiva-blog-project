@@ -1,6 +1,7 @@
 import swaggerJsDoc from "swagger-jsdoc";
 import { userDocs } from "../users/user-docs.js";
-// import { authDocs } from "#/auth/auth-docs.js";
+import { authDocs } from "../auth/auth-docs.js";
+import { postDocs } from "../posts/posts-docs.js";
 
 const options = {
   definition: {
@@ -13,7 +14,8 @@ const options = {
 
     paths: {
       ...userDocs,
-      //   ...authDocs,
+      ...authDocs,
+      ...postDocs,
     },
 
     components: {

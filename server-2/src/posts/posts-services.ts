@@ -1,0 +1,182 @@
+import { HttpException } from "../lib/exceptions/http-exception.ts";
+import Post, {
+  Comment,
+  Reaction,
+  type ReactionType,
+  type IComment,
+  type IPost,
+} from "./posts-model.ts";
+
+export class PostServices {
+  /**
+   * @static createPost
+   * @description Creates a new blog post.
+   * @param {IPost} postData - The data for the new post.
+   * @returns {Promise<IPost>} A promise that resolves to the new post.
+   */
+  public static async createPost(postData: Partial<IPost>): Promise<IPost> {
+    const slug = postData.title!.toLowerCase().split(" ").join("-");
+    const existingPost = await Post.findOne({ slug });
+    if (existingPost) {
+      throw new HttpException(409, "A post with this title already exists.");
+    }
+
+    const post = new Post({
+      ...postData,
+      slug,
+    });
+
+    await post.save();
+    return post;
+  }
+
+  /**
+   * @static getPosts
+   * @description Retrieves a list of posts with pagination.
+   * @param {number} limit - The number of posts to return.
+   * @param {number} page - The page number.
+   * @returns {Promise<{posts: IPost[], total: number}>} A promise that resolves to the posts and total count.
+   */
+  public static async getPosts(
+    limit: number,
+    page: number,
+  ): Promise<{ posts: IPost[]; total: number }> {
+    const posts = await Post.find({ status: "published" })
+      .populate("author", "firstName lastName avatar")
+      .populate("category", "name")
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(limit * (page - 1));
+
+    const total = await Post.countDocuments({ status: "published" });
+    return { posts, total };
+  }
+
+  /**
+   * @static getAllPostsForAdmin
+   * @description Retrieves all posts for an admin user with pagination.
+   * @param {number} limit - The number of posts to return.
+   * @param {number} page - The page number.
+   * @returns {Promise<{posts: IPost[], total: number}>} A promise that resolves to the posts and total count.
+   */
+  public static async getAllPostsForAdmin(
+    limit: number,
+    page: number,
+  ): Promise<{ posts: IPost[]; total: number }> {
+    const posts = await Post.find()
+      .populate("author", "firstName lastName avatar")
+      .populate("category", "name")
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(limit * (page - 1));
+
+    const total = await Post.countDocuments();
+    return { posts, total };
+  }
+
+  /**
+   * @static getPostBySlug
+   * @description Retrieves a single post by its slug.
+   * @param {string} slug - The slug of the post.
+   * @returns {Promise<IPost>} A promise that resolves to the found post.
+   */
+  public static async getPostBySlug(slug: string): Promise<IPost> {
+    const post = await Post.findOne({ slug }).populate(
+      "author",
+      "firstName lastName avatar",
+    );
+    if (!post) {
+      throw new HttpException(404, "Post not found.");
+    }
+    // Increment view count
+    post.viewCount += 1;
+    await post.save();
+
+    return post;
+  }
+
+  /**
+   * @static addComment
+   * @description Adds a comment to a post.
+   * @param {string} postId - The ID of the post to comment on.
+   * @param {string} authorId - The ID of the user adding the comment.
+   * @param {string} content - The content of the comment.
+   * @param {string | null} parentId - The ID of the parent comment if it's a reply.
+   * @returns {Promise<IComment>} A promise that resolves to the new comment.
+   */
+  public static async addComment(
+    postId: string,
+    authorId: string,
+    content: string,
+    parentId: string | null = null,
+  ): Promise<IComment> {
+    const comment = new Comment({
+      post: postId as any,
+      author: authorId as any,
+      content,
+      parent: parentId,
+    });
+    await comment.save();
+
+    // Increment comment count on the post
+    await Post.findByIdAndUpdate(postId, {
+      $inc: { commentCount: 1 },
+    });
+
+    return comment;
+  }
+
+  /**
+   * @static addOrUpdateReaction
+   * @description Adds, updates, or removes a reaction from a post for a specific user.
+   * @param {string} postId - The ID of the post.
+   * @param {string} authorId - The ID of the user reacting.
+   * @param {ReactionType} type - The type of reaction.
+   * @returns {Promise<{message: string}>} A promise that resolves to a success message.
+   */
+  public static async addOrUpdateReaction(
+    postId: string,
+    authorId: string,
+    type: ReactionType,
+  ): Promise<{ message: string }> {
+    const existingReaction = await Reaction.findOne({
+      post: postId as any,
+      author: authorId as any,
+    } as any);
+
+    if (existingReaction) {
+      const reactionId = (existingReaction as any)._id;
+      if (existingReaction.type === type) {
+        // User is removing their reaction
+        await Reaction.findByIdAndDelete(reactionId);
+        await Post.findByIdAndUpdate(postId, { $inc: { reactionCount: -1 } });
+        return { message: "Reaction removed" };
+      } else {
+        // User is changing their reaction
+        await Reaction.findByIdAndUpdate(reactionId, { type });
+        return { message: "Reaction updated" };
+      }
+    } else {
+      // User is adding a new reaction
+      const reaction = new Reaction({
+        post: postId as any,
+        author: authorId as any,
+        type,
+      });
+      await reaction.save();
+      await Post.findByIdAndUpdate(postId, { $inc: { reactionCount: 1 } });
+      return { message: "Reaction added" };
+    }
+  }
+
+  /**
+   * @static getCommentsByPost
+   * @description Retrieves all comments for a given post.
+   */
+  public static async getCommentsByPost(postId: string): Promise<IComment[]> {
+    return Comment.find({
+      post: postId,
+      parent: null,
+    } as any).populate("author", "firstName lastName avatar");
+  }
+}

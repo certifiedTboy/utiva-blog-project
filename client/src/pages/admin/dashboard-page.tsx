@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { POSTS } from "@/lib/mock-data";
-import { useAuth } from "@/lib/mock-auth";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/features/context/auth-context";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 
@@ -76,7 +76,7 @@ export default function DashboardPage() {
         >
           <div>
             <h1 className="font-serif text-3xl font-semibold text-foreground">
-              Welcome back{user?.firstName ? `, ${user.firstName}` : ""}
+              Welcome back{user?.name ? `, ${user.name}` : ""}
             </h1>
             <p className="text-muted-foreground mt-1">
               Manage your posts and track your impact

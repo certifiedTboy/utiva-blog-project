@@ -2,7 +2,7 @@ import { useRoute, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, Clock, Eye } from "lucide-react";
 import { POSTS } from "@/lib/mock-data";
-import { useAuth } from "@/lib/mock-auth";
+import { useAuth } from "@/features/context/auth-context";
 import ReadingProgress from "./reading-progress";
 import ReactionsPanel from "./reaction-panel";
 import CommentsSection from "./comments-section";
@@ -11,7 +11,7 @@ import NotFoundBlog from "./not-found-blog";
 export default function PostDetailPage() {
   const [, params] = useRoute("/blog/:slug");
   const [, navigate] = useLocation();
-  const { isSignedIn } = useAuth();
+  const { isAuthenticated: isSignedIn } = useAuth();
   const slug = params?.slug ?? "";
 
   const post = POSTS.find((p) => p.slug === slug);
