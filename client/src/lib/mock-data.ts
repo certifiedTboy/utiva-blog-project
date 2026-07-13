@@ -575,3 +575,11 @@ export const ADMIN_COMMENTS = Object.values(COMMENTS)
     ...c,
     postTitle: POSTS.find((p) => p.id === c.postId)?.title ?? "Unknown Post",
   }));
+
+export const REACTIONS = [
+  { type: "like", emoji: "👍", label: "Like" },
+  { type: "love", emoji: "❤️", label: "Love" },
+  { type: "clap", emoji: "👏", label: "Clap" },
+  { type: "fire", emoji: "🔥", label: "Fire" },
+  { type: "wow", emoji: "😮", label: "Wow" },
+];

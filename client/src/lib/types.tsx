@@ -1,6 +1,6 @@
 export type Comment = {
-  id: number;
-  postId: number;
+  id: any;
+  postId: any;
   content: string;
   authorName: string;
   authorAvatar?: string;
@@ -30,7 +30,7 @@ export interface IPost {
   readingTime: number;
   status: "published" | "draft";
   featured: boolean;
-  isReactedTo: boolean;
+  isViewed: boolean;
   createdAt: string;
   updatedAt: string;
 }

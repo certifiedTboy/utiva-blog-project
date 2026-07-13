@@ -81,6 +81,24 @@ export const postDocs = {
     },
   },
   "/posts/{postId}/comments": {
+    get: {
+      tags: ["Posts"],
+      summary: "Get all comments for a post",
+      parameters: [
+        {
+          name: "postId",
+          in: "path",
+          required: true,
+          schema: { type: "string" },
+          description: "ID of the post to fetch comments for",
+        },
+      ],
+      responses: {
+        200: {
+          description: "Comments fetched successfully",
+        },
+      },
+    },
     post: {
       tags: ["Posts"],
       summary: "Add a comment to a post",
@@ -118,6 +136,21 @@ export const postDocs = {
     },
   },
   "/posts/{postId}/reactions": {
+    get: {
+      tags: ["Posts"],
+      summary: "Get all reactions for a post",
+      parameters: [
+        {
+          name: "postId",
+          in: "path",
+          required: true,
+          schema: { type: "string" },
+        },
+      ],
+      responses: {
+        200: { description: "Reactions fetched successfully" },
+      },
+    },
     post: {
       tags: ["Posts"],
       summary: "Add, update, or remove a reaction on a post",

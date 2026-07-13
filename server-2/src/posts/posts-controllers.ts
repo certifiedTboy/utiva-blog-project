@@ -140,4 +140,40 @@ export class PostControllers {
       next(error);
     }
   }
+
+  /**
+   * @static getCommentsByPost
+   * @description Handles fetching all comments for a post.
+   */
+  public static async getCommentsByPost(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const { postId } = req.params;
+      const comments = await PostServices.getCommentsByPost(postId as string);
+      ResponseHandler.ok(res, 200, "Comments fetched successfully", comments);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * @static getReactionsByPost
+   * @description Handles fetching all reactions for a post.
+   */
+  public static async getReactionsByPost(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const { postId } = req.params;
+      const reactions = await PostServices.getReactionsByPost(postId as string);
+      ResponseHandler.ok(res, 200, "Reactions fetched successfully", reactions);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

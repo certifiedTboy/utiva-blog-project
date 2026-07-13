@@ -1,20 +1,52 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { COMMENTS } from "@/lib/mock-data";
 import { useAuth } from "@/features/context/auth-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import {
+  useAddCommentToPostMutation,
+  useGetCommentsByPostMutation,
+} from "@/features/apis/post-apis";
 import type { Comment } from "@/lib/types";
 import CommentItem from "./comment-item";
 
-export default function CommentsSection({ postId }: { postId: number }) {
+export default function CommentsSection({ postId }: { postId: any }) {
   const { isAuthenticated: isSignedIn, user } = useAuth();
   const [comments, setComments] = useState<Comment[]>(
     () => COMMENTS[postId] ?? [],
   );
   const [newComment, setNewComment] = useState("");
   const { toast } = useToast();
+
+  const [addCommentToPost] = useAddCommentToPostMutation();
+  const [
+    getCommentsByPost,
+    { data: commentsData, isSuccess: commentsSuccess },
+  ] = useGetCommentsByPostMutation();
+
+  useEffect(() => {
+    if (postId) {
+      getCommentsByPost(postId);
+    }
+  }, [postId]);
+
+  useEffect(() => {
+    if (commentsData && commentsSuccess) {
+      const comments = commentsData?.data?.map((c: any) => ({
+        ...c,
+        createdAt: new Date(c.createdAt).toISOString(),
+        authorName: c?.author?.firstName + " " + c?.author?.lastName,
+        authorAvatar: c?.author?.picture,
+
+        replies: [],
+      }));
+
+      setComments(comments);
+    }
+  }, [commentsData, commentsSuccess]);
+
   let nextId = 1000;
 
   function submitComment() {
@@ -29,6 +61,7 @@ export default function CommentsSection({ postId }: { postId: number }) {
       replies: [],
     };
     setComments((prev) => [c, ...prev]);
+    addCommentToPost({ postId, content: newComment });
     setNewComment("");
     toast({ title: "Comment posted!" });
   }

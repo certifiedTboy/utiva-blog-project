@@ -4,6 +4,7 @@ import Post, {
   Reaction,
   type ReactionType,
   type IComment,
+  type IReaction,
   type IPost,
 } from "./posts-model.ts";
 
@@ -64,7 +65,7 @@ export class PostServices {
     page: number,
   ): Promise<{ posts: IPost[]; total: number }> {
     const posts = await Post.find()
-      .populate("author", "firstName lastName avatar")
+      .populate("author", "firstName lastName picture")
       .populate("category", "name")
       .sort({ createdAt: -1 })
       .limit(limit)
@@ -83,7 +84,7 @@ export class PostServices {
   public static async getPostBySlug(slug: string): Promise<IPost> {
     const post = await Post.findOne({ slug }).populate(
       "author",
-      "firstName lastName avatar",
+      "firstName lastName lastName picture",
     );
     if (!post) {
       throw new HttpException(404, "Post not found.");
@@ -111,8 +112,8 @@ export class PostServices {
     parentId: string | null = null,
   ): Promise<IComment> {
     const comment = new Comment({
-      post: postId as any,
-      author: authorId as any,
+      post: postId as unknown as any,
+      author: authorId,
       content,
       parent: parentId,
     });
@@ -140,9 +141,9 @@ export class PostServices {
     type: ReactionType,
   ): Promise<{ message: string }> {
     const existingReaction = await Reaction.findOne({
-      post: postId as any,
-      author: authorId as any,
-    } as any);
+      post: postId as unknown as any,
+      author: authorId as unknown as any,
+    });
 
     if (existingReaction) {
       const reactionId = (existingReaction as any)._id;
@@ -159,8 +160,8 @@ export class PostServices {
     } else {
       // User is adding a new reaction
       const reaction = new Reaction({
-        post: postId as any,
-        author: authorId as any,
+        post: postId as unknown as any,
+        author: authorId as unknown as any,
         type,
       });
       await reaction.save();
@@ -175,8 +176,21 @@ export class PostServices {
    */
   public static async getCommentsByPost(postId: string): Promise<IComment[]> {
     return Comment.find({
-      post: postId,
+      post: postId as unknown as any,
       parent: null,
-    } as any).populate("author", "firstName lastName avatar");
+    }).populate("author", "firstName lastName picture");
+  }
+
+  /**
+   * @static getReactionsByPost
+   * @description Retrieves all reactions for a given post.
+   * @param {string} postId - The ID of the post.
+   * @returns {Promise<IReaction[]>} A promise that resolves to the list of reactions.
+   */
+  public static async getReactionsByPost(postId: string): Promise<IReaction[]> {
+    return Reaction.find({ post: postId as unknown as any }).populate(
+      "author",
+      "firstName lastName picture",
+    );
   }
 }

@@ -1,28 +1,58 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { REACTIONS_DATA } from "@/lib/mock-data";
-
+import {
+  useReactToPostsMutation,
+  useGetReactionsToPostMutation,
+} from "@/features/apis/post-apis";
+import { REACTIONS } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
-
-const REACTIONS = [
-  { type: "like", emoji: "👍", label: "Like" },
-  { type: "love", emoji: "❤️", label: "Love" },
-  { type: "clap", emoji: "👏", label: "Clap" },
-  { type: "fire", emoji: "🔥", label: "Fire" },
-  { type: "wow", emoji: "😮", label: "Wow" },
-];
+import { useAuth } from "@/features/context/auth-context";
 
 export default function ReactionsPanel({
   postId,
   userSignedIn,
 }: {
-  postId: number;
+  postId: any;
   userSignedIn: boolean;
 }) {
-  const [reactions, setReactions] = useState(() => ({
-    ...REACTIONS_DATA[postId],
-  }));
+  const { user } = useAuth();
+  const [reactions, setReactions] = useState<{
+    counts: Record<string, number>;
+    userReaction: string | null;
+  }>({
+    counts: {},
+    userReaction: null,
+  });
   const { toast } = useToast();
+
+  const [reactToPosts] = useReactToPostsMutation();
+  const [getReactions, { data, isSuccess }] = useGetReactionsToPostMutation();
+
+  useEffect(() => {
+    if (postId) {
+      getReactions(postId);
+    }
+  }, [postId]);
+
+  useEffect(() => {
+    if (isSuccess && data) {
+      const reactionData: any[] = data?.data || [];
+      const newCounts: Record<string, number> = {};
+      let newUserReaction: string | null = null;
+
+      for (const reaction of reactionData) {
+        newCounts[reaction.type] = (newCounts[reaction.type] || 0) + 1;
+        if (user && reaction.author === user.id) {
+          newUserReaction = reaction.type;
+        }
+      }
+
+      setReactions({
+        counts: newCounts,
+        userReaction: newUserReaction,
+      });
+    }
+  }, [isSuccess, data, user]);
 
   function handleReact(type: string) {
     if (!userSignedIn) {
@@ -45,6 +75,8 @@ export default function ReactionsPanel({
         return { counts, userReaction: type };
       }
     });
+
+    reactToPosts({ postId, type });
   }
 
   return (

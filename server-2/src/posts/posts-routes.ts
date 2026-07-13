@@ -28,6 +28,9 @@ export class PostRoutes extends AppRoutesHandler {
     // Get a single post by slug (public)
     this.routes.get("/:slug", PostControllers.getPostBySlug);
 
+    // Get all comments for a post (public)
+    this.routes.get("/:postId/comments", PostControllers.getCommentsByPost);
+
     // Add a comment to a post (protected)
     this.routes.post(
       "/:postId/comments",
@@ -35,6 +38,13 @@ export class PostRoutes extends AppRoutesHandler {
       this.getAddCommentValidationRules(),
       this.checkValidationResult,
       PostControllers.addComment,
+    );
+
+    // Get all reactions for a post (public)
+    this.routes.get(
+      "/:postId/reactions",
+      this.checkValidationResult,
+      PostControllers.getReactionsByPost,
     );
 
     // Add or update a reaction to a post (protected)

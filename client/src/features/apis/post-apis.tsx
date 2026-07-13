@@ -55,7 +55,7 @@ export const postApis = createApi({
       query: (payload) => ({
         url: `/posts/${payload.postId}/reactions`,
         method: "POST",
-        body: payload,
+        body: { type: payload.type },
         credentials: "include",
       }),
     }),
@@ -65,6 +65,22 @@ export const postApis = createApi({
         url: `/posts/${payload.id}`,
         method: "PATCH",
         body: payload,
+        credentials: "include",
+      }),
+    }),
+
+    getCommentsByPost: builder.mutation({
+      query: (payload) => ({
+        url: `/posts/${payload}/comments`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+
+    getReactionsToPost: builder.mutation({
+      query: (payload) => ({
+        url: `/posts/${payload}/reactions`,
+        method: "GET",
         credentials: "include",
       }),
     }),
@@ -79,4 +95,6 @@ export const {
   useReactToPostsMutation,
   useGetPublishedPostsMutation,
   useUpdatePostMutation,
+  useGetCommentsByPostMutation,
+  useGetReactionsToPostMutation,
 } = postApis;

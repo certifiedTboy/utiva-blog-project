@@ -7,8 +7,6 @@ export interface PostContextType {
   posts: IPost[];
   post: IPost | null;
   categories: { id: number; name: string; postCount: number }[];
-  reactToPost: (id: string) => void;
-  addCommentToPost: (id: string, comment: string) => void;
   viewPostsDetails: (id: string) => void;
 }
 
@@ -16,8 +14,6 @@ const PostContext = createContext<PostContextType>({
   posts: [],
   categories: [],
   post: null,
-  reactToPost: () => {},
-  addCommentToPost: () => {},
   viewPostsDetails: () => {},
 });
 
@@ -74,15 +70,11 @@ export const PostContextProvider = ({ children }: React.PropsWithChildren) => {
     }
   }, [data, isSuccess]);
 
-  const reactToPost = (id: string) => {};
-
-  const addCommentToPost = (id: string, commentData: string) => {};
-
   const viewPostsDetails = (slug: string) => {
     const post = posts.find((p) => p.slug === slug);
     if (post) {
-      post.viewCount++;
-      post.isReactedTo = true;
+      !post.isViewed && post.viewCount++;
+      post.isViewed = true;
       setPost(post);
       setPosts([...posts]);
     }
@@ -92,8 +84,6 @@ export const PostContextProvider = ({ children }: React.PropsWithChildren) => {
     posts,
     post,
     categories,
-    reactToPost,
-    addCommentToPost,
     viewPostsDetails,
   };
 

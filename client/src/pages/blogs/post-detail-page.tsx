@@ -161,8 +161,8 @@ export default function PostDetailPage() {
           </div>
         )}
 
-        <ReactionsPanel postId={+post._id} userSignedIn={!!isSignedIn} />
-        <CommentsSection postId={+post._id} />
+        <ReactionsPanel postId={post._id} userSignedIn={!!isSignedIn} />
+        <CommentsSection postId={post._id} />
       </div>
     </div>
   );
