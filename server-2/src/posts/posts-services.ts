@@ -42,7 +42,7 @@ export class PostServices {
     page: number,
   ): Promise<{ posts: IPost[]; total: number }> {
     const posts = await Post.find({ status: "published" })
-      .populate("author", "firstName lastName avatar")
+      .populate("author", "firstName lastName picture")
       .populate("category", "name")
       .sort({ createdAt: -1 })
       .limit(limit)

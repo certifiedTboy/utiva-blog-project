@@ -100,4 +100,19 @@ export const authDocs = {
       },
     },
   },
+  "/auth/new-access-token": {
+    get: {
+      tags: ["Auth"],
+      summary: "Generates a new access token",
+      security: [
+        {
+          bearerAuth: [],
+        },
+      ],
+      responses: {
+        403: { description: "invalid jwt token" },
+        200: { description: "New access token generated successfully" },
+      },
+    },
+  },
 };

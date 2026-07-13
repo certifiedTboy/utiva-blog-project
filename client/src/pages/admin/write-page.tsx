@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Save, Send, X, Plus, Image } from "lucide-react";
+import { Save, Send, X, Plus, Image, Loader2 } from "lucide-react";
 import { CATEGORIES, POSTS } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,22 +27,11 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-
-const postSchema = z.object({
-  title: z.string().min(1, "Title is required").max(200),
-  excerpt: z.string().max(500).optional(),
-  content: z.string().min(1, "Content is required"),
-  coverImage: z
-    .string()
-    .url("Must be a valid URL")
-    .optional()
-    .or(z.literal("")),
-  categoryId: z.string().optional(),
-  status: z.enum(["draft", "published"]),
-  featured: z.boolean(),
-});
-
-type PostFormData = z.infer<typeof postSchema>;
+import { postSchema, type PostFormData } from "@/helpers/form-validators";
+import {
+  useCreatePostMutation,
+  useUpdatePostMutation,
+} from "@/features/apis/post-apis";
 
 export default function WritePage() {
   const [, params] = useRoute("/write/:id");
@@ -55,6 +43,26 @@ export default function WritePage() {
   const editId = params?.id ? parseInt(params.id) : null;
   const existingPost = editId ? POSTS.find((p) => p.id === editId) : null;
 
+  const [
+    createPost,
+    {
+      isLoading: isCreating,
+      isSuccess: isCreateSuccess,
+      isError: isCreateError,
+      error: createError,
+    },
+  ] = useCreatePostMutation();
+
+  const [
+    updatePost,
+    {
+      isLoading: isUpdating,
+      isSuccess: isUpdateSuccess,
+      isError: isUpdateError,
+      error: updateError,
+    },
+  ] = useUpdatePostMutation();
+
   const form = useForm<PostFormData>({
     resolver: zodResolver(postSchema),
     defaultValues: existingPost
@@ -63,7 +71,7 @@ export default function WritePage() {
           excerpt: existingPost.excerpt ?? "",
           content: existingPost.content,
           coverImage: existingPost.coverImage ?? "",
-          categoryId: existingPost.categoryId?.toString() ?? "",
+          category: existingPost.categoryId?.toString() ?? "",
           status: existingPost.status as "draft" | "published",
           featured: existingPost.featured,
         }
@@ -87,17 +95,47 @@ export default function WritePage() {
     setTags((prev) => prev.filter((t) => t !== tag));
   }
 
+  const isLoading = isCreating || isUpdating;
+
+  useEffect(() => {
+    if (isCreateSuccess || isUpdateSuccess) {
+      toast({
+        title: editId ? "Post updated!" : "Post published!",
+        description: "Your post has been successfully saved.",
+      });
+      navigate("/dashboard");
+    }
+    if (isCreateError || isUpdateError) {
+      const error = createError || updateError;
+      const errorMessage =
+        (error as any)?.data?.message || "Something went wrong.";
+      toast({
+        title: "Operation Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+  }, [
+    isCreateSuccess,
+    isUpdateSuccess,
+    isCreateError,
+    createError,
+    isUpdateError,
+    updateError,
+    editId,
+    navigate,
+    toast,
+  ]);
+
   function onSubmit(data: PostFormData, asDraft = false) {
     const status = asDraft ? "draft" : data.status;
-    toast({
-      title:
-        status === "published"
-          ? editId
-            ? "Post updated!"
-            : "Post published!"
-          : "Draft saved!",
-    });
-    navigate("/dashboard");
+    const payload = { ...data, tags, status };
+
+    if (editId) {
+      updatePost({ id: editId, ...payload });
+    } else {
+      createPost(payload);
+    }
   }
 
   const coverImagePreview = form.watch("coverImage");
@@ -211,7 +249,7 @@ export default function WritePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
-                name="categoryId"
+                name="category"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
@@ -358,20 +396,31 @@ export default function WritePage() {
             <div className="flex items-center gap-3 pt-4 border-t border-border">
               <Button
                 type="submit"
+                disabled={isLoading}
                 className="gap-2 cursor-pointer"
                 data-testid="button-publish"
               >
-                <Send className="w-4 h-4" />{" "}
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
                 {editId ? "Update Post" : "Publish"}
               </Button>
               <Button
                 type="button"
                 variant="outline"
+                disabled={isLoading}
                 onClick={() => onSubmit(form.getValues(), true)}
                 className="gap-2 cursor-pointer"
                 data-testid="button-save-draft"
               >
-                <Save className="w-4 h-4" /> Save as Draft
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}{" "}
+                Save as Draft
               </Button>
               <Button
                 type="button"

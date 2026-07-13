@@ -20,14 +20,10 @@ export class PostRoutes extends AppRoutesHandler {
     );
 
     // Get all posts for admin (protected, admin only)
-    this.routes.get(
-      "/admin/all",
-      this.adminGuard,
-      PostControllers.getAllPostsForAdmin,
-    );
+    this.routes.get("/", this.adminGuard, PostControllers.getAllPostsForAdmin);
 
     // Get all posts (public)
-    this.routes.get("/", PostControllers.getPosts);
+    this.routes.get("/published", PostControllers.getPosts);
 
     // Get a single post by slug (public)
     this.routes.get("/:slug", PostControllers.getPostBySlug);

@@ -15,6 +15,7 @@ import {
 import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/features/context/auth-context";
 import { useGetUserProfileMutation } from "@/features/apis/user-apis";
+import { useGetNewTokenMutation } from "@/features/apis/auth-apis";
 import { Button } from "@/components/ui/button";
 
 const navLinks = [
@@ -27,9 +28,9 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
-  const { isAuthenticated, user, checkUserIsAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
-  const [getUserProfile, { data, isSuccess }] = useGetUserProfileMutation();
+  const [getUserProfile] = useGetUserProfileMutation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -46,15 +47,6 @@ export default function Navbar() {
       getUserProfile(null);
     }
   }, []);
-
-  useEffect(() => {
-    if (isSuccess && data) {
-      checkUserIsAuthenticated({
-        ...data?.data,
-        name: `${data?.data?.firstName} ${data?.data?.lastName}`,
-      });
-    }
-  }, [data, isSuccess]);
 
   return (
     <motion.header

@@ -37,27 +37,9 @@ export const authApis = createApi({
 
     getNewToken: builder.mutation({
       query: () => ({
-        url: `/auth/new-token`,
+        url: `/auth/new-access-token`,
         method: "GET",
       }),
-
-      //   async onQueryStarted(__, { dispatch, queryFulfilled }) {
-      //     try {
-      //       const { data } = await queryFulfilled;
-
-      //       if (data) {
-      //         const { accessToken, user } = data.data;
-
-      //         if (accessToken && user) {
-      //           await updateToken(accessToken);
-
-      //           dispatch(setCurrentUser({ currentUser: user }));
-      //         }
-      //       }
-      //     } catch (error) {
-      //       console.log(error);
-      //     }
-      //   },
     }),
 
     requestPasswordReset: builder.mutation({

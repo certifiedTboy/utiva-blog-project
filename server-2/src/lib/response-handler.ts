@@ -31,7 +31,7 @@ export class ResponseHandler {
 
   static auth(res: Response, statusCode: number, message: string, data?: any) {
     const cookieOptions: CookieOptions = {
-      expires: new Date(Date.now() + 15 * 60 * 1000),
+      expires: new Date(Date.now() + 60 * 60 * 1000),
       maxAge: 60 * 60 * 1000,
       secure: true,
       httpOnly: true,

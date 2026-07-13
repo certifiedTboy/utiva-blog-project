@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { ResponseHandler } from "../lib/response-handler.ts";
 import { AuthServices } from "./auth-services.ts";
+import { HttpException } from "../lib/exceptions/http-exception.ts";
 
 /**
  * @class AuthControllers
@@ -118,6 +119,38 @@ export class AuthControllers {
       const result = await AuthServices.updatePassword(otp, password);
 
       ResponseHandler.ok(res, 200, "password updated successfully", result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * @static
+   * @async
+   * @method getNewAccessToken
+   * @description handles generating new access token
+   * @param {Request} req - The Express request object.
+   * @param {Response} res - The Express response object.
+   * @param {NextFunction} next - The Express next middleware function.
+   */
+  public static async getNewAccessToken(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const id = req?.user?.id;
+
+      if (!id) throw new HttpException(400, "invalid request");
+
+      const result = await AuthServices.newAccessToken(id);
+
+      ResponseHandler.auth(
+        res,
+        201,
+        "New access token generated successfully",
+        result,
+      );
     } catch (error) {
       next(error);
     }

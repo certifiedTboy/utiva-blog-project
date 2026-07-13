@@ -1,20 +1,29 @@
 import { useRoute, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, Clock, Eye } from "lucide-react";
-import { POSTS } from "@/lib/mock-data";
 import { useAuth } from "@/features/context/auth-context";
 import ReadingProgress from "./reading-progress";
 import ReactionsPanel from "./reaction-panel";
 import CommentsSection from "./comments-section";
+import { usePosts } from "@/features/context/post-context";
 import NotFoundBlog from "./not-found-blog";
+import { useEffect } from "react";
 
 export default function PostDetailPage() {
+  const { posts: POSTS, viewPostsDetails } = usePosts();
+
   const [, params] = useRoute("/blog/:slug");
   const [, navigate] = useLocation();
   const { isAuthenticated: isSignedIn } = useAuth();
   const slug = params?.slug ?? "";
 
   const post = POSTS.find((p) => p.slug === slug);
+
+  useEffect(() => {
+    if (slug) {
+      viewPostsDetails(slug);
+    }
+  }, [slug]);
 
   if (!post) {
     return <NotFoundBlog />;
@@ -23,15 +32,15 @@ export default function PostDetailPage() {
   return (
     <div className="min-h-screen pt-20 pb-20">
       <ReadingProgress />
-      {post.coverImage && (
+      {post?.coverImage && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="w-full max-h-[500px] overflow-hidden"
         >
           <img
-            src={post.coverImage}
-            alt={post.title}
+            src={post?.coverImage}
+            alt={post?.title}
             className="w-full h-full object-cover"
             style={{ aspectRatio: "21/9" }}
           />
@@ -48,13 +57,13 @@ export default function PostDetailPage() {
           <ArrowLeft className="w-4 h-4" /> Back to Blog
         </motion.button>
 
-        {post.categoryName && (
+        {post?.category && (
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="inline-block text-xs font-semibold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full mb-4"
           >
-            {post.categoryName}
+            {post?.category}
           </motion.span>
         )}
 
@@ -64,17 +73,17 @@ export default function PostDetailPage() {
           transition={{ delay: 0.1 }}
           className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-foreground leading-tight mb-6"
         >
-          {post.title}
+          {post?.title}
         </motion.h1>
 
-        {post.excerpt && (
+        {post?.excerpt && (
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
             className="text-lg text-muted-foreground mb-6 leading-relaxed italic border-l-4 border-primary pl-4"
           >
-            {post.excerpt}
+            {post?.excerpt}
           </motion.p>
         )}
 
@@ -85,20 +94,20 @@ export default function PostDetailPage() {
           className="flex flex-wrap items-center gap-4 py-4 border-y border-border mb-8"
         >
           <div className="flex items-center gap-2">
-            {post.authorAvatar ? (
+            {post?.author?.picture ? (
               <img
-                src={post.authorAvatar}
-                alt={post.authorName}
+                src={post?.author?.picture}
+                alt={`${post?.author?.firstName} ${post?.author?.lastName}`}
                 className="w-9 h-9 rounded-full"
               />
             ) : (
               <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-                {post.authorName?.[0]}
+                {post?.author?.firstName[0]}
               </div>
             )}
             <div>
               <p className="text-sm font-semibold text-foreground">
-                {post.authorName}
+                {`${post?.author?.firstName} ${post?.author?.lastName}`}
               </p>
               <p className="text-xs text-muted-foreground">Author</p>
             </div>
@@ -106,7 +115,7 @@ export default function PostDetailPage() {
           <div className="flex items-center gap-4 text-xs text-muted-foreground ml-auto">
             <span className="flex items-center gap-1">
               <Calendar className="w-3.5 h-3.5" />
-              {new Date(post.createdAt).toLocaleDateString("en-US", {
+              {new Date(post?.createdAt).toLocaleDateString("en-US", {
                 month: "long",
                 day: "numeric",
                 year: "numeric",
@@ -114,11 +123,11 @@ export default function PostDetailPage() {
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-3.5 h-3.5" />
-              {post.readingTime} min
+              {post?.readingTime} min
             </span>
             <span className="flex items-center gap-1">
               <Eye className="w-3.5 h-3.5" />
-              {post.viewCount.toLocaleString()}
+              {post?.viewCount?.toLocaleString()}
             </span>
           </div>
         </motion.div>
@@ -129,7 +138,7 @@ export default function PostDetailPage() {
           transition={{ delay: 0.4 }}
           className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-serif prose-headings:font-semibold prose-a:text-primary"
         >
-          {post.content?.split("\n").map((line, i) => {
+          {post?.content?.split("\n").map((line, i) => {
             if (line.startsWith("## ")) return <h2 key={i}>{line.slice(3)}</h2>;
             if (line.startsWith("# ")) return <h1 key={i}>{line.slice(2)}</h1>;
             if (line.startsWith("```")) return null;
@@ -138,9 +147,9 @@ export default function PostDetailPage() {
           })}
         </motion.div>
 
-        {post.tags?.length > 0 && (
+        {post?.tags?.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-8">
-            {post.tags.map((tag) => (
+            {post?.tags?.map((tag) => (
               <a
                 key={tag}
                 href={`/blog?tag=${tag}`}
@@ -152,8 +161,8 @@ export default function PostDetailPage() {
           </div>
         )}
 
-        <ReactionsPanel postId={post.id} userSignedIn={!!isSignedIn} />
-        <CommentsSection postId={post.id} />
+        <ReactionsPanel postId={+post._id} userSignedIn={!!isSignedIn} />
+        <CommentsSection postId={+post._id} />
       </div>
     </div>
   );

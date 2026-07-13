@@ -1,4 +1,5 @@
 import * as Yup from "yup";
+import { z } from "zod";
 
 export const createUserValidationSchema = Yup.object({
   firstName: Yup.string().required("First name is required"),
@@ -55,3 +56,19 @@ export const loginValidationSchema = Yup.object({
     .required("Email is required"),
   password: Yup.string().required("Password is required"),
 });
+
+export const postSchema = z.object({
+  title: z.string().min(1, "Title is required").max(200),
+  excerpt: z.string().max(500).optional(),
+  content: z.string().min(1, "Content is required"),
+  coverImage: z
+    .string()
+    .url("Must be a valid URL")
+    .optional()
+    .or(z.literal("")),
+  category: z.string().optional(),
+  status: z.enum(["draft", "published"]),
+  featured: z.boolean(),
+});
+
+export type PostFormData = z.infer<typeof postSchema>;

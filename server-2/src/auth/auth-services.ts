@@ -38,16 +38,10 @@ export class AuthServices {
       throw new HttpException(403, "user account is not verified");
     }
 
-    // console.log(
-    //   "stored password:",
-    //   userExist.password,
-    //   "provided password:",
-    //   userData.password,
-    // );
+    if (userExist && !userExist?.password) {
+      throw new HttpException(400, "Reset your password to login");
+    }
 
-    // Note: Password verification logic seems to be missing here.
-    // You should compare the provided password with the stored hashed password.
-    // For example:
     const isMatch = await AppHelpers.verifyPassword(
       userData.password,
       userExist.password,
@@ -135,6 +129,48 @@ export class AuthServices {
         email: user.email,
         role: user.role || "user",
         picture: user.picture,
+      },
+    };
+  }
+
+  /**
+   * @static
+   * @method newAccessToken
+   * @description Authenticates a user with their email and password.
+   * @param {string} userId - the id of the user request a new access token
+   * @returns {Promise<{accessToken: string, refreshToken: string, user: IUser}>} A promise that resolves to an object containing the access and refresh tokens.
+   * @throws {HttpException} If the user does not exist, is not verified, or if the password is incorrect.
+   */
+  public static async newAccessToken(userId: string) {
+    const userExist = await UserServices.checkIfUserExist({
+      _id: userId,
+    });
+
+    if (!userExist) {
+      throw new HttpException(404, "User does not exist");
+    }
+
+    const accessToken = newJwt.generateAccessToken({
+      id: userExist._id,
+      email: userExist.email,
+      role: userExist.role,
+    });
+
+    const refreshToken = newJwt.generateRefreshToken({
+      id: userExist._id,
+      email: userExist.email,
+      role: userExist.role,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      user: {
+        firstName: userExist.firstName,
+        lastName: userExist.lastName,
+        email: userExist.email,
+        role: userExist.role || "user",
+        picture: userExist.picture || "",
       },
     };
   }

@@ -61,19 +61,31 @@ export class AppRoutesHandler {
    * @param {NextFunction} next - The next middleware function in the stack.
    */
   authGuard(req: Request, _res: Response, next: NextFunction) {
-    const authToken = req.cookies["authToken"];
-    if (!authToken) {
-      throw new HttpException(403, "Unauthorized");
+    try {
+      const authToken = req.cookies["authToken"];
+
+      if (!authToken) {
+        throw new HttpException(403, "Unauthorized");
+      }
+
+      const payload = newJwt.verifyAccessToken(authToken);
+
+      req.user = payload;
+      next();
+    } catch (error: unknown) {
+      if (error instanceof HttpException) {
+        next(new HttpException(403, "Unathorized"));
+      }
+
+      if (error instanceof Error) {
+        if (error?.message === "invalid signature") {
+          next(new HttpException(401, "Unauthorized"));
+        }
+        if (error?.message === "jwt expired") {
+          next(new HttpException(401, "jwt expired"));
+        }
+      }
     }
-
-    const payload = newJwt.verifyAccessToken(authToken);
-
-    if (!payload) {
-      throw new HttpException(401, "jwt expired");
-    }
-
-    req.user = payload;
-    next();
   }
 
   /**
@@ -86,23 +98,23 @@ export class AppRoutesHandler {
    * @param {NextFunction} next - The next middleware function in the stack.
    */
   adminGuard(req: Request, _res: Response, next: NextFunction) {
-    const authToken = req.cookies["authToken"];
-    if (!authToken) {
-      throw new HttpException(403, "Unauthorized");
+    try {
+      const authToken = req.cookies["authToken"];
+      if (!authToken) {
+        throw new HttpException(403, "Unauthorized");
+      }
+
+      const payload = newJwt.verifyAccessToken(authToken);
+
+      if (payload.role !== "admin") {
+        throw new HttpException(403, "Unauthorized");
+      }
+
+      req.user = payload;
+      next();
+    } catch (error) {
+      next(error);
     }
-
-    const payload = newJwt.verifyAccessToken(authToken);
-
-    if (!payload) {
-      throw new HttpException(401, "jwt expired");
-    }
-
-    if (payload.role !== "admin") {
-      throw new HttpException(403, "Unauthorized");
-    }
-
-    req.user = payload;
-    next();
   }
 
   /**

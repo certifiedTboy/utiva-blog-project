@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import { usePosts } from "@/features/context/post-context";
 import { Search, Filter } from "lucide-react";
-import { POSTS, CATEGORIES, TAGS } from "@/lib/mock-data";
+import { TAGS } from "@/lib/mock-data";
 import PostCard from "@/pages/blogs/post-card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,30 +11,35 @@ import BookOpenIcon from "./book-open-icon";
 const PAGE_SIZE = 9;
 
 export default function BlogPage() {
-  const params = new URLSearchParams(
-    typeof window !== "undefined" ? window.location.search : "",
-  );
-  const [search, setSearch] = useState(params.get("search") || "");
-  const [selectedCategory, setSelectedCategory] = useState(
-    params.get("category") || "",
-  );
-  const [selectedTag, setSelectedTag] = useState(params.get("tag") || "");
+  const { posts: allPosts, categories: CATEGORIES } = usePosts();
+
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedTag, setSelectedTag] = useState("");
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
-    return POSTS.filter((p) => {
-      const matchSearch =
-        !search ||
-        p.title.toLowerCase().includes(search.toLowerCase()) ||
-        p.excerpt?.toLowerCase().includes(search.toLowerCase());
-      const matchCat = !selectedCategory || p.categoryName === selectedCategory;
-      const matchTag = !selectedTag || p.tags.includes(selectedTag);
-      return matchSearch && matchCat && matchTag;
-    });
-  }, [search, selectedCategory, selectedTag]);
+    return (
+      allPosts &&
+      allPosts?.length > 0 &&
+      allPosts.filter((p) => {
+        const matchSearch =
+          !search ||
+          p.title.toLowerCase().includes(search.toLowerCase()) ||
+          p.excerpt?.toLowerCase().includes(search.toLowerCase());
+        const matchCat = !selectedCategory || p.category === selectedCategory;
+        const matchTag = !selectedTag || p.tags.includes(selectedTag);
+        return matchSearch && matchCat && matchTag;
+      })
+    );
+  }, [allPosts, search, selectedCategory, selectedTag]);
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const posts = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages =
+    filtered && filtered?.length > 0 && Math.ceil(filtered?.length / PAGE_SIZE);
+  const posts =
+    filtered &&
+    filtered?.length > 0 &&
+    filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div className="min-h-screen pt-24 pb-20">
@@ -47,7 +53,7 @@ export default function BlogPage() {
             The Blog
           </h1>
           <p className="text-muted-foreground">
-            {filtered.length > 0
+            {filtered && filtered?.length > 0 && filtered.length > 0
               ? `${filtered.length} articles and counting`
               : "Discover great writing"}
           </p>
@@ -119,10 +125,10 @@ export default function BlogPage() {
               </div>
             )}
 
-            {posts.length > 0 ? (
+            {posts && posts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {posts.map((post, i) => (
-                  <PostCard key={post.id} post={post} index={i} />
+                  <PostCard key={i} post={post} index={i} />
                 ))}
               </div>
             ) : (
@@ -135,7 +141,7 @@ export default function BlogPage() {
               </div>
             )}
 
-            {totalPages > 1 && (
+            {totalPages && totalPages > 1 && (
               <div className="flex justify-center gap-2 mt-12">
                 <Button
                   variant="outline"

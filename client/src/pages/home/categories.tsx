@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { CATEGORIES } from "@/lib/mock-data";
+import { usePosts } from "@/features/context/post-context";
 
 export default function Categories() {
+  const { categories: CATEGORIES } = usePosts();
+
   return (
     <section className="py-20 px-4 max-w-7xl mx-auto">
       <motion.div

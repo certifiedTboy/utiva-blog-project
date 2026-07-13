@@ -45,6 +45,12 @@ export class AuthRoutes extends AppRoutesHandler {
       this.checkValidationResult,
       AuthControllers.updateUserPassword,
     );
+
+    this.routes.get(
+      "/new-access-token",
+      this.refreshTokenGuard,
+      AuthControllers.getNewAccessToken,
+    );
   }
 
   /**
