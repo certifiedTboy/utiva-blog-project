@@ -40,23 +40,23 @@ export const PostContextProvider = ({ children }: React.PropsWithChildren) => {
       const fetchedPosts: IPost[] = data.data.posts.map((post: IPost) => ({
         ...post,
         isReactedTo: false,
-        id: post._id,
-        category:
-          CATEGORIES.find((cat: any) => cat.id.toString() === post.category)
-            ?.name ?? "",
+        id: post._id, // The original post.category is the categoryId
+        categoryName:
+          CATEGORIES.find((cat) => cat.id.toString() === post.category)?.name ??
+          "", // Add categoryName
       }));
 
       setPosts(fetchedPosts);
       tempPosts = fetchedPosts;
 
       // Calculate post counts for each category
-      const categoryCounts = new Map<string, number>();
+      const categoryCounts = new Map<string, number>(); // Counts based on category ID
       fetchedPosts.forEach((post) => {
-        const categoryName = post.category;
-        if (categoryName) {
+        const categoryId = post.category; // Use the original category ID
+        if (categoryId) {
           categoryCounts.set(
-            categoryName,
-            (categoryCounts.get(categoryName) || 0) + 1,
+            categoryId,
+            (categoryCounts.get(categoryId) || 0) + 1,
           );
         }
       });
@@ -64,7 +64,7 @@ export const PostContextProvider = ({ children }: React.PropsWithChildren) => {
       setCategories((prevCategories) =>
         prevCategories.map((cat) => ({
           ...cat,
-          postCount: categoryCounts.get(cat.name) || 0,
+          postCount: categoryCounts.get(cat.id.toString()) || 0,
         })),
       );
     }

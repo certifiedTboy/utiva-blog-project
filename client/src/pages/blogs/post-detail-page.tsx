@@ -65,13 +65,15 @@ export default function PostDetailPage() {
           <ArrowLeft className="w-4 h-4" /> Back to Blog
         </motion.button>
 
-        {post?.category && (
+        {/* @ts-ignore */}
+        {post?.categoryName && (
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="inline-block text-xs font-semibold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full mb-4"
           >
-            {post?.category}
+            {/* @ts-ignore */}
+            {post.categoryName}
           </motion.span>
         )}
 

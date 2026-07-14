@@ -27,7 +27,10 @@ export default function BlogPage() {
           !search ||
           p.title.toLowerCase().includes(search.toLowerCase()) ||
           p.excerpt?.toLowerCase().includes(search.toLowerCase());
-        const matchCat = !selectedCategory || p.category === selectedCategory;
+
+        const matchCat =
+          //@ts-ignore
+          !selectedCategory || p.categoryName === selectedCategory;
         const matchTag = !selectedTag || p.tags.includes(selectedTag);
         return matchSearch && matchCat && matchTag;
       })
