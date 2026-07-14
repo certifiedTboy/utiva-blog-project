@@ -6,6 +6,7 @@ export interface IPost extends Document {
   excerpt: string;
   content: string;
   coverImage: string;
+  coverImageCredit: string;
   author: Schema.Types.ObjectId;
   category: string;
   tags: string[];
@@ -24,6 +25,7 @@ const postSchema = new Schema<IPost>(
     excerpt: { type: String },
     content: { type: String, required: true },
     coverImage: { type: String },
+    coverImageCredit: { type: String },
     author: { type: Schema.Types.ObjectId, ref: "user", required: true },
     category: {
       type: String,

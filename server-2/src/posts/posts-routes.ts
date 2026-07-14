@@ -62,6 +62,7 @@ export class PostRoutes extends AppRoutesHandler {
       body("title").notEmpty().withMessage("Title is required"),
       body("content").notEmpty().withMessage("Content is required"),
       body("category").notEmpty().withMessage("Category is required"),
+      body("coverImageCredit").optional().isString(),
       body("status")
         .optional()
         .isIn(["published", "draft"])

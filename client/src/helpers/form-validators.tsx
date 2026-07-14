@@ -67,6 +67,7 @@ export const postSchema = z.object({
     .optional()
     .or(z.literal("")),
   category: z.string().optional(),
+  coverImageCredit: z.string().optional(),
   status: z.enum(["draft", "published"]),
   featured: z.boolean(),
 });

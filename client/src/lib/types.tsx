@@ -24,6 +24,7 @@ export interface IPost {
   };
   category: string;
   categoryName?: string;
+  coverImageCredit: string;
   tags: string[];
   viewCount: number;
   commentCount: number;

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import dummyProfile from "@/assets/dummy-profile.png";
 
 interface User {
   id: string;
@@ -27,7 +28,7 @@ export const AuthContextProvider = ({ children }: React.PropsWithChildren) => {
   const checkUserIsAuthenticated = (userData: User) => {
     if (localStorage.getItem("isAuthenticated")) {
       setIsAuthenticated(true);
-      setUser(userData);
+      setUser({ ...userData, picture: userData?.picture || dummyProfile });
     } else {
       setIsAuthenticated(false);
       setUser(null);

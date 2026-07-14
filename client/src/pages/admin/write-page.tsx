@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Save, Send, X, Plus, Image, Loader2 } from "lucide-react";
-import { CATEGORIES, POSTS } from "@/lib/mock-data";
+import { CATEGORIES } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,19 +33,7 @@ import {
   useCreatePostMutation,
   useUpdatePostMutation,
 } from "@/features/apis/post-apis";
-
-const languageAliases: Record<string, string> = {
-  javascript: "javascript",
-  jsx: "jsx",
-  typescript: "typescript",
-  tsx: "tsx",
-  markup: "markup",
-  bash: "bash",
-  python: "python",
-  ruby: "ruby",
-  csharp: "csharp",
-  cpp: "cpp",
-};
+import { usePosts } from "@/features/context/post-context";
 
 export default function WritePage() {
   const [, params] = useRoute("/write/:id");
@@ -53,10 +41,11 @@ export default function WritePage() {
   const { toast } = useToast();
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [showLangHint, setShowLangHint] = useState(false);
 
-  const editId = params?.id ? parseInt(params.id) : null;
-  const existingPost = editId ? POSTS.find((p) => p.id === editId) : null;
+  const { posts: POSTS } = usePosts();
+
+  const editId = params?.id || null;
+  const existingPost = editId ? POSTS.find((p) => p._id === editId) : null;
 
   const [
     createPost,
@@ -86,7 +75,8 @@ export default function WritePage() {
           excerpt: existingPost.excerpt ?? "",
           content: existingPost.content,
           coverImage: existingPost.coverImage ?? "",
-          category: existingPost.categoryId?.toString() ?? "",
+          coverImageCredit: existingPost?.coverImageCredit ?? "",
+          category: existingPost?.category ?? "",
           status: existingPost.status as "draft" | "published",
           featured: existingPost.featured,
         }
@@ -95,6 +85,8 @@ export default function WritePage() {
           excerpt: "",
           content: "",
           coverImage: "",
+          coverImageCredit: "Image by ",
+          category: "",
           status: "draft",
           featured: false,
         },
@@ -255,6 +247,30 @@ export default function WritePage() {
                         </div>
                       )}
                     </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="coverImageCredit"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Image Credit{" "}
+                    <span className="text-muted-foreground text-xs">
+                      (optional field)
+                    </span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Give credit to the image creator..."
+                      className="text-lg font-serif font-semibold h-12"
+                      data-testid="input-title"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

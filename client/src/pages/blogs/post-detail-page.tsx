@@ -1,4 +1,4 @@
-import { useRoute, useLocation } from "wouter";
+import { useRoute, useLocation, Link } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, Clock, Eye } from "lucide-react";
 import { transform } from "./transform";
@@ -37,6 +37,18 @@ export default function PostDetailPage() {
     breaks: true,
   });
 
+  const credit = post?.coverImageCredit;
+  let creditText = credit;
+  let creditUrl: string | undefined;
+
+  if (credit) {
+    const urlMatch = credit.match(/https?:\/\/\S+/);
+    if (urlMatch) {
+      creditUrl = urlMatch[0];
+      creditText = credit.replace(urlMatch[0], "").trim();
+    }
+  }
+
   return (
     <div className="min-h-screen pt-20 pb-20">
       <ReadingProgress />
@@ -53,6 +65,25 @@ export default function PostDetailPage() {
             style={{ aspectRatio: "21/9" }}
           />
         </motion.div>
+      )}
+
+      {creditText && (
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <p className="text-xs text-muted-foreground mt-2 italic">
+            {creditUrl ? (
+              <a
+                href={creditUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
+                {creditText}
+              </a>
+            ) : (
+              creditText
+            )}
+          </p>
+        </div>
       )}
       <div className="max-w-3xl mx-auto px-4 mt-10">
         <div className="sticky top-16 bg-background/95 backdrop-blur-md z-10 py-4 -mx-4 px-4 mb-4">

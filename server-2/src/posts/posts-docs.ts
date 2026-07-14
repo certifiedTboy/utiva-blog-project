@@ -15,6 +15,7 @@ export const postDocs = {
                 content: { type: "string" },
                 excerpt: { type: "string" },
                 coverImage: { type: "string" },
+                coverImageCredit: { type: "string" },
                 category: { type: "string", description: "Category ID" },
                 tags: { type: "array", items: { type: "string" } },
                 status: { type: "string", enum: ["published", "draft"] },
