@@ -1,6 +1,9 @@
 import { useRoute, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, Clock, Eye } from "lucide-react";
+import { transform } from "./transform";
+import { Interweave } from "interweave";
+import { marked } from "marked";
 import { useAuth } from "@/features/context/auth-context";
 import ReadingProgress from "./reading-progress";
 import ReactionsPanel from "./reaction-panel";
@@ -28,6 +31,11 @@ export default function PostDetailPage() {
   if (!post) {
     return <NotFoundBlog />;
   }
+
+  const renderedContent = marked.parse(post?.content, {
+    gfm: true,
+    breaks: true,
+  });
 
   return (
     <div className="min-h-screen pt-20 pb-20">
@@ -136,15 +144,18 @@ export default function PostDetailPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-serif prose-headings:font-semibold prose-a:text-primary"
+          className="
+        prose prose-lg dark:prose-invert max-w-none
+        prose-headings:font-serif
+        prose-headings:font-semibold
+        prose-a:text-primary
+        prose-pre:m-0
+        prose-pre:bg-transparent
+        prose-pre:p-0
+      "
         >
-          {post?.content?.split("\n").map((line, i) => {
-            if (line.startsWith("## ")) return <h2 key={i}>{line.slice(3)}</h2>;
-            if (line.startsWith("# ")) return <h1 key={i}>{line.slice(2)}</h1>;
-            if (line.startsWith("```")) return null;
-            if (!line.trim()) return <br key={i} />;
-            return <p key={i}>{line}</p>;
-          })}
+          {/* @ts-ignore */}
+          <Interweave content={renderedContent} transform={transform} />
         </motion.div>
 
         {post?.tags?.length > 0 && (
@@ -161,7 +172,7 @@ export default function PostDetailPage() {
           </div>
         )}
 
-        <ReactionsPanel postId={post._id} userSignedIn={!!isSignedIn} />
+        <ReactionsPanel postId={post?._id} userSignedIn={!!isSignedIn} />
         <CommentsSection postId={post._id} />
       </div>
     </div>

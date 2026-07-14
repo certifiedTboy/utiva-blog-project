@@ -25,7 +25,7 @@ export default function ReactionsPanel({
   });
   const { toast } = useToast();
 
-  const [reactToPosts] = useReactToPostsMutation();
+  const [reactToPost] = useReactToPostsMutation();
   const [getReactions, { data, isSuccess }] = useGetReactionsToPostMutation();
 
   useEffect(() => {
@@ -59,24 +59,31 @@ export default function ReactionsPanel({
       toast({ title: "Sign in to react" });
       return;
     }
+
     setReactions((prev) => {
       const wasActive = prev.userReaction === type;
       const counts = { ...prev.counts };
+
       if (wasActive) {
+        // User is un-reacting
         counts[type] = Math.max(0, (counts[type] || 0) - 1);
         return { counts, userReaction: null };
       } else {
-        if (prev.userReaction)
+        // User is reacting or switching reaction
+        if (prev.userReaction) {
+          // Decrement the previous reaction if there was one
           counts[prev.userReaction] = Math.max(
             0,
             (counts[prev.userReaction] || 0) - 1,
           );
+        }
+        // Increment the new reaction
         counts[type] = (counts[type] || 0) + 1;
         return { counts, userReaction: type };
       }
     });
 
-    reactToPosts({ postId, type });
+    reactToPost({ postId, type });
   }
 
   return (

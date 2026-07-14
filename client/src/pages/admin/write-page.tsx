@@ -383,9 +383,24 @@ export default function WritePage() {
                   <FormControl>
                     <Textarea
                       {...field}
-                      placeholder="Start writing your post..."
+                      placeholder="Start writing your post... Use markdown for code blocks (e.g., ```js)"
                       className="min-h-[400px] font-mono text-sm resize-none"
                       data-testid="input-content"
+                      spellCheck="false"
+                      onKeyDown={(e) => {
+                        if (e.key === "Tab" && !e.shiftKey) {
+                          e.preventDefault();
+                          const start = e.currentTarget.selectionStart;
+                          const end = e.currentTarget.selectionEnd;
+                          const value = e.currentTarget.value;
+                          e.currentTarget.value =
+                            value.substring(0, start) +
+                            "  " +
+                            value.substring(end);
+                          e.currentTarget.selectionStart =
+                            e.currentTarget.selectionEnd = start + 2;
+                        }
+                      }}
                     />
                   </FormControl>
                   <FormMessage />

@@ -137,6 +137,7 @@ export class PostControllers {
       );
       ResponseHandler.ok(res, 200, result.message, result);
     } catch (error) {
+      console.log(error);
       next(error);
     }
   }
