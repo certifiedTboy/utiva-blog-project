@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { MarkdownContentField } from "./markdown-content-field";
 import {
   Form,
   FormControl,
@@ -33,12 +34,26 @@ import {
   useUpdatePostMutation,
 } from "@/features/apis/post-apis";
 
+const languageAliases: Record<string, string> = {
+  javascript: "javascript",
+  jsx: "jsx",
+  typescript: "typescript",
+  tsx: "tsx",
+  markup: "markup",
+  bash: "bash",
+  python: "python",
+  ruby: "ruby",
+  csharp: "csharp",
+  cpp: "cpp",
+};
+
 export default function WritePage() {
   const [, params] = useRoute("/write/:id");
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [showLangHint, setShowLangHint] = useState(false);
 
   const editId = params?.id ? parseInt(params.id) : null;
   const existingPost = editId ? POSTS.find((p) => p.id === editId) : null;
@@ -374,35 +389,9 @@ export default function WritePage() {
               name="content"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Content *{" "}
-                    <span className="text-muted-foreground text-xs">
-                      (supports Markdown: ## Heading, **bold**)
-                    </span>
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Start writing your post... Use markdown for code blocks (e.g., ```js)"
-                      className="min-h-[400px] font-mono text-sm resize-none"
-                      data-testid="input-content"
-                      spellCheck="false"
-                      onKeyDown={(e) => {
-                        if (e.key === "Tab" && !e.shiftKey) {
-                          e.preventDefault();
-                          const start = e.currentTarget.selectionStart;
-                          const end = e.currentTarget.selectionEnd;
-                          const value = e.currentTarget.value;
-                          e.currentTarget.value =
-                            value.substring(0, start) +
-                            "  " +
-                            value.substring(end);
-                          e.currentTarget.selectionStart =
-                            e.currentTarget.selectionEnd = start + 2;
-                        }
-                      }}
-                    />
-                  </FormControl>
+                  <FormLabel>Content</FormLabel>
+                  <MarkdownContentField field={field} />
+
                   <FormMessage />
                 </FormItem>
               )}

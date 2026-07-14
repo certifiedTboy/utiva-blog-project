@@ -1,8 +1,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Interweave } from "interweave";
+import { marked } from "marked";
 import { useAuth } from "@/features/context/auth-context";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { transform } from "./transform";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import { MarkdownCommentField } from "./markdown-comment-field";
 
 type Comment = {
   id: number;
@@ -25,13 +32,19 @@ export default function CommentItem({
   depth?: number;
 }) {
   const [replying, setReplying] = useState(false);
-  const [replyText, setReplyText] = useState("");
   const { isAuthenticated: isSignedIn } = useAuth();
 
-  function submitReply() {
-    if (!replyText.trim()) return;
-    onReply(comment.id, replyText);
-    setReplyText("");
+  const form = useForm({
+    resolver: zodResolver(z.object({ content: z.string().min(1) })),
+    defaultValues: {
+      content: "",
+    },
+  });
+
+  function submitReply(values: { content: string }) {
+    if (!values.content.trim()) return;
+    onReply(comment.id, values.content);
+    form.reset();
     setReplying(false);
   }
 
@@ -67,9 +80,12 @@ export default function CommentItem({
               })}
             </span>
           </div>
-          <p className="text-sm text-foreground/90 leading-relaxed">
-            {comment.content}
-          </p>
+          <div className="prose prose-sm dark:prose-invert max-w-none">
+            <Interweave
+              content={marked.parse(comment.content || "") as string}
+              transform={transform}
+            />
+          </div>
           {isSignedIn && depth === 0 && (
             <button
               className="mt-2 text-xs text-muted-foreground hover:text-primary transition-colors"
@@ -81,30 +97,44 @@ export default function CommentItem({
           )}
           {replying && (
             <div className="mt-3 space-y-2">
-              <Textarea
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                placeholder="Write a reply..."
-                className="text-sm resize-none"
-                rows={2}
-                data-testid="input-reply-text"
-              />
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={submitReply}
-                  data-testid="button-submit-reply"
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(submitReply)}
+                  className="space-y-2"
                 >
-                  Reply
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setReplying(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
+                  <FormField
+                    control={form.control}
+                    name="content"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <MarkdownCommentField
+                            field={field}
+                            placeholder="Write a reply... Use ``` for code blocks."
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      type="submit"
+                      size="sm"
+                      data-testid="button-submit-reply"
+                    >
+                      Reply
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setReplying(false)}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              </Form>
             </div>
           )}
         </div>

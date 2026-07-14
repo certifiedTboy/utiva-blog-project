@@ -1,23 +1,7 @@
 import React from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-
-const languageAliases: Record<string, string> = {
-  js: "javascript",
-  jsx: "jsx",
-  ts: "typescript",
-  tsx: "tsx",
-  html: "markup",
-  xml: "markup",
-  shell: "bash",
-  sh: "bash",
-  py: "python",
-  rb: "ruby",
-  cs: "csharp",
-  "c#": "csharp",
-  cpp: "cpp",
-  "c++": "cpp",
-};
+import { languageAliases } from "@/lib/mock-data";
 
 export const transform = (
   node: HTMLElement,

@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import { MessageCircle } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { COMMENTS } from "@/lib/mock-data";
 import { useAuth } from "@/features/context/auth-context";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import {
   useAddCommentToPostMutation,
   useGetCommentsByPostMutation,
 } from "@/features/apis/post-apis";
 import type { Comment } from "@/lib/types";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import { MarkdownCommentField } from "./markdown-comment-field";
 import CommentItem from "./comment-item";
 
 export default function CommentsSection({ postId }: { postId: any }) {
@@ -17,8 +21,14 @@ export default function CommentsSection({ postId }: { postId: any }) {
   const [comments, setComments] = useState<Comment[]>(
     () => COMMENTS[postId] ?? [],
   );
-  const [newComment, setNewComment] = useState("");
   const { toast } = useToast();
+
+  const form = useForm({
+    resolver: zodResolver(z.object({ content: z.string().min(1) })),
+    defaultValues: {
+      content: "",
+    },
+  });
 
   const [addCommentToPost] = useAddCommentToPostMutation();
   const [
@@ -49,20 +59,20 @@ export default function CommentsSection({ postId }: { postId: any }) {
 
   let nextId = 1000;
 
-  function submitComment() {
-    if (!newComment.trim()) return;
+  function submitComment(values: { content: string }) {
+    if (!values.content.trim()) return;
     const c: Comment = {
       id: nextId++,
       postId,
-      content: newComment,
+      content: values.content,
       authorName: user?.name ?? "You",
       authorAvatar: user?.picture,
       createdAt: new Date().toISOString(),
       replies: [],
     };
     setComments((prev) => [c, ...prev]);
-    addCommentToPost({ postId, content: newComment });
-    setNewComment("");
+    addCommentToPost({ postId, content: values.content });
+    form.reset();
     toast({ title: "Comment posted!" });
   }
 
@@ -96,22 +106,35 @@ export default function CommentsSection({ postId }: { postId: any }) {
       </h3>
       {isSignedIn ? (
         <div className="mb-8 space-y-3">
-          <Textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Share your thoughts..."
-            className="resize-none"
-            rows={3}
-            data-testid="input-comment"
-          />
-          <Button
-            onClick={submitComment}
-            disabled={!newComment.trim()}
-            className="cursor-pointer"
-            data-testid="button-submit-comment"
-          >
-            Post Comment
-          </Button>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(submitComment)}
+              className="space-y-3"
+            >
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <MarkdownCommentField
+                        field={field}
+                        placeholder="Share your thoughts... Use ``` for code blocks."
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                disabled={!form.watch("content")?.trim()}
+                className="cursor-pointer"
+                data-testid="button-submit-comment"
+              >
+                Post Comment
+              </Button>
+            </form>
+          </Form>
         </div>
       ) : (
         <div className="mb-8 p-4 bg-muted rounded-xl text-sm text-muted-foreground text-center">
