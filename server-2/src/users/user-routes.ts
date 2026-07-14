@@ -37,6 +37,8 @@ export class UserRoutes extends AppRoutesHandler {
       this.authGuard,
       UserControllers.getCurrentUserProfile,
     );
+
+    this.routes.get("/", this.adminGuard, UserControllers.getAllUsers);
   }
 
   /**

@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Edit, Trash2, Eye, Shield, Search } from "lucide-react";
-import { POSTS } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminContext } from "@/features/context/admin-context";
 
 const ADMIN_TABS = [
   { href: "/admin", label: "Overview" },
@@ -17,22 +17,25 @@ const ADMIN_TABS = [
 export default function AdminPostsPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [posts, setAllPosts] = useState(POSTS);
+
+  const { posts } = useAdminContext();
+
   const { toast } = useToast();
 
   const filtered = posts.filter(
     (p) =>
       !search ||
       p.title.toLowerCase().includes(search.toLowerCase()) ||
-      p.authorName.toLowerCase().includes(search.toLowerCase()),
+      p?.author?.firstName.toLowerCase().includes(search.toLowerCase()) ||
+      p?.author?.lastName.toLowerCase().includes(search.toLowerCase()),
   );
   const PAGE_SIZE = 15;
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const pagePosts = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  function handleDelete(id: number, title: string) {
+  function handleDelete(id: string, title: string) {
     if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
-    setAllPosts((prev) => prev.filter((p) => p.id !== id));
+    // setAllPosts((prev) => prev.filter((p) => p.id !== id));
     toast({ title: "Post deleted" });
   }
 
@@ -89,28 +92,28 @@ export default function AdminPostsPage() {
             <div className="divide-y divide-border">
               {pagePosts.map((post, i) => (
                 <motion.div
-                  key={post.id}
+                  key={post?._id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.02 }}
                   className="px-5 py-3 flex items-center gap-4 hover:bg-muted/30 transition-colors group"
-                  data-testid={`row-admin-post-${post.id}`}
+                  data-testid={`row-admin-post-${post?._id}`}
                 >
                   {post.coverImage && (
                     <img
-                      src={post.coverImage}
-                      alt={post.title}
+                      src={post?.coverImage}
+                      alt={post?.title}
                       className="w-10 h-10 rounded object-cover flex-shrink-0"
                     />
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-foreground truncate">
-                        {post.title}
+                        {post?.title}
                       </span>
                       <Badge
                         variant={
-                          post.status === "published" ? "default" : "secondary"
+                          post?.status === "published" ? "default" : "secondary"
                         }
                         className="text-xs flex-shrink-0"
                       >
@@ -118,17 +121,18 @@ export default function AdminPostsPage() {
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      by {post.authorName} · <Eye className="w-3 h-3 inline" />{" "}
-                      {post.viewCount}
+                      by{" "}
+                      {`${post?.author?.firstName} ${post?.author?.lastName}`} ·{" "}
+                      <Eye className="w-3 h-3 inline" /> {post?.viewCount}
                     </p>
                   </div>
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Link href={`/blog/${post.slug}`}>
+                    <Link href={`/blog/${post?.slug}`}>
                       <Button size="sm" variant="ghost">
                         <Eye className="w-3.5 h-3.5" />
                       </Button>
                     </Link>
-                    <Link href={`/write/${post.id}`}>
+                    <Link href={`/write/${post?._id}`}>
                       <Button size="sm" variant="ghost">
                         <Edit className="w-3.5 h-3.5" />
                       </Button>
@@ -137,8 +141,8 @@ export default function AdminPostsPage() {
                       size="sm"
                       variant="ghost"
                       className="text-destructive hover:text-destructive"
-                      onClick={() => handleDelete(post.id, post.title)}
-                      data-testid={`button-delete-post-${post.id}`}
+                      onClick={() => handleDelete(post._id, post?.title)}
+                      data-testid={`button-delete-post-${post._id}`}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>

@@ -9,6 +9,14 @@ export type Comment = {
   replies: Comment[];
 };
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  picture: string;
+  role: string;
+}
+
 export interface IPost {
   _id: string;
   title: string;

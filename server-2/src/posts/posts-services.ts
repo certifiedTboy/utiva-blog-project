@@ -77,6 +77,31 @@ export class PostServices {
   }
 
   /**
+   * @static updatePost
+   * @description Updates an existing post.
+   * @param {string} postId - The ID of the post to update.
+   * @param {Partial<IPost>} postData - The data to update the post with.
+   * @returns {Promise<IPost>} A promise that resolves to the updated post.
+   */
+  public static async updatePost(
+    postId: string,
+    postData: Partial<IPost>,
+  ): Promise<IPost> {
+    if (postData.title) {
+      postData.slug = postData.title.toLowerCase().split(" ").join("-");
+    }
+
+    const post = await Post.findByIdAndUpdate(postId, postData, {
+      new: true,
+    });
+
+    if (!post) {
+      throw new HttpException(404, "Post not found.");
+    }
+    return post;
+  }
+
+  /**
    * @static getPostBySlug
    * @description Retrieves a single post by its slug.
    * @param {string} slug - The slug of the post.
@@ -96,6 +121,21 @@ export class PostServices {
 
     return post;
   }
+
+  /**
+   * @static updatePostViewCount
+   * @description Increments the view count of a post.
+   * @param {string} postId - The ID of the post.
+   * @returns {Promise<{message: string}>} A promise that resolves to a success message.
+   */
+  public static async updatePostViewCount(
+    postId: string,
+  ): Promise<{ message: string }> {
+    await Post.findByIdAndUpdate(postId, { $inc: { viewCount: 1 } });
+    return { message: "Post view count updated successfully" };
+  }
+
+  // ... existing methods
 
   /**
    * @static addComment
@@ -172,6 +212,26 @@ export class PostServices {
     }
   }
 
+  /**
+   * @static getAllComments
+   * @description Retrieves all comments with pagination (for admins).
+   * @param {number} limit - The number of comments to return.
+   * @param {number} page - The page number.
+   * @returns {Promise<{comments: IComment[], total: number}>} A promise that resolves to the comments and total count.
+   */
+  public static async getAllComments(
+    limit: number,
+    page: number,
+  ): Promise<{ comments: IComment[]; total: number }> {
+    const comments = await Comment.find()
+      .populate("author", "firstName lastName")
+      .populate("post", "title")
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(limit * (page - 1));
+    const total = await Comment.countDocuments();
+    return { comments, total };
+  }
   /**
    * @static getCommentsByPost
    * @description Retrieves all comments for a given post.
@@ -336,5 +396,60 @@ export class PostServices {
       "author",
       "firstName lastName picture",
     );
+  }
+
+  /**
+   * @static updateComment
+   * @description Updates a comment.
+   * @param {string} commentId - The ID of the comment to update.
+   * @param {string} content - The new content of the comment.
+   * @returns {Promise<IComment>} A promise that resolves to the updated comment.
+   */
+  public static async updateComment(
+    commentId: string,
+    content: string,
+  ): Promise<IComment> {
+    const comment = await Comment.findByIdAndUpdate(
+      commentId,
+      { content },
+      { new: true },
+    );
+    if (!comment) {
+      throw new HttpException(404, "Comment not found.");
+    }
+    return comment;
+  }
+
+  /**
+   * @static deletePost
+   * @description Deletes a post and its associated comments and reactions.
+   * @param {string} postId - The ID of the post to delete.
+   * @returns {Promise<{message: string}>} A promise that resolves to a success message.
+   */
+  public static async deletePost(postId: string): Promise<{ message: string }> {
+    await Post.findByIdAndDelete(postId);
+    // @ts-ignore
+    await Comment.deleteMany({ post: postId });
+    // @ts-ignore
+    await Reaction.deleteMany({ post: postId });
+    return { message: "Post deleted successfully" };
+  }
+
+  /**
+   * @static deleteComment
+   * @description Deletes a comment and its replies, and decrements the post's comment count.
+   * @param {string} commentId - The ID of the comment to delete.
+   * @returns {Promise<{message: string}>} A promise that resolves to a success message.
+   */
+  public static async deleteComment(
+    commentId: string,
+  ): Promise<{ message: string }> {
+    const comment = await Comment.findByIdAndDelete(commentId);
+    if (comment) {
+      await Post.findByIdAndUpdate(comment.post, {
+        $inc: { commentCount: -1 },
+      });
+    }
+    return { message: "Comment deleted successfully" };
   }
 }

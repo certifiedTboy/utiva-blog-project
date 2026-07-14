@@ -1,9 +1,9 @@
 export const CATEGORIES = [
-  { id: 1, name: "Technology", postCount: 2 },
-  { id: 2, name: "Design", postCount: 1 },
-  { id: 3, name: "Culture", postCount: 1 },
-  { id: 4, name: "Business", postCount: 1 },
-  { id: 5, name: "Science", postCount: 1 },
+  { id: 1, name: "Technology", postCount: 0 },
+  { id: 2, name: "Design", postCount: 0 },
+  { id: 3, name: "Culture", postCount: 0 },
+  { id: 4, name: "Business", postCount: 0 },
+  { id: 5, name: "Science", postCount: 0 },
 ];
 
 export const TAGS = [

@@ -1,13 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import dummyProfile from "@/assets/dummy-profile.png";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  picture: string;
-  role: string;
-}
+import type { User } from "@/lib/types";
 
 interface AuthContextType {
   isAuthenticated: boolean;

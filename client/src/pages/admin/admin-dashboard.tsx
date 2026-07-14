@@ -10,8 +10,8 @@ import {
   TrendingUp,
   Shield,
 } from "lucide-react";
+import { useAdminContext } from "@/features/context/admin-context";
 import StatCard from "./stat-card";
-import { ADMIN_STATS } from "@/lib/mock-data";
 
 const ADMIN_TABS = [
   { href: "/admin", label: "Overview" },
@@ -21,7 +21,14 @@ const ADMIN_TABS = [
 ];
 
 export default function AdminDashboard() {
-  const stats = ADMIN_STATS;
+  const {
+    totalPosts,
+    totalPublishedPosts,
+    totalViews,
+    totalDraftPosts,
+    totalComments,
+    totalReactions,
+  } = useAdminContext();
 
   return (
     <div className="min-h-screen pt-24 pb-20">
@@ -65,56 +72,56 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatCard
             label="Total Posts"
-            value={stats.totalPosts}
+            value={totalPosts}
             icon={FileText}
-            sub={`${stats.publishedPosts} published`}
+            sub={`${totalPublishedPosts} published`}
             color="bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400"
           />
           <StatCard
             label="Total Users"
-            value={stats.totalUsers}
+            value={0}
             icon={Users}
             color="bg-green-50 text-green-600 dark:bg-green-950/50 dark:text-green-400"
           />
           <StatCard
             label="Total Views"
-            value={stats.totalViews}
+            value={totalViews}
             icon={Eye}
             color="bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400"
           />
           <StatCard
             label="Reactions"
-            value={stats.totalReactions}
+            value={totalReactions}
             icon={Heart}
             color="bg-red-50 text-red-600 dark:bg-red-950/50 dark:text-red-400"
           />
           <StatCard
             label="Comments"
-            value={stats.totalComments}
+            value={totalComments}
             icon={MessageCircle}
             color="bg-purple-50 text-purple-600 dark:bg-purple-950/50 dark:text-purple-400"
           />
           <StatCard
             label="Draft Posts"
-            value={stats.draftPosts}
+            value={totalDraftPosts}
             icon={FileText}
             color="bg-gray-50 text-gray-600 dark:bg-gray-900 dark:text-gray-400"
           />
           <StatCard
             label="Published"
-            value={stats.publishedPosts}
+            value={totalPublishedPosts}
             icon={BarChart3}
             color="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400"
           />
           <StatCard
             label="Engagement"
-            value={`${((stats.totalReactions / Math.max(1, stats.totalViews)) * 100).toFixed(1)}%`}
+            value={`${((totalReactions / Math.max(1, totalViews)) * 100).toFixed(1)}%`}
             icon={TrendingUp}
             color="bg-orange-50 text-orange-600 dark:bg-orange-950/50 dark:text-orange-400"
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-card border border-card-border rounded-xl overflow-hidden">
             <div className="px-5 py-4 border-b border-border">
               <h3 className="font-serif text-lg font-semibold text-foreground">
@@ -167,7 +174,7 @@ export default function AdminDashboard() {
               ))}
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

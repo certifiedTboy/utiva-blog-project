@@ -25,6 +25,24 @@ export class PostRoutes extends AppRoutesHandler {
     // Get all posts (public)
     this.routes.get("/published", PostControllers.getPosts);
 
+    // Update a post (protected)
+    this.routes.patch(
+      "/:postId",
+      this.authGuard,
+      this.getUpdatePostValidationRules(),
+      this.checkValidationResult,
+      PostControllers.updatePost,
+    );
+
+    // Delete a post (protected, admin only)
+    this.routes.delete("/:postId", this.adminGuard, PostControllers.deletePost);
+
+    // Update post view count
+    this.routes.patch(
+      "/:postId/view-count",
+      PostControllers.updatePostViewCount,
+    );
+
     // Get a single post by slug (public)
     this.routes.get("/:slug", PostControllers.getPostBySlug);
 
@@ -38,6 +56,29 @@ export class PostRoutes extends AppRoutesHandler {
       this.getAddCommentValidationRules(),
       this.checkValidationResult,
       PostControllers.addComment,
+    );
+
+    // Get all comments (admin only)
+    this.routes.get(
+      "/comments/all",
+      this.adminGuard,
+      PostControllers.getAllComments,
+    );
+
+    // Update a comment (protected)
+    this.routes.patch(
+      "/comments/:commentId",
+      this.authGuard,
+      this.getUpdateCommentValidationRules(),
+      this.checkValidationResult,
+      PostControllers.updateComment,
+    );
+
+    // Delete a comment (protected)
+    this.routes.delete(
+      "/comments/:commentId",
+      this.authGuard,
+      PostControllers.deleteComment,
     );
 
     // Get all reactions for a post (public)
@@ -71,6 +112,24 @@ export class PostRoutes extends AppRoutesHandler {
     ];
   }
 
+  private getUpdatePostValidationRules() {
+    return [
+      body("title").optional().notEmpty().withMessage("Title cannot be empty"),
+      body("content")
+        .optional()
+        .notEmpty()
+        .withMessage("Content cannot be empty"),
+      body("category")
+        .optional()
+        .notEmpty()
+        .withMessage("Category cannot be empty"),
+      body("status")
+        .optional()
+        .isIn(["published", "draft"])
+        .withMessage("Invalid status"),
+    ];
+  }
+
   private getAddCommentValidationRules() {
     return [
       body("content").notEmpty().withMessage("Comment content is required"),
@@ -78,6 +137,12 @@ export class PostRoutes extends AppRoutesHandler {
         .optional({ nullable: true })
         .isMongoId()
         .withMessage("Invalid parent ID"),
+    ];
+  }
+
+  private getUpdateCommentValidationRules() {
+    return [
+      body("content").notEmpty().withMessage("Comment content is required"),
     ];
   }
 

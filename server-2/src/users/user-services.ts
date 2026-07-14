@@ -172,4 +172,26 @@ export class UserServices {
 
     return updatedUser;
   }
+
+  /**
+   * @static getAllUsers
+   * @description Retrieves a list of all users with pagination (for admins).
+   * @param {number} limit - The number of users to return.
+   * @param {number} page - The page number.
+   * @returns {Promise<{users: IUser[], total: number}>} A promise that resolves to the users and total count.
+   */
+  public static async getAllUsers(
+    limit: number,
+    page: number,
+  ): Promise<{ users: IUser[]; total: number }> {
+    const users = await User.find()
+      .select("-password -otp -otpExpiry")
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(limit * (page - 1));
+    const total = await User.countDocuments();
+
+    //@ts-ignore
+    return { users, total };
+  }
 }

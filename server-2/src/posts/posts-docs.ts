@@ -81,6 +81,105 @@ export const postDocs = {
       },
     },
   },
+  "/posts/{postId}": {
+    patch: {
+      tags: ["Posts"],
+      summary: "Update a post",
+      security: [{ cookieAuth: [] }],
+      parameters: [
+        {
+          name: "postId",
+          in: "path",
+          required: true,
+          schema: { type: "string" },
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                title: { type: "string" },
+                content: { type: "string" },
+                category: { type: "string" },
+                status: { type: "string", enum: ["published", "draft"] },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: { description: "Post updated successfully" },
+        401: { description: "Unauthorized" },
+        404: { description: "Post not found" },
+      },
+    },
+    delete: {
+      tags: ["Posts"],
+      summary: "Delete a post",
+      description: "Admin only",
+      security: [{ cookieAuth: [] }],
+      parameters: [
+        {
+          name: "postId",
+          in: "path",
+          required: true,
+          schema: { type: "string" },
+        },
+      ],
+      responses: {
+        200: { description: "Post deleted successfully" },
+        401: { description: "Unauthorized" },
+        403: { description: "Forbidden" },
+      },
+    },
+  },
+  "/posts/{postId}/view-count": {
+    patch: {
+      tags: ["Posts"],
+      summary: "Update post view count",
+      parameters: [
+        {
+          name: "postId",
+          in: "path",
+          required: true,
+          schema: { type: "string" },
+        },
+      ],
+      responses: {
+        200: { description: "Post view count updated successfully" },
+      },
+    },
+  },
+  "/posts/comments/all": {
+    get: {
+      tags: ["Posts"],
+      summary: "Get all comments",
+      description: "Admin only",
+      security: [{ cookieAuth: [] }],
+      parameters: [
+        {
+          name: "page",
+          in: "query",
+          schema: { type: "integer", default: 1 },
+          description: "Page number",
+        },
+        {
+          name: "limit",
+          in: "query",
+          schema: { type: "integer", default: 10 },
+          description: "Number of comments per page",
+        },
+      ],
+      responses: {
+        200: { description: "All comments fetched successfully" },
+        401: { description: "Unauthorized" },
+        403: { description: "Forbidden" },
+      },
+    },
+  },
   "/posts/{postId}/comments": {
     get: {
       tags: ["Posts"],
@@ -132,6 +231,57 @@ export const postDocs = {
       },
       responses: {
         201: { description: "Comment added successfully" },
+        401: { description: "Unauthorized" },
+      },
+    },
+  },
+  "/posts/comments/{commentId}": {
+    patch: {
+      tags: ["Posts"],
+      summary: "Update a comment",
+      security: [{ cookieAuth: [] }],
+      parameters: [
+        {
+          name: "commentId",
+          in: "path",
+          required: true,
+          schema: { type: "string" },
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                content: { type: "string" },
+              },
+              required: ["content"],
+            },
+          },
+        },
+      },
+      responses: {
+        200: { description: "Comment updated successfully" },
+        401: { description: "Unauthorized" },
+        404: { description: "Comment not found" },
+      },
+    },
+    delete: {
+      tags: ["Posts"],
+      summary: "Delete a comment",
+      security: [{ cookieAuth: [] }],
+      parameters: [
+        {
+          name: "commentId",
+          in: "path",
+          required: true,
+          schema: { type: "string" },
+        },
+      ],
+      responses: {
+        200: { description: "Comment deleted successfully" },
         401: { description: "Unauthorized" },
       },
     },

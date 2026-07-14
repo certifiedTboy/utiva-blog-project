@@ -33,7 +33,7 @@ import {
   useCreatePostMutation,
   useUpdatePostMutation,
 } from "@/features/apis/post-apis";
-import { usePosts } from "@/features/context/post-context";
+import { useAdminContext } from "@/features/context/admin-context";
 
 export default function WritePage() {
   const [, params] = useRoute("/write/:id");
@@ -42,7 +42,7 @@ export default function WritePage() {
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
 
-  const { posts: POSTS } = usePosts();
+  const { posts: POSTS } = useAdminContext();
 
   const editId = params?.id || null;
   const existingPost = editId ? POSTS.find((p) => p._id === editId) : null;

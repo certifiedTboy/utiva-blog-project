@@ -73,6 +73,24 @@ export class PostControllers {
   }
 
   /**
+   * @static updatePost
+   * @description Handles updating a post.
+   */
+  public static async updatePost(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const { postId } = req.params;
+      const post = await PostServices.updatePost(postId as string, req.body);
+      ResponseHandler.ok(res, 200, "Post updated successfully", post);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * @static getPostBySlug
    * @description Handles fetching a single post by its slug.
    */
@@ -85,6 +103,24 @@ export class PostControllers {
       const rawSlug = req.params.slug as string;
       const post = await PostServices.getPostBySlug(rawSlug);
       ResponseHandler.ok(res, 200, "Post fetched successfully", post);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * @static updatePostViewCount
+   * @description Handles updating a post's view count.
+   */
+  public static async updatePostViewCount(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const { postId } = req.params;
+      const result = await PostServices.updatePostViewCount(postId as string);
+      ResponseHandler.ok(res, 200, result.message, result);
     } catch (error) {
       next(error);
     }
@@ -143,6 +179,33 @@ export class PostControllers {
   }
 
   /**
+   * @static getAllComments
+   * @description Handles fetching all comments for an admin user.
+   */
+  public static async getAllComments(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const { comments, total } = await PostServices.getAllComments(
+        limit,
+        page,
+      );
+      ResponseHandler.ok(res, 200, "All comments fetched successfully", {
+        comments,
+        total,
+        page,
+        limit,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * @static getCommentsByPost
    * @description Handles fetching all comments for a post.
    */
@@ -173,6 +236,64 @@ export class PostControllers {
       const { postId } = req.params;
       const reactions = await PostServices.getReactionsByPost(postId as string);
       ResponseHandler.ok(res, 200, "Reactions fetched successfully", reactions);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * @static updateComment
+   * @description Handles updating a comment.
+   */
+  public static async updateComment(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const { commentId } = req.params;
+      const { content } = req.body;
+      const comment = await PostServices.updateComment(
+        commentId as string,
+        content,
+      );
+      ResponseHandler.ok(res, 200, "Comment updated successfully", comment);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * @static deletePost
+   * @description Handles deleting a post.
+   */
+  public static async deletePost(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const { postId } = req.params;
+      const result = await PostServices.deletePost(postId as string);
+      ResponseHandler.ok(res, 200, result.message, result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * @static deleteComment
+   * @description Handles deleting a comment.
+   */
+  public static async deleteComment(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const { commentId } = req.params;
+      const result = await PostServices.deleteComment(commentId as string);
+      ResponseHandler.ok(res, 200, result.message, result);
     } catch (error) {
       next(error);
     }

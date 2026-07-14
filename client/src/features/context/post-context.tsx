@@ -46,7 +46,7 @@ export const PostContextProvider = ({ children }: React.PropsWithChildren) => {
       const fetchedPosts: IPost[] = data.data.posts.map((post: IPost) => ({
         ...post,
         isReactedTo: false,
-        id: post._id, // The original post.category is the categoryId
+        id: post._id,
         categoryName:
           CATEGORIES.find((cat) => cat.id.toString() === post.category)?.name ??
           "", // Add categoryName
@@ -90,6 +90,8 @@ export const PostContextProvider = ({ children }: React.PropsWithChildren) => {
       setPosts([...posts]);
     }
   };
+
+  // console.log(posts);
 
   const value = {
     posts,

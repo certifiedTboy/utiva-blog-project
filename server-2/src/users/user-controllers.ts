@@ -95,4 +95,33 @@ export class UserControllers {
       next(error);
     }
   }
+
+  /**
+   * @static
+   * @async
+   * @method getAllUsers
+   * @description Handles fetching all users for an admin.
+   * @param {Request} req - The Express request object.
+   * @param {Response} res - The Express response object.
+   * @param {NextFunction} next - The Express next middleware function.
+   */
+  public static async getAllUsers(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const { users, total } = await UserServices.getAllUsers(limit, page);
+      ResponseHandler.ok(res, 200, "Users fetched successfully", {
+        users,
+        total,
+        page,
+        limit,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
