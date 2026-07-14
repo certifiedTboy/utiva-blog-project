@@ -98,6 +98,15 @@ export default function PasswordResetRequestPage() {
               Reset Password
             </Button>
           </form>
+
+          <div className="mt-6 text-center text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <Link href="/sign-in">
+              <span className="text-primary hover:underline font-medium cursor-pointer">
+                Sign in
+              </span>
+            </Link>
+          </div>
         </div>
       </motion.div>
     </div>

@@ -7,6 +7,8 @@ export interface PostContextType {
   posts: IPost[];
   post: IPost | null;
   categories: { id: number; name: string; postCount: number }[];
+  featuredPosts: IPost[];
+  trendingPosts: IPost[];
   viewPostsDetails: (id: string) => void;
 }
 
@@ -14,6 +16,8 @@ const PostContext = createContext<PostContextType>({
   posts: [],
   categories: [],
   post: null,
+  featuredPosts: [],
+  trendingPosts: [],
   viewPostsDetails: () => {},
 });
 
@@ -23,6 +27,8 @@ export const PostContextProvider = ({ children }: React.PropsWithChildren) => {
   const [posts, setPosts] = useState<IPost[]>(tempPosts);
   const [categories, setCategories] = useState(CATEGORIES);
   const [post, setPost] = useState<IPost | null>(null);
+  const [featuredPosts, setFeaturedPosts] = useState<IPost[]>([]);
+  const [trendingPosts, setTrendingPosts] = useState<IPost[]>([]);
 
   const [getPublishedPosts, { data, isSuccess }] =
     useGetPublishedPostsMutation();
@@ -48,6 +54,11 @@ export const PostContextProvider = ({ children }: React.PropsWithChildren) => {
 
       setPosts(fetchedPosts);
       tempPosts = fetchedPosts;
+
+      setFeaturedPosts(fetchedPosts.filter((p) => p.featured));
+      setTrendingPosts(
+        [...fetchedPosts].sort((a, b) => b.viewCount - a.viewCount).slice(0, 5),
+      );
 
       // Calculate post counts for each category
       const categoryCounts = new Map<string, number>(); // Counts based on category ID
@@ -84,6 +95,8 @@ export const PostContextProvider = ({ children }: React.PropsWithChildren) => {
     posts,
     post,
     categories,
+    featuredPosts,
+    trendingPosts,
     viewPostsDetails,
   };
 

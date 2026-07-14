@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "wouter";
 import { MessageCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,9 +19,22 @@ import CommentItem from "./comment-item";
 
 export default function CommentsSection({ postId }: { postId: any }) {
   const { isAuthenticated: isSignedIn, user } = useAuth();
-  const [comments, setComments] = useState<Comment[]>(
-    () => COMMENTS[postId] ?? [],
-  );
+
+  const [comments, setComments] = useState<Comment[]>(() => {
+    return (COMMENTS[postId] ?? []).map((comment: any) => ({
+      ...comment,
+      _id: comment.id,
+      replies:
+        comment.replies?.map((reply: any) => ({
+          ...reply,
+          createdAt: new Date(reply.createdAt).toISOString(),
+          // authorName: reply?.author?.firstName + " " + reply?.author?.lastName,
+          // authorAvatar: reply?.author?.picture,
+          _id: reply.id,
+        })) ?? [],
+    }));
+  });
+
   const { toast } = useToast();
 
   const form = useForm({
@@ -50,7 +64,13 @@ export default function CommentsSection({ postId }: { postId: any }) {
         authorName: c?.author?.firstName + " " + c?.author?.lastName,
         authorAvatar: c?.author?.picture,
 
-        replies: [],
+        replies:
+          c?.replies?.map((r: any) => ({
+            ...r,
+            createdAt: new Date(r.createdAt).toISOString(),
+            authorName: r?.author?.firstName + " " + r?.author?.lastName,
+            authorAvatar: r?.author?.picture,
+          })) ?? [],
       }));
 
       setComments(comments);
@@ -62,7 +82,7 @@ export default function CommentsSection({ postId }: { postId: any }) {
   function submitComment(values: { content: string }) {
     if (!values.content.trim()) return;
     const c: Comment = {
-      id: nextId++,
+      _id: nextId++,
       postId,
       content: values.content,
       authorName: user?.name ?? "You",
@@ -78,7 +98,7 @@ export default function CommentsSection({ postId }: { postId: any }) {
 
   function handleReply(parentId: number, text: string) {
     const reply: Comment = {
-      id: nextId++,
+      _id: nextId++,
       postId,
       content: text,
       authorName: user?.name ?? "You",
@@ -89,7 +109,7 @@ export default function CommentsSection({ postId }: { postId: any }) {
     };
     setComments((prev) =>
       prev.map((c) =>
-        c.id === parentId ? { ...c, replies: [...c.replies, reply] } : c,
+        c._id === parentId ? { ...c, replies: [...c.replies, reply] } : c,
       ),
     );
     toast({ title: "Reply posted!" });
@@ -138,12 +158,12 @@ export default function CommentsSection({ postId }: { postId: any }) {
         </div>
       ) : (
         <div className="mb-8 p-4 bg-muted rounded-xl text-sm text-muted-foreground text-center">
-          <a
+          <Link
             href="/sign-in"
             className="text-primary hover:underline font-medium"
           >
             Sign in
-          </a>{" "}
+          </Link>{" "}
           to leave a comment
         </div>
       )}
@@ -155,8 +175,9 @@ export default function CommentsSection({ postId }: { postId: any }) {
         <div className="divide-y divide-border">
           {comments.map((comment) => (
             <CommentItem
-              key={comment.id}
+              key={comment._id}
               comment={comment}
+              postId={postId}
               onReply={handleReply}
             />
           ))}

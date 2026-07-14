@@ -1,5 +1,5 @@
 export type Comment = {
-  id: any;
+  _id: any;
   postId: any;
   content: string;
   authorName: string;
@@ -23,6 +23,7 @@ export interface IPost {
     picture?: string;
   };
   category: string;
+  categoryName?: string;
   tags: string[];
   viewCount: number;
   commentCount: number;

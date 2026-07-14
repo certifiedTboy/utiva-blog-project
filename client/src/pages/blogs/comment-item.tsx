@@ -9,10 +9,12 @@ import { useAuth } from "@/features/context/auth-context";
 import { Button } from "@/components/ui/button";
 import { transform } from "./transform";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import { useAddCommentToPostMutation } from "@/features/apis/post-apis";
 import { MarkdownCommentField } from "./markdown-comment-field";
+import CommentReply from "./comment-reply";
 
 type Comment = {
-  id: number;
+  _id: number;
   postId: number;
   content: string;
   authorName: string;
@@ -25,14 +27,18 @@ type Comment = {
 export default function CommentItem({
   comment,
   onReply,
+  postId,
   depth = 0,
 }: {
   comment: Comment;
   onReply: (parentId: number, text: string) => void;
+  postId: any;
   depth?: number;
 }) {
   const [replying, setReplying] = useState(false);
   const { isAuthenticated: isSignedIn } = useAuth();
+
+  const [addCommentToPost] = useAddCommentToPostMutation();
 
   const form = useForm({
     resolver: zodResolver(z.object({ content: z.string().min(1) })),
@@ -43,7 +49,12 @@ export default function CommentItem({
 
   function submitReply(values: { content: string }) {
     if (!values.content.trim()) return;
-    onReply(comment.id, values.content);
+    onReply(comment._id, values.content);
+    addCommentToPost({
+      postId,
+      content: values.content,
+      parentId: comment._id,
+    });
     form.reset();
     setReplying(false);
   }
@@ -90,7 +101,7 @@ export default function CommentItem({
             <button
               className="mt-2 text-xs text-muted-foreground hover:text-primary transition-colors"
               onClick={() => setReplying((r) => !r)}
-              data-testid={`button-reply-${comment.id}`}
+              data-testid={`button-reply-${comment._id}`}
             >
               Reply
             </button>
@@ -139,14 +150,24 @@ export default function CommentItem({
           )}
         </div>
       </div>
-      {comment.replies?.map((r) => (
-        <CommentItem
-          key={r.id}
-          comment={r}
-          onReply={onReply}
-          depth={depth + 1}
-        />
-      ))}
+
+      {comment?.replies &&
+        comment?.replies?.length > 0 &&
+        comment?.replies?.map((reply: any, index: number) => (
+          <CommentReply
+            key={index}
+            _id={reply._id}
+            depth={depth + 1}
+            content={reply?.content}
+            authorName={
+              reply.author
+                ? `${reply.author.firstName} ${reply.author.lastName}`
+                : reply.authorName
+            }
+            authorAvatar={reply?.author?.picture || reply?.authorAvatar}
+            createdAt={reply?.createdAt}
+          />
+        ))}
     </motion.div>
   );
 }

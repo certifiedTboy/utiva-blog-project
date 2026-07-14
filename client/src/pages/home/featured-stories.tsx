@@ -1,13 +1,12 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
-import { POSTS } from "@/lib/mock-data";
+import { usePosts } from "@/features/context/post-context";
 import PostCard from "@/pages/blogs/post-card";
 import { Button } from "@/components/ui/button";
 
-const featuredPosts = POSTS.filter((p) => p.featured);
-
 export default function FeaturedStories() {
+  const { featuredPosts } = usePosts();
   return (
     <section className="py-20 px-4 max-w-7xl mx-auto">
       <motion.div
@@ -37,7 +36,7 @@ export default function FeaturedStories() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {featuredPosts.map((post, i) => (
-          <PostCard key={post.id} post={post} index={i} variant="featured" />
+          <PostCard key={post._id} post={post} index={i} variant="featured" />
         ))}
       </div>
     </section>

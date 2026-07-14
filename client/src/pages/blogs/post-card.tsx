@@ -17,7 +17,11 @@ function formatDate(dateStr: string) {
   });
 }
 
-export default function PostCard({ post, index = 0 }: PostCardProps) {
+export default function PostCard({
+  post,
+  index = 0,
+  variant = "default",
+}: PostCardProps) {
   return (
     <Link href={`/blog/${post?.slug}`}>
       <motion.article
@@ -48,9 +52,11 @@ export default function PostCard({ post, index = 0 }: PostCardProps) {
             )}
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                <Clock className="w-3 h-3" /> {post?.readingTime} min read
-              </span>
+              {variant && variant !== "compact" && (
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Clock className="w-3 h-3" /> {post?.readingTime} min read
+                </span>
+              )}
 
               <span className="flex items-center gap-1">
                 <Eye className="w-3 h-3" /> {post?.viewCount?.toLocaleString()}
@@ -89,10 +95,6 @@ export default function PostCard({ post, index = 0 }: PostCardProps) {
               </span>
             </div>
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                {post?.readingTime}m
-              </span>
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
                 {formatDate(post?.createdAt).split(",")[0]}

@@ -1,4 +1,5 @@
 import { HttpException } from "../lib/exceptions/http-exception.ts";
+import { Types } from "mongoose";
 import Post, {
   Comment,
   Reaction,
@@ -112,7 +113,7 @@ export class PostServices {
     parentId: string | null = null,
   ): Promise<IComment> {
     const comment = new Comment({
-      post: postId as unknown as any,
+      post: postId,
       author: authorId,
       content,
       parent: parentId,
@@ -141,8 +142,9 @@ export class PostServices {
     type: ReactionType,
   ): Promise<{ message: string }> {
     const existingReaction = await Reaction.findOne({
-      post: postId as unknown as any,
-      author: authorId as unknown as any,
+      // @ts-ignore
+      post: new Types.ObjectId(postId),
+      author: new Types.ObjectId(authorId),
     });
 
     if (existingReaction) {
@@ -160,8 +162,8 @@ export class PostServices {
     } else {
       // User is adding a new reaction
       const reaction = new Reaction({
-        post: postId as unknown as any,
-        author: authorId as unknown as any,
+        post: postId,
+        author: authorId,
         type,
       });
       await reaction.save();
@@ -175,10 +177,151 @@ export class PostServices {
    * @description Retrieves all comments for a given post.
    */
   public static async getCommentsByPost(postId: string): Promise<IComment[]> {
-    return Comment.find({
-      post: postId as unknown as any,
-      parent: null,
-    }).populate("author", "firstName lastName picture");
+    return Comment.aggregate([
+      {
+        $match: {
+          post: new Types.ObjectId(postId),
+          parent: null,
+        },
+      },
+
+      {
+        $sort: {
+          createdAt: 1,
+        },
+      },
+
+      // Get every descendant reply for each top-level comment
+      {
+        $graphLookup: {
+          from: "comments",
+          startWith: "$_id",
+          connectFromField: "_id",
+          connectToField: "parent",
+          as: "replies",
+          depthField: "depth",
+        },
+      },
+
+      // Populate the top-level comment author
+      {
+        $lookup: {
+          from: "users",
+          let: {
+            authorId: "$author",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$_id", "$$authorId"],
+                },
+              },
+            },
+            {
+              $project: {
+                firstName: 1,
+                lastName: 1,
+                picture: 1,
+                username: 1,
+              },
+            },
+          ],
+          as: "authorDetails",
+        },
+      },
+
+      {
+        $set: {
+          author: {
+            $arrayElemAt: ["$authorDetails", 0],
+          },
+        },
+      },
+
+      {
+        $unset: "authorDetails",
+      },
+
+      // Fetch the profile details of every reply author
+      {
+        $lookup: {
+          from: "users",
+          let: {
+            replyAuthorIds: "$replies.author",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: ["$_id", "$$replyAuthorIds"],
+                },
+              },
+            },
+            {
+              $project: {
+                firstName: 1,
+                lastName: 1,
+                picture: 1,
+                username: 1,
+              },
+            },
+          ],
+          as: "replyAuthors",
+        },
+      },
+
+      // Attach the correct author profile to each reply
+      {
+        $set: {
+          replies: {
+            $map: {
+              input: "$replies",
+              as: "reply",
+              in: {
+                $mergeObjects: [
+                  "$$reply",
+                  {
+                    author: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: "$replyAuthors",
+                            as: "replyAuthor",
+                            cond: {
+                              $eq: ["$$replyAuthor._id", "$$reply.author"],
+                            },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+
+      {
+        $unset: "replyAuthors",
+      },
+
+      // Sort replies from oldest to newest
+      {
+        $set: {
+          replies: {
+            $sortArray: {
+              input: "$replies",
+              sortBy: {
+                createdAt: 1,
+              },
+            },
+          },
+        },
+      },
+    ]);
   }
 
   /**
@@ -188,7 +331,8 @@ export class PostServices {
    * @returns {Promise<IReaction[]>} A promise that resolves to the list of reactions.
    */
   public static async getReactionsByPost(postId: string): Promise<IReaction[]> {
-    return Reaction.find({ post: postId as unknown as any }).populate(
+    // @ts-ignore
+    return Reaction.find({ post: new Types.ObjectId(postId) }).populate(
       "author",
       "firstName lastName picture",
     );
