@@ -55,110 +55,115 @@ export default function PostDetailPage() {
         </motion.div>
       )}
       <div className="max-w-3xl mx-auto px-4 mt-10">
-        <motion.button
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          onClick={() => navigate("/blog")}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
-          data-testid="button-back"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to Blog
-        </motion.button>
-
-        {/* @ts-ignore */}
-        {post?.categoryName && (
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="inline-block text-xs font-semibold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full mb-4"
+        <div className="sticky top-16 bg-background/95 backdrop-blur-md z-10 py-4 -mx-4 px-4 mb-4">
+          <motion.button
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            onClick={() => navigate("/blog")}
+            className="flex items-center cursor-pointer gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            data-testid="button-back"
           >
-            {/* @ts-ignore */}
-            {post.categoryName}
-          </motion.span>
-        )}
+            <ArrowLeft className="w-4 h-4" /> Back to Blog
+          </motion.button>
+        </div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-foreground leading-tight mb-6"
-        >
-          {post?.title}
-        </motion.h1>
-
-        {post?.excerpt && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-lg text-muted-foreground mb-6 leading-relaxed italic border-l-4 border-primary pl-4"
-          >
-            {post?.excerpt}
-          </motion.p>
-        )}
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="flex flex-wrap items-center gap-4 py-4 border-y border-border mb-8"
-        >
-          <div className="flex items-center gap-2">
-            {post?.author?.picture ? (
-              <img
-                src={post?.author?.picture}
-                alt={`${post?.author?.firstName} ${post?.author?.lastName}`}
-                className="w-9 h-9 rounded-full"
-              />
-            ) : (
-              <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-                {post?.author?.firstName[0]}
-              </div>
-            )}
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                {`${post?.author?.firstName} ${post?.author?.lastName}`}
-              </p>
-              <p className="text-xs text-muted-foreground">Author</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 text-xs text-muted-foreground ml-auto">
-            <span className="flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5" />
-              {new Date(post?.createdAt).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5" />
-              {post?.readingTime} min
-            </span>
-            <span className="flex items-center gap-1">
-              <Eye className="w-3.5 h-3.5" />
-              {post?.viewCount?.toLocaleString()}
-            </span>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+        <div
           className="
-        prose prose-lg dark:prose-invert max-w-none
-        prose-headings:font-serif
-        prose-headings:font-semibold
-        prose-a:text-primary
-        prose-pre:m-0
-        prose-pre:bg-transparent
-        prose-pre:p-0
-      "
+            prose prose-lg dark:prose-invert max-w-none
+            prose-headings:font-serif
+            prose-headings:font-semibold
+            prose-a:text-primary
+            prose-pre:m-0
+            prose-pre:bg-transparent
+            prose-pre:p-0
+          "
         >
           {/* @ts-ignore */}
-          <Interweave content={renderedContent} transform={transform} />
-        </motion.div>
+          {post?.categoryName && (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="inline-block text-xs font-semibold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full mb-4"
+            >
+              {/* @ts-ignore */}
+              {post.categoryName}
+            </motion.span>
+          )}
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-foreground leading-tight mb-6"
+          >
+            {post?.title}
+          </motion.h1>
+
+          {post?.excerpt && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-lg text-muted-foreground mb-6 leading-relaxed italic border-l-4 border-primary pl-4"
+            >
+              {post?.excerpt}
+            </motion.p>
+          )}
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-wrap items-center gap-4 py-4 border-y border-border mb-8"
+          >
+            <div className="flex items-center gap-2">
+              {post?.author?.picture ? (
+                <img
+                  src={post?.author?.picture}
+                  alt={`${post?.author?.firstName} ${post?.author?.lastName}`}
+                  className="w-9 h-9 rounded-full"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                  {post?.author?.firstName[0]}
+                </div>
+              )}
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  {`${post?.author?.firstName} ${post?.author?.lastName}`}
+                </p>
+                <p className="text-xs text-muted-foreground">Author</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 text-xs text-muted-foreground ml-auto">
+              <span className="flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5" />
+                {new Date(post?.createdAt).toLocaleDateString("en-US", {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
+              <span className="flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" />
+                {post?.readingTime} min
+              </span>
+              <span className="flex items-center gap-1">
+                <Eye className="w-3.5 h-3.5" />
+                {post?.viewCount?.toLocaleString()}
+              </span>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            {/* @ts-ignore */}
+            <Interweave content={renderedContent} transform={transform} />
+          </motion.div>
+        </div>
 
         {post?.tags?.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-8">
