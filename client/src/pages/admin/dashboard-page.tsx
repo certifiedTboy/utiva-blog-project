@@ -31,6 +31,7 @@ export default function DashboardPage() {
     posts,
     onDeletePost,
   } = useAdminContext();
+
   const { user } = useAuth();
   const { toast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
