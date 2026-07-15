@@ -5,21 +5,33 @@ import { Shield, Trash2, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminContext } from "@/features/context/admin-context";
+import { ConfirmationModal } from "@/components/common/confirmation-modal";
+import type { Comment } from "@/lib/types";
 import { ADMIN_TABS } from "@/lib/mock-data";
 
 export default function AdminCommentsPage() {
   const [page, setPage] = useState(1);
-
   const { comments, onDeleteComment } = useAdminContext();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState<Comment | null>(null);
 
   const { toast } = useToast();
   const PAGE_SIZE = 20;
   const totalPages = Math.ceil(comments.length / PAGE_SIZE);
   const pageComments = comments.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  function handleDelete(id: string) {
-    onDeleteComment(id);
+  function handleConfirmDelete() {
+    if (!commentToDelete) return;
+
+    onDeleteComment(commentToDelete._id);
     toast({ title: "Comment deleted" });
+    setIsModalOpen(false);
+    setCommentToDelete(null);
+  }
+
+  function handleDeleteClick(comment: Comment) {
+    setCommentToDelete(comment);
+    setIsModalOpen(true);
   }
 
   return (
@@ -100,7 +112,7 @@ export default function AdminCommentsPage() {
                     size="sm"
                     variant="ghost"
                     className="text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-                    onClick={() => handleDelete(comment?._id)}
+                    onClick={() => handleDeleteClick(comment)}
                     data-testid={`button-delete-comment-${comment._id}`}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -135,6 +147,22 @@ export default function AdminCommentsPage() {
           </div>
         )}
       </div>
+      {commentToDelete && (
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onConfirm={handleConfirmDelete}
+          title="Delete Post"
+          description={
+            <>
+              Are you sure you want to delete this comment "
+              <strong className="truncate">{commentToDelete?.content}</strong>"?
+              This action cannot be undone.
+            </>
+          }
+          confirmText="sudo delete"
+        />
+      )}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import {
@@ -16,7 +17,9 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/context/auth-context";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { ConfirmationModal } from "@/components/common/confirmation-modal";
 import { useAdminContext } from "@/features/context/admin-context";
+import type { IPost } from "@/lib/types";
 
 export default function DashboardPage() {
   const {
@@ -26,13 +29,25 @@ export default function DashboardPage() {
     totalReactions,
     totalViews,
     posts,
+    onDeletePost,
   } = useAdminContext();
   const { user } = useAuth();
   const { toast } = useToast();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<IPost | null>(null);
 
-  function handleDelete(id: string, title: string) {
-    if (!confirm(`Delete "${title}"?`)) return;
+  function handleDeleteClick(post: IPost) {
+    setPostToDelete(post);
+    setIsModalOpen(true);
+  }
+
+  function handleConfirmDelete() {
+    if (!postToDelete) return;
+
+    onDeletePost(postToDelete._id);
     toast({ title: "Post deleted" });
+    setIsModalOpen(false);
+    setPostToDelete(null);
   }
 
   return (
@@ -180,7 +195,7 @@ export default function DashboardPage() {
                         size="sm"
                         variant="ghost"
                         className="gap-1 text-destructive hover:text-destructive"
-                        onClick={() => handleDelete(post?._id, post?.title)}
+                        onClick={() => handleDeleteClick(post)}
                         data-testid={`button-delete-post-${post?._id}`}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -191,6 +206,22 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+        {postToDelete && (
+          <ConfirmationModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onConfirm={handleConfirmDelete}
+            title="Delete Post"
+            description={
+              <>
+                Are you sure you want to delete the post "
+                <strong>{postToDelete.title}</strong>"? This action cannot be
+                undone.
+              </>
+            }
+            confirmText="sudo delete"
+          />
+        )}
       </div>
     </div>
   );

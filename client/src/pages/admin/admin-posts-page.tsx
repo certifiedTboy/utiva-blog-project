@@ -6,15 +6,33 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminContext } from "@/features/context/admin-context";
+import { ConfirmationModal } from "@/components/common/confirmation-modal";
 import { ADMIN_TABS } from "@/lib/mock-data";
+import type { IPost } from "@/lib/types";
 
 export default function AdminPostsPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<IPost | null>(null);
 
   const { posts, onDeletePost } = useAdminContext();
 
   const { toast } = useToast();
+
+  function handleDeleteClick(post: IPost) {
+    setPostToDelete(post);
+    setIsModalOpen(true);
+  }
+
+  function handleConfirmDelete() {
+    if (!postToDelete) return;
+
+    onDeletePost(postToDelete._id);
+    toast({ title: "Post deleted" });
+    setIsModalOpen(false);
+    setPostToDelete(null);
+  }
 
   const filtered = posts.filter(
     (p) =>
@@ -26,11 +44,6 @@ export default function AdminPostsPage() {
   const PAGE_SIZE = 15;
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const pagePosts = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  function handleDelete(id: string) {
-    onDeletePost(id);
-    toast({ title: "Post deleted" });
-  }
 
   return (
     <div className="min-h-screen pt-24 pb-20">
@@ -134,7 +147,7 @@ export default function AdminPostsPage() {
                       size="sm"
                       variant="ghost"
                       className="text-destructive hover:text-destructive"
-                      onClick={() => handleDelete(post._id)}
+                      onClick={() => handleDeleteClick(post)}
                       data-testid={`button-delete-post-${post._id}`}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -170,6 +183,23 @@ export default function AdminPostsPage() {
           </div>
         )}
       </div>
+
+      {postToDelete && (
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onConfirm={handleConfirmDelete}
+          title="Delete Post"
+          description={
+            <>
+              Are you sure you want to delete the post "
+              <strong>{postToDelete.title}</strong>"? This action cannot be
+              undone.
+            </>
+          }
+          confirmText="sudo delete"
+        />
+      )}
     </div>
   );
 }
