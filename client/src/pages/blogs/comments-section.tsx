@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link } from "wouter";
 import { MessageCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -9,11 +9,13 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import {
   useAddCommentToPostMutation,
+  useDeleteCommentMutation,
   useGetCommentsByPostMutation,
 } from "@/features/apis/post-apis";
 import type { Comment } from "@/lib/types";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { MarkdownCommentField } from "./markdown-comment-field";
+import { ConfirmationModal } from "@/components/common/confirmation-modal";
 import CommentItem from "./comment-item";
 
 export default function CommentsSection({ postId }: { postId: any }) {
@@ -33,6 +35,10 @@ export default function CommentsSection({ postId }: { postId: any }) {
         })) ?? [],
     }));
   });
+
+  const [commentToDelete, setCommentToDelete] = useState<Comment | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteComment, { isLoading: isDeleting }] = useDeleteCommentMutation();
 
   const { toast } = useToast();
 
@@ -86,6 +92,7 @@ export default function CommentsSection({ postId }: { postId: any }) {
       content: values.content,
       authorName: user?.name ?? "You",
       authorAvatar: user?.picture,
+      authorId: user?._id,
       createdAt: new Date().toISOString(),
       replies: [],
     };
@@ -102,6 +109,7 @@ export default function CommentsSection({ postId }: { postId: any }) {
       content: text,
       authorName: user?.name ?? "You",
       authorAvatar: user?.picture,
+      authorId: user?._id,
       createdAt: new Date().toISOString(),
       parentId,
       replies: [],
@@ -112,6 +120,54 @@ export default function CommentsSection({ postId }: { postId: any }) {
       ),
     );
     toast({ title: "Reply posted!" });
+  }
+
+  const findComment = useCallback(
+    (commentId: string | number, commentsList: Comment[]): Comment | null => {
+      for (const comment of commentsList) {
+        if (comment._id === commentId) {
+          return comment;
+        }
+        if (comment.replies && comment.replies.length > 0) {
+          const foundInReply = findComment(commentId, comment.replies);
+          if (foundInReply) {
+            return foundInReply;
+          }
+        }
+      }
+      return null;
+    },
+    [],
+  );
+
+  const handleDelete = useCallback(
+    (commentId: string | number) => {
+      const toDelete = findComment(commentId, comments);
+      if (toDelete) {
+        setCommentToDelete(toDelete);
+        setIsDeleteModalOpen(true);
+      }
+    },
+    [comments, findComment],
+  );
+
+  async function handleConfirmDelete() {
+    if (!commentToDelete) return;
+
+    try {
+      await deleteComment(commentToDelete._id).unwrap();
+      // Refetch comments to get the latest state from the server
+      getCommentsByPost(postId);
+      toast({ title: "Comment deleted successfully" });
+    } catch (error) {
+      toast({
+        title: "Failed to delete comment",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleteModalOpen(false);
+      setCommentToDelete(null);
+    }
   }
 
   return (
@@ -177,10 +233,27 @@ export default function CommentsSection({ postId }: { postId: any }) {
               key={comment._id}
               comment={comment}
               postId={postId}
+              onDelete={handleDelete}
               onReply={handleReply}
             />
           ))}
         </div>
+      )}
+      {commentToDelete && (
+        <ConfirmationModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirm={handleConfirmDelete}
+          title="Delete Comment"
+          description={
+            <>
+              Are you sure you want to delete this comment? This action cannot
+              be undone.
+            </>
+          }
+          confirmText="sudo delete"
+          isPending={isDeleting}
+        />
       )}
     </div>
   );

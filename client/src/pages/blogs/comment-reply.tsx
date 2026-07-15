@@ -2,17 +2,20 @@ import { motion } from "framer-motion";
 import { Interweave } from "interweave";
 import { marked } from "marked";
 import { transform } from "./transform";
+import { useAuth } from "@/features/context/auth-context";
+import { MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import type { Replies } from "@/lib/types";
 
-type Replies = {
-  _id: number | string;
-  content: string;
-  authorAvatar?: string;
-  authorName: string;
-  createdAt: string;
-  depth?: number;
-};
+export function CommentReply(replies: Replies) {
+  const { user, isAuthenticated: isSignedIn } = useAuth();
 
-export default function CommentReply(replies: Replies) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -48,7 +51,36 @@ export default function CommentReply(replies: Replies) {
                 day: "numeric",
               })}
             </span>
+
+            {isSignedIn && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="ml-auto cursor-pointer p-1 text-muted-foreground hover:text-foreground transition-colors">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem className="cursor-pointer">
+                    Report comment
+                  </DropdownMenuItem>
+                  {/* @ts-ignore */}
+                  {user && user?._id === replies?.authorId && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-destructive cursor-pointer"
+                        onClick={() => replies?.onDelete(replies?._id)}
+                        data-testid={`button-delete-comment-${replies?._id}`}
+                      >
+                        Delete comment
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
+
           <div className="prose prose-sm dark:prose-invert max-w-none">
             <Interweave
               content={marked.parse(replies?.content || "") as string}

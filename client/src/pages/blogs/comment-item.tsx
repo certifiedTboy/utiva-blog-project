@@ -5,38 +5,38 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Interweave } from "interweave";
 import { marked } from "marked";
+import { MoreHorizontal } from "lucide-react";
 import { useAuth } from "@/features/context/auth-context";
 import { Button } from "@/components/ui/button";
 import { transform } from "./transform";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { useAddCommentToPostMutation } from "@/features/apis/post-apis";
 import { MarkdownCommentField } from "./markdown-comment-field";
-import CommentReply from "./comment-reply";
-
-type Comment = {
-  _id: number;
-  postId: number;
-  content: string;
-  authorName: string;
-  authorAvatar?: string;
-  createdAt: string;
-  parentId?: number;
-  replies: Comment[];
-};
+import { CommentReply } from "./comment-reply";
+import type { Comment } from "@/lib/types";
 
 export default function CommentItem({
   comment,
   onReply,
+  onDelete,
   postId,
   depth = 0,
 }: {
   comment: Comment;
   onReply: (parentId: number, text: string) => void;
+  onDelete: (commentId: string | number) => void;
   postId: any;
   depth?: number;
 }) {
   const [replying, setReplying] = useState(false);
-  const { isAuthenticated: isSignedIn } = useAuth();
+  const { isAuthenticated: isSignedIn, user } = useAuth();
 
   const [addCommentToPost] = useAddCommentToPostMutation();
 
@@ -80,9 +80,9 @@ export default function CommentItem({
           )}
         </div>
         <div className="flex-1">
-          <div className="flex items-baseline gap-2 mb-1">
+          <div className="flex gap-2 mb-1">
             <span className="text-sm font-semibold text-foreground">
-              {comment.authorName}
+              {comment?.authorName}
             </span>
             <span className="text-xs text-muted-foreground">
               {new Date(comment.createdAt).toLocaleDateString("en-US", {
@@ -90,18 +90,45 @@ export default function CommentItem({
                 day: "numeric",
               })}
             </span>
+            {isSignedIn && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="ml-auto cursor-pointer p-1 text-muted-foreground hover:text-foreground transition-colors">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem className="cursor-pointer">
+                    Report comment
+                  </DropdownMenuItem>
+                  {/* @ts-ignore */}
+                  {user && user?._id === comment?.author?._id && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-destructive cursor-pointer"
+                        onClick={() => onDelete(comment._id)}
+                        data-testid={`button-delete-comment-${comment?._id}`}
+                      >
+                        Delete comment
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
           <div className="prose prose-sm dark:prose-invert max-w-none">
             <Interweave
-              content={marked.parse(comment.content || "") as string}
+              content={marked.parse(comment?.content || "") as string}
               transform={transform}
             />
           </div>
           {isSignedIn && depth === 0 && (
             <button
-              className="mt-2 text-xs text-muted-foreground hover:text-primary transition-colors"
+              className="mt-2 cursor-pointer text-xs text-muted-foreground hover:text-primary transition-colors"
               onClick={() => setReplying((r) => !r)}
-              data-testid={`button-reply-${comment._id}`}
+              data-testid={`button-reply-${comment?._id}`}
             >
               Reply
             </button>
@@ -159,6 +186,7 @@ export default function CommentItem({
             _id={reply._id}
             depth={depth + 1}
             content={reply?.content}
+            authorId={reply?.author?._id}
             authorName={
               reply.author
                 ? `${reply.author.firstName} ${reply.author.lastName}`
@@ -166,6 +194,7 @@ export default function CommentItem({
             }
             authorAvatar={reply?.author?.picture || reply?.authorAvatar}
             createdAt={reply?.createdAt}
+            onDelete={onDelete}
           />
         ))}
     </motion.div>

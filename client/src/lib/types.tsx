@@ -4,12 +4,14 @@ export type Comment = {
   content: string;
   authorName: string;
   authorAvatar?: string;
+  authorId?: string;
   createdAt: string;
   parentId?: number;
   replies: Comment[];
 };
 
 export interface User {
+  _id: string;
   id: string;
   name: string;
   email: string;
@@ -44,3 +46,14 @@ export interface IPost {
   createdAt: string;
   updatedAt: string;
 }
+
+export type Replies = {
+  _id: number | string;
+  content: string;
+  authorAvatar?: string;
+  authorName: string;
+  createdAt: string;
+  depth?: number;
+  authorId: string;
+  onDelete: (commentId: string | number) => void;
+};
