@@ -17,28 +17,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
-import { useAddCommentToPostMutation } from "@/features/apis/post-apis";
 import { MarkdownCommentField } from "./markdown-comment-field";
 import { CommentReply } from "./comment-reply";
+import { useComments } from "@/features/context/comment-context";
 import type { Comment } from "@/lib/types";
 
 export default function CommentItem({
   comment,
-  onReply,
-  onDelete,
   postId,
   depth = 0,
 }: {
   comment: Comment;
-  onReply: (parentId: number, text: string) => void;
-  onDelete: (commentId: string | number) => void;
   postId: any;
   depth?: number;
 }) {
   const [replying, setReplying] = useState(false);
   const { isAuthenticated: isSignedIn, user } = useAuth();
 
-  const [addCommentToPost] = useAddCommentToPostMutation();
+  const { addReply, deleteReply, deleteComment, setCommentToDelete } =
+    useComments();
 
   const form = useForm({
     resolver: zodResolver(z.object({ content: z.string().min(1) })),
@@ -49,14 +46,19 @@ export default function CommentItem({
 
   function submitReply(values: { content: string }) {
     if (!values.content.trim()) return;
-    onReply(comment._id, values.content);
-    addCommentToPost({
-      postId,
-      content: values.content,
-      parentId: comment._id,
-    });
-    form.reset();
-    setReplying(false);
+
+    if (user) {
+      addReply(
+        values.content,
+        user?.name,
+        user?.picture,
+        postId,
+        comment._id,
+        user?._id,
+      );
+      form.reset();
+      setReplying(false);
+    }
   }
 
   return (
@@ -102,12 +104,14 @@ export default function CommentItem({
                     Report comment
                   </DropdownMenuItem>
                   {/* @ts-ignore */}
-                  {user && user?._id === comment?.author?._id && (
+                  {user && user?._id === comment?.authorId && (
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         className="text-destructive cursor-pointer"
-                        onClick={() => onDelete(comment._id)}
+                        onClick={() =>
+                          setCommentToDelete(comment, "delete-comment")
+                        }
                         data-testid={`button-delete-comment-${comment?._id}`}
                       >
                         Delete comment
@@ -194,7 +198,7 @@ export default function CommentItem({
             }
             authorAvatar={reply?.author?.picture || reply?.authorAvatar}
             createdAt={reply?.createdAt}
-            onDelete={onDelete}
+            onDelete={() => deleteReply(comment._id, postId, reply._id)}
           />
         ))}
     </motion.div>

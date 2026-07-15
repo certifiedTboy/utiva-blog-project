@@ -1,7 +1,14 @@
 import EventEmitter from "node:events";
 import cron from "node-cron";
 import EmailService from "./smtp.ts";
-import { type IEventData, type EventTypes } from "../lib/types.ts";
+import {
+  type IEventData,
+  type EventTypes,
+  type ICommentEvent,
+  type IReactionEvent,
+  type IUpdateCommentEvent,
+} from "../lib/types.ts";
+import { PostServices } from "../posts/posts-services.ts";
 
 /**
  * @class AppEvents
@@ -29,6 +36,13 @@ export class AppEvents extends EventEmitter {
       "user-verified",
       "password-reset",
       "password-changed",
+      "add-comment",
+      "delete-comment",
+      "react-to-post",
+      "delete-post",
+      "update-post",
+      "update-comment",
+      "update-post-view-count",
     ];
 
     this.initializeListeners();
@@ -79,17 +93,32 @@ export class AppEvents extends EventEmitter {
    */
   private listenToEvent(name: EventTypes) {
     this.on(name, async (eventData: IEventData) => {
-      // Add the user's email to the active jobs set to lock it.
+      // Add the job ID to the active jobs set to lock it.
       this.activeJobs.add(eventData.id);
 
-      const cronPattern = this.calculateJobPattern(eventData);
-
-      await this.scheduleCronJob(eventData, cronPattern, name);
+      // If there's no delay, run the event immediately without scheduling.
+      if (eventData.delayInMinutes === 0) {
+        console.log(`Running immediate job for ${eventData.id}`);
+        try {
+          await this.runEvent(name, eventData);
+        } catch (error) {
+          console.error(
+            `Failed to run immediate job for ${eventData.id}:`,
+            error,
+          );
+        } finally {
+          // Unlock the job ID
+          this.activeJobs.delete(eventData.id);
+        }
+      } else {
+        // Otherwise, schedule it as a cron job.
+        const cronPattern = this.calculateJobPattern(eventData);
+        await this.scheduleCronJob(eventData, cronPattern, name);
+      }
     });
   }
 
   private calculateJobPattern(eventData: IEventData) {
-    // Define a delay for the job. Here, it's set to 0.3 minutes (18 seconds).
     const scheduledTime = new Date(
       Date.now() + eventData.delayInMinutes * 60 * 1000,
     );
@@ -113,13 +142,11 @@ export class AppEvents extends EventEmitter {
   ) {
     // Schedule the task with node-cron.
     const task = cron.schedule(cronPattern, async () => {
-      console.log(`Executing one-time job for user: ${eventData.email}`);
       try {
         await this.runEvent(name, eventData);
       } catch (error) {
-        // Log any errors that occur during email sending.
         console.error(
-          `Failed to send verification email to ${eventData.email}:`,
+          `Failed to run scheduled job for ${eventData.id}:`,
           error,
         );
       } finally {
@@ -173,6 +200,68 @@ export class AppEvents extends EventEmitter {
           { name: eventData.firstName },
         );
         console.log(`Password changed confirmation sent to ${eventData.email}`);
+        break;
+
+      case "update-post":
+        if (eventData.postId && eventData.postData) {
+          await PostServices.updatePost(eventData.postId, eventData.postData);
+          console.log(`Post ${eventData.postId} updated via event.`);
+        }
+        break;
+
+      case "delete-post":
+        if (eventData.postId) {
+          await PostServices.deletePost(eventData.postId);
+          console.log(`Post ${eventData.postId} deleted via event.`);
+        }
+        break;
+
+      case "add-comment":
+        const commentData = eventData as ICommentEvent;
+        await PostServices.addComment(
+          commentData.postId,
+          commentData.authorId,
+          commentData.content,
+          commentData.parentId,
+        );
+        console.log(`Comment added to post ${commentData.postId} via event.`);
+        break;
+
+      case "delete-comment":
+        if (eventData.commentId) {
+          await PostServices.deleteComment(eventData.commentId);
+          console.log(`Comment ${eventData.commentId} deleted via event.`);
+        }
+        break;
+
+      case "react-to-post":
+        const reactionData = eventData as IReactionEvent;
+        await PostServices.addOrUpdateReaction(
+          reactionData.postId,
+          reactionData.authorId,
+          reactionData.type,
+        );
+        console.log(`Reaction added to post ${reactionData.postId} via event.`);
+        break;
+
+      case "update-comment":
+        const updateCommentData = eventData as IUpdateCommentEvent;
+        await PostServices.updateComment(
+          updateCommentData.commentId,
+          updateCommentData.content,
+        );
+        console.log(
+          `Comment ${updateCommentData.commentId} updated via event.`,
+        );
+        break;
+
+      case "update-post-view-count":
+        if (eventData.postId) {
+          await PostServices.updatePostViewCount(eventData.postId);
+          console.log(
+            `Post view count for ${eventData.postId} updated via event.`,
+          );
+        }
         break;
 
       default:

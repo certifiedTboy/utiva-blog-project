@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { ResponseHandler } from "../lib/response-handler.ts";
 import { PostServices } from "./posts-services.ts";
+import eventEmitter from "../helpers/events.ts";
 
 export class PostControllers {
   /**
@@ -83,8 +84,13 @@ export class PostControllers {
   ) {
     try {
       const { postId } = req.params;
-      const post = await PostServices.updatePost(postId as string, req.body);
-      ResponseHandler.ok(res, 200, "Post updated successfully", post);
+      eventEmitter.emitEvent("update-post", {
+        id: `update-post-${postId}`,
+        delayInMinutes: 0.5,
+        postId,
+        postData: req.body,
+      });
+      ResponseHandler.ok(res, 202, "Post update has been queued.");
     } catch (error) {
       next(error);
     }
@@ -119,8 +125,12 @@ export class PostControllers {
   ) {
     try {
       const { postId } = req.params;
-      const result = await PostServices.updatePostViewCount(postId as string);
-      ResponseHandler.ok(res, 200, result.message, result);
+      eventEmitter.emitEvent("update-post-view-count", {
+        id: `update-post-view-count-${postId}`,
+        delayInMinutes: 0.5,
+        postId,
+      });
+      ResponseHandler.ok(res, 202, "Post view count update has been queued.");
     } catch (error) {
       next(error);
     }
@@ -140,13 +150,16 @@ export class PostControllers {
       const authorId = req.user!.id;
       const { content, parentId } = req.body;
 
-      const comment = await PostServices.addComment(
+      eventEmitter.emitEvent("add-comment", {
+        id: `add-comment-${postId}-${authorId}`,
+        delayInMinutes: 0.5,
         postId,
         authorId,
         content,
         parentId,
-      );
-      ResponseHandler.created(res, 201, "Comment added successfully", comment);
+      });
+
+      ResponseHandler.created(res, 202, "Comment has been queued.");
     } catch (error) {
       next(error);
     }
@@ -166,12 +179,14 @@ export class PostControllers {
       const authorId = req.user!.id;
       const { type } = req.body;
 
-      const result = await PostServices.addOrUpdateReaction(
+      eventEmitter.emitEvent("react-to-post", {
+        id: `react-to-post-${postId}-${authorId}`,
+        delayInMinutes: 0.5,
         postId,
         authorId,
         type,
-      );
-      ResponseHandler.ok(res, 200, result.message, result);
+      });
+      ResponseHandler.ok(res, 202, "Reaction has been queued.");
     } catch (error) {
       console.log(error);
       next(error);
@@ -253,11 +268,13 @@ export class PostControllers {
     try {
       const { commentId } = req.params;
       const { content } = req.body;
-      const comment = await PostServices.updateComment(
-        commentId as string,
+      eventEmitter.emitEvent("update-comment", {
+        id: `update-comment-${commentId}`,
+        delayInMinutes: 0.5,
+        commentId,
         content,
-      );
-      ResponseHandler.ok(res, 200, "Comment updated successfully", comment);
+      });
+      ResponseHandler.ok(res, 202, "Comment update has been queued.");
     } catch (error) {
       next(error);
     }
@@ -274,8 +291,12 @@ export class PostControllers {
   ) {
     try {
       const { postId } = req.params;
-      const result = await PostServices.deletePost(postId as string);
-      ResponseHandler.ok(res, 200, result.message, result);
+      eventEmitter.emitEvent("delete-post", {
+        id: `delete-post-${postId}`,
+        delayInMinutes: 0.5,
+        postId,
+      });
+      ResponseHandler.ok(res, 202, "Post deletion has been queued.");
     } catch (error) {
       next(error);
     }
@@ -292,8 +313,12 @@ export class PostControllers {
   ) {
     try {
       const { commentId } = req.params;
-      const result = await PostServices.deleteComment(commentId as string);
-      ResponseHandler.ok(res, 200, result.message, result);
+      eventEmitter.emitEvent("delete-comment", {
+        id: `delete-comment-${commentId}`,
+        delayInMinutes: 0.5,
+        commentId,
+      });
+      ResponseHandler.ok(res, 202, "Comment deletion has been queued.");
     } catch (error) {
       next(error);
     }

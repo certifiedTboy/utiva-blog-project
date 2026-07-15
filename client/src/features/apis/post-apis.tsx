@@ -104,7 +104,7 @@ export const postApis = createApi({
 
     getAllComments: builder.mutation({
       query: () => ({
-        url: `/posts/comments/all`,
+        url: `/posts/comments/all?page=1&limit=50`,
         method: "GET",
         credentials: "include",
       }),

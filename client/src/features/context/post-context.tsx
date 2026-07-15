@@ -4,7 +4,7 @@ import {
   useUpdatePostViewCountMutation,
 } from "../apis/post-apis";
 import { CATEGORIES } from "@/lib/mock-data";
-import type { IPost } from "@/lib/types";
+import type { IPost, Comment } from "@/lib/types";
 
 export interface PostContextType {
   posts: IPost[];
@@ -95,8 +95,6 @@ export const PostContextProvider = ({ children }: React.PropsWithChildren) => {
       setPosts([...posts]);
     }
   };
-
-  // console.log(posts);
 
   const value = {
     posts,

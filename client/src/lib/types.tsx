@@ -7,7 +7,7 @@ export type Comment = {
   authorId?: string;
   createdAt: string;
   parentId?: number;
-  replies: Comment[];
+  replies?: Comment[];
 };
 
 export interface User {

@@ -1,3 +1,5 @@
+import { type ReactionType } from "../posts/posts-model.ts";
+
 export interface IUser {
   firstName: string;
   lastName: string;
@@ -15,12 +17,24 @@ export interface IEventData {
   email?: string;
   otp?: string;
 }
+export interface IEventData {
+  id: string;
+  delayInMinutes: number;
+  [key: string]: any;
+}
 
 export type EventTypes =
   | "new-user"
   | "user-verified"
   | "password-reset"
-  | "password-changed";
+  | "password-changed"
+  | "add-comment"
+  | "delete-comment"
+  | "react-to-post"
+  | "delete-post"
+  | "update-post"
+  | "update-comment"
+  | "update-post-view-count";
 
 export interface IJWTPayload {
   id: string;
@@ -28,4 +42,22 @@ export interface IJWTPayload {
   role: string;
   iat?: number;
   exp?: number;
+}
+
+export interface ICommentEvent extends IEventData {
+  postId: string;
+  authorId: string;
+  content: string;
+  parentId?: string | null;
+}
+
+export interface IReactionEvent extends IEventData {
+  postId: string;
+  authorId: string;
+  type: ReactionType;
+}
+
+export interface IUpdateCommentEvent extends IEventData {
+  commentId: string;
+  content: string;
 }
