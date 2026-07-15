@@ -12,13 +12,7 @@ import {
 } from "lucide-react";
 import { useAdminContext } from "@/features/context/admin-context";
 import StatCard from "./stat-card";
-
-const ADMIN_TABS = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/posts", label: "Posts" },
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/comments", label: "Comments" },
-];
+import { ADMIN_TABS } from "@/lib/mock-data";
 
 export default function AdminDashboard() {
   const {
@@ -28,6 +22,7 @@ export default function AdminDashboard() {
     totalDraftPosts,
     totalComments,
     totalReactions,
+    totalUsers,
   } = useAdminContext();
 
   return (
@@ -79,7 +74,7 @@ export default function AdminDashboard() {
           />
           <StatCard
             label="Total Users"
-            value={0}
+            value={totalUsers}
             icon={Users}
             color="bg-green-50 text-green-600 dark:bg-green-950/50 dark:text-green-400"
           />

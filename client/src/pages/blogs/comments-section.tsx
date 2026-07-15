@@ -4,7 +4,6 @@ import { MessageCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { COMMENTS } from "@/lib/mock-data";
 import { useAuth } from "@/features/context/auth-context";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -21,7 +20,7 @@ export default function CommentsSection({ postId }: { postId: any }) {
   const { isAuthenticated: isSignedIn, user } = useAuth();
 
   const [comments, setComments] = useState<Comment[]>(() => {
-    return (COMMENTS[postId] ?? []).map((comment: any) => ({
+    return [].map((comment: any) => ({
       ...comment,
       _id: comment.id,
       replies:

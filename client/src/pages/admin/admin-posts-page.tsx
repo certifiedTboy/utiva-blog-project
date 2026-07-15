@@ -6,19 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminContext } from "@/features/context/admin-context";
-
-const ADMIN_TABS = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/posts", label: "Posts" },
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/comments", label: "Comments" },
-];
+import { ADMIN_TABS } from "@/lib/mock-data";
 
 export default function AdminPostsPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
-  const { posts } = useAdminContext();
+  const { posts, onDeletePost } = useAdminContext();
 
   const { toast } = useToast();
 
@@ -33,9 +27,8 @@ export default function AdminPostsPage() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const pagePosts = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  function handleDelete(id: string, title: string) {
-    if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
-    // setAllPosts((prev) => prev.filter((p) => p.id !== id));
+  function handleDelete(id: string) {
+    onDeletePost(id);
     toast({ title: "Post deleted" });
   }
 
@@ -141,7 +134,7 @@ export default function AdminPostsPage() {
                       size="sm"
                       variant="ghost"
                       className="text-destructive hover:text-destructive"
-                      onClick={() => handleDelete(post._id, post?.title)}
+                      onClick={() => handleDelete(post._id)}
                       data-testid={`button-delete-post-${post._id}`}
                     >
                       <Trash2 className="w-3.5 h-3.5" />

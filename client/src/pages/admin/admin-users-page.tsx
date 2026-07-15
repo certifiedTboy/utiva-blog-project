@@ -2,19 +2,16 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Shield, Users } from "lucide-react";
-import { ADMIN_USERS } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-const ADMIN_TABS = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/posts", label: "Posts" },
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/comments", label: "Comments" },
-];
+import { useAdminContext } from "@/features/context/admin-context";
+import { ADMIN_TABS } from "@/lib/mock-data";
 
 export default function AdminUsersPage() {
   const [page, setPage] = useState(1);
+
+  const { users: ADMIN_USERS } = useAdminContext();
+
   const PAGE_SIZE = 20;
   const totalPages = Math.ceil(ADMIN_USERS.length / PAGE_SIZE);
   const users = ADMIN_USERS.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -60,25 +57,24 @@ export default function AdminUsersPage() {
                 className="px-5 py-3 flex items-center gap-3"
                 data-testid={`row-user-${user.id}`}
               >
-                {user.avatarUrl ? (
+                {user?.picture ? (
                   <img
-                    src={user.avatarUrl}
-                    alt={user.name}
+                    src={user?.picture}
+                    alt={user?.name}
                     className="w-9 h-9 rounded-full flex-shrink-0 object-cover"
                   />
                 ) : (
                   <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary text-sm font-bold flex-shrink-0">
-                    {user.name?.[0] || "?"}
+                    {user?.name?.[0] || "?"}
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground">
-                    {user.name}
+                    {user?.name}
                   </p>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                 </div>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span>{user.postCount} posts</span>
                   {user.role === "admin" && (
                     <Badge variant="default" className="text-xs">
                       Admin

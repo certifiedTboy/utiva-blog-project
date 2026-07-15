@@ -2,28 +2,23 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Shield, Trash2, MessageCircle } from "lucide-react";
-import { ADMIN_COMMENTS } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-
-const ADMIN_TABS = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/posts", label: "Posts" },
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/comments", label: "Comments" },
-];
+import { useAdminContext } from "@/features/context/admin-context";
+import { ADMIN_TABS } from "@/lib/mock-data";
 
 export default function AdminCommentsPage() {
   const [page, setPage] = useState(1);
-  const [comments, setComments] = useState(ADMIN_COMMENTS);
+
+  const { comments, onDeleteComment } = useAdminContext();
+
   const { toast } = useToast();
   const PAGE_SIZE = 20;
   const totalPages = Math.ceil(comments.length / PAGE_SIZE);
   const pageComments = comments.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  function handleDelete(id: number) {
-    if (!confirm("Delete this comment?")) return;
-    setComments((prev) => prev.filter((c) => c.id !== id));
+  function handleDelete(id: string) {
+    onDeleteComment(id);
     toast({ title: "Comment deleted" });
   }
 
@@ -55,7 +50,7 @@ export default function AdminCommentsPage() {
           <div className="px-5 py-3 border-b border-border">
             <span className="text-sm text-muted-foreground flex items-center gap-2">
               <MessageCircle className="w-4 h-4" />
-              {comments.length} comments
+              {comments?.length} comments
             </span>
           </div>
           {pageComments.length === 0 ? (
@@ -64,51 +59,49 @@ export default function AdminCommentsPage() {
             </p>
           ) : (
             <div className="divide-y divide-border">
-              {pageComments.map((comment, i) => (
+              {pageComments?.map((comment, i) => (
                 <motion.div
-                  key={comment.id}
+                  key={comment._id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.02 }}
                   className="px-5 py-4 flex gap-3 group hover:bg-muted/20 transition-colors"
-                  data-testid={`row-comment-${comment.id}`}
+                  data-testid={`row-comment-${comment._id}`}
                 >
-                  {comment.authorAvatar ? (
+                  {comment?.authorAvatar ? (
                     <img
-                      src={comment.authorAvatar}
-                      alt={comment.authorName}
+                      src={comment?.authorAvatar}
+                      alt={comment?.authorName}
                       className="w-8 h-8 rounded-full flex-shrink-0"
                     />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-sm font-bold flex-shrink-0">
-                      {comment.authorName?.[0] || "?"}
+                      {comment?.authorName?.[0] || "?"}
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className="text-sm font-medium text-foreground">
-                        {comment.authorName}
+                        {comment?.authorName}
                       </span>
-                      <span className="text-xs text-muted-foreground">
-                        on "{comment.postTitle}"
-                      </span>
+
                       <span className="text-xs text-muted-foreground ml-auto">
-                        {new Date(comment.createdAt).toLocaleDateString(
+                        {new Date(comment?.createdAt).toLocaleDateString(
                           "en-US",
                           { month: "short", day: "numeric" },
                         )}
                       </span>
                     </div>
                     <p className="text-sm text-foreground/80 line-clamp-2">
-                      {comment.content}
+                      {comment?.content}
                     </p>
                   </div>
                   <Button
                     size="sm"
                     variant="ghost"
                     className="text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-                    onClick={() => handleDelete(comment.id)}
-                    data-testid={`button-delete-comment-${comment.id}`}
+                    onClick={() => handleDelete(comment?._id)}
+                    data-testid={`button-delete-comment-${comment._id}`}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>

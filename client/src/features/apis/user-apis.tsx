@@ -1,6 +1,4 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-// import { updateToken } from "../../helpers/user-session";
-// import { setCurrentUser } from "../../redux/slice/auth-slice";
 
 const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
 
@@ -43,6 +41,14 @@ export const userApis = createApi({
         credentials: "include",
       }),
     }),
+
+    getAllUsers: builder.mutation({
+      query: () => ({
+        url: "/users",
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -50,4 +56,5 @@ export const {
   useCreateUserMutation,
   useVerifyUserAccountMutation,
   useGetUserProfileMutation,
+  useGetAllUsersMutation,
 } = userApis;

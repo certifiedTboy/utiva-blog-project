@@ -84,6 +84,48 @@ export const postApis = createApi({
         credentials: "include",
       }),
     }),
+
+    deletePost: builder.mutation({
+      query: (payload) => ({
+        url: `/posts/${payload}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+    }),
+
+    updatePostViewCount: builder.mutation({
+      query: (payload) => ({
+        url: `/posts/${payload}/view-count`,
+        method: "PATCH",
+        body: payload,
+        credentials: "include",
+      }),
+    }),
+
+    getAllComments: builder.mutation({
+      query: () => ({
+        url: `/posts/comments/all`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+
+    updateComment: builder.mutation({
+      query: (payload) => ({
+        url: `/posts/comments/${payload.commentId}`,
+        method: "PATCH",
+        body: payload,
+        credentials: "include",
+      }),
+    }),
+
+    deleteComment: builder.mutation({
+      query: (payload) => ({
+        url: `/posts/comments/${payload}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -97,4 +139,9 @@ export const {
   useUpdatePostMutation,
   useGetCommentsByPostMutation,
   useGetReactionsToPostMutation,
+  useDeletePostMutation,
+  useUpdatePostViewCountMutation,
+  useGetAllCommentsMutation,
+  useUpdateCommentMutation,
+  useDeleteCommentMutation,
 } = postApis;

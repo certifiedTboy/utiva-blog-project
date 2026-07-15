@@ -224,7 +224,7 @@ export class PostServices {
     page: number,
   ): Promise<{ comments: IComment[]; total: number }> {
     const comments = await Comment.find()
-      .populate("author", "firstName lastName")
+      .populate("author", "firstName lastName picture")
       .populate("post", "title")
       .sort({ createdAt: -1 })
       .limit(limit)

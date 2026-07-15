@@ -1,5 +1,8 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import { useGetPublishedPostsMutation } from "../apis/post-apis";
+import {
+  useGetPublishedPostsMutation,
+  useUpdatePostViewCountMutation,
+} from "../apis/post-apis";
 import { CATEGORIES } from "@/lib/mock-data";
 import type { IPost } from "@/lib/types";
 
@@ -32,6 +35,8 @@ export const PostContextProvider = ({ children }: React.PropsWithChildren) => {
 
   const [getPublishedPosts, { data, isSuccess }] =
     useGetPublishedPostsMutation();
+
+  const [updatePostViewCount] = useUpdatePostViewCountMutation();
 
   useEffect(() => {
     if (tempPosts.length === 0) {
@@ -84,7 +89,7 @@ export const PostContextProvider = ({ children }: React.PropsWithChildren) => {
   const viewPostsDetails = (slug: string) => {
     const post = posts.find((p) => p.slug === slug);
     if (post) {
-      !post.isViewed && post.viewCount++;
+      !post.isViewed && post.viewCount++ && updatePostViewCount(post._id);
       post.isViewed = true;
       setPost(post);
       setPosts([...posts]);
