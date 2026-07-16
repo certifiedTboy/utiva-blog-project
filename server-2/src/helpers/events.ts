@@ -1,5 +1,5 @@
 import EventEmitter from "node:events";
-import cron from "node-cron";
+import cron, { type ScheduledTask } from "node-cron";
 import EmailService from "./smtp.ts";
 import {
   type IEventData,
@@ -29,7 +29,13 @@ export class AppEvents extends EventEmitter {
    * scheduled or running. This is used as a locking mechanism to prevent duplicate jobs for the same user,
    * for example, if multiple 'new-user' events are fired in quick succession for the same email.
    */
-  private activeJobs = new Set<string>();
+  public activeJobs = new Set<string>();
+  /**
+   * @property {Map<string, ScheduledTask>} scheduledTasks - A map to hold references to the actual cron jobs.
+   * The key is the event ID and the value is the task object returned by `node-cron`.
+   * This allows us to explicitly stop a scheduled task.
+   */
+  private scheduledTasks = new Map<string, ScheduledTask>();
   constructor() {
     super();
     this.events = [
@@ -74,6 +80,28 @@ export class AppEvents extends EventEmitter {
 
     // emit events
     this.emit(name, eventData);
+  }
+
+  /**
+   * Cancels a pending event if it exists in the active jobs queue.
+   * @param {string} eventId - The ID of the event to cancel.
+   * @returns {boolean} - True if the event was found and cancelled, false otherwise.
+   */
+  public cancelEvent(eventId: string): boolean {
+    // Stop and remove the scheduled cron job if it exists
+    if (this.scheduledTasks.has(eventId)) {
+      const task = this.scheduledTasks.get(eventId);
+      task?.stop();
+      this.scheduledTasks.delete(eventId);
+    }
+
+    // Remove the job from the active jobs lock
+    if (this.activeJobs.has(eventId)) {
+      this.activeJobs.delete(eventId);
+      console.log(`Job with id ${eventId} was cancelled before execution.`);
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -154,10 +182,15 @@ export class AppEvents extends EventEmitter {
         // The `finally` block ensures that we clean up, regardless of success or failure.
         // Remove the email from the active jobs set to unlock it for future jobs.
         this.activeJobs.delete(eventData.id);
+        // Remove the task from our map of scheduled tasks
+        this.scheduledTasks.delete(eventData.id);
         // Stop the cron job to ensure it doesn't run again and to free up resources.
         task.stop();
       }
     });
+
+    // Store the scheduled task so we can potentially cancel it later
+    this.scheduledTasks.set(eventData.id, task);
   }
 
   private async runEvent(name: EventTypes, eventData: IEventData) {
@@ -232,19 +265,17 @@ export class AppEvents extends EventEmitter {
       case "delete-comment":
         if (eventData.commentId) {
           if (isValidObjectId(eventData.commentId)) {
+            // This event is now a fallback for when immediate cancellation fails.
             await PostServices.deleteComment(eventData.commentId);
-            console.log(`Comment ${eventData.commentId} deleted via event.`);
+            console.log(
+              `Comment ${eventData.commentId} deleted from DB via event.`,
+            );
           } else {
-            const eventId = `add-comment-${eventData?.postId}-${eventData?.commentId}`;
-
-            if (this.activeJobs.has(eventId)) {
-              this.activeJobs.delete(eventId);
-
-              console.log(`job with ${eventId} is deleted`);
-            } else {
-              await PostServices.deleteCommentByTempId(eventData?.commentId);
-              console.log(`Comment ${eventData?.tempId} deleted via event.`);
-            }
+            // This event is now a fallback for when immediate cancellation fails.
+            await PostServices.deleteCommentByTempId(eventData?.commentId);
+            console.log(
+              `Comment ${eventData.commentId} deleted from DB via event.`,
+            );
           }
         }
         break;

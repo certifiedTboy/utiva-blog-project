@@ -121,7 +121,7 @@ export const postApis = createApi({
 
     deleteComment: builder.mutation({
       query: (payload) => ({
-        url: `/posts/comments/${payload}`,
+        url: `/posts/comments/${payload?.commentId}?postId=${payload?.postId}`,
         method: "DELETE",
         credentials: "include",
       }),

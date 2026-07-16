@@ -3,6 +3,7 @@ import { ResponseHandler } from "../lib/response-handler.ts";
 import { PostServices } from "./posts-services.ts";
 import eventEmitter from "../helpers/events.ts";
 
+import { isValidObjectId } from "mongoose";
 export class PostControllers {
   /**
    * @static createPost
@@ -316,14 +317,27 @@ export class PostControllers {
       const { commentId } = req.params;
       const { postId } = req?.query;
 
+      const eventId = `add-comment-${postId}-${commentId}`;
+
+      if (!isValidObjectId(commentId) && eventEmitter.activeJobs.has(eventId)) {
+        // This is a tempId, try to cancel the add-comment event immediately
+
+        const wasCancelled = eventEmitter.cancelEvent(eventId);
+
+        if (wasCancelled) {
+          console.log(`Pending add-comment job ${eventId} was cancelled.`);
+          return ResponseHandler.ok(res, 200, "Comment creation cancelled.");
+        }
+      }
+
+      // If it's a real commentId or the add-comment job was already processed,
+      // queue the deletion from the database.
       eventEmitter.emitEvent("delete-comment", {
-        id: `delete-comment-${commentId}`,
+        id: `delete-comment-${commentId}`, // This can be a real or temp id
         delayInMinutes: 0.5,
         commentId,
-        postId,
       });
-
-      ResponseHandler.ok(res, 202, "Comment deletion has been queued.");
+      return ResponseHandler.ok(res, 202, "Comment deletion has been queued.");
     } catch (error) {
       next(error);
     }

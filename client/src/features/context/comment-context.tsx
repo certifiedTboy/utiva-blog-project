@@ -1,5 +1,9 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import { useGetCommentsByPostMutation } from "../apis/post-apis";
+import {
+  useGetCommentsByPostMutation,
+  useAddCommentToPostMutation,
+  useDeleteCommentMutation,
+} from "../apis/post-apis";
 import type { Comment, Replies } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
@@ -43,10 +47,7 @@ const CommentContext = createContext<CommentContextType>({
   onGetComment: () => {},
   commentToDelete: { comment: null, reason: "none" },
   isDeleteModalOpen: false,
-  setCommentToDelete: (
-    comment: Comment | Replies | null,
-    reason: DeleteReason,
-  ) => {},
+  setCommentToDelete: () => {},
   setIsDeleteModalOpen: () => {},
 });
 
@@ -67,6 +68,9 @@ export const CommentContextProvider = ({
     getCommentsByPost,
     { data: commentData, isSuccess: commentIsSuccess },
   ] = useGetCommentsByPostMutation();
+
+  const [addCommentToPost] = useAddCommentToPostMutation();
+  const [deleteCommentFromPost] = useDeleteCommentMutation();
 
   useEffect(() => {
     if (commentData && commentIsSuccess) {
@@ -104,7 +108,7 @@ export const CommentContextProvider = ({
     authorId: string,
   ) => {
     const newComment: Comment = {
-      _id: Math.random().toString(),
+      _id: Math.floor(Math.random() * 1000000).toString() + "-comment",
       authorName: author,
       postId,
       authorAvatar,
@@ -115,7 +119,15 @@ export const CommentContextProvider = ({
     };
 
     setComments((prev) => [newComment, ...prev]);
+
     toast({ title: "Comment posted!" });
+
+    addCommentToPost({
+      content: comment,
+      postId,
+      parentId: null,
+      tempId: newComment._id,
+    });
   };
 
   const addReply = (
@@ -127,7 +139,7 @@ export const CommentContextProvider = ({
     authorId: string,
   ) => {
     const newReply: Comment = {
-      _id: Math.random().toString(),
+      _id: Math.floor(Math.random() * 1000000).toString() + "-reply",
       authorName: author,
       postId,
       content: comment,
@@ -143,12 +155,23 @@ export const CommentContextProvider = ({
     );
 
     toast({ title: "Reply posted!" });
+
+    // check this reply operation for newly created reply
+    // the function is not being called
+    addCommentToPost({
+      content: comment,
+      postId,
+      parentId,
+      tempId: newReply._id,
+    });
   };
 
   const deleteComment = (commentId: string, postId: string) => {
     setComments((prev) => prev.filter((c) => c._id !== commentId));
 
     toast({ title: "Comment deleted!" });
+
+    deleteCommentFromPost({ commentId, postId });
   };
 
   const deleteReply = (parentId: string, postId: string, replyId: string) => {
@@ -164,6 +187,7 @@ export const CommentContextProvider = ({
     );
 
     toast({ title: "Reply deleted!" });
+    deleteCommentFromPost({ commentId: replyId, postId });
   };
 
   const value = {

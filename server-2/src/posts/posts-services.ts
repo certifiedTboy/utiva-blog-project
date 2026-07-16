@@ -443,10 +443,15 @@ export class PostServices {
    * @param {string} commentId - The ID of the comment to delete.
    * @returns {Promise<{message: string}>} A promise that resolves to a success message.
    */
-  public static async deleteComment(
-    commentId: string,
-  ): Promise<{ message: string }> {
-    const comment = await Comment.findByIdAndDelete(commentId);
+  public static async deleteComment(id: string): Promise<{ message: string }> {
+    let comment;
+    if (Types.ObjectId.isValid(id)) {
+      comment = await Comment.findByIdAndDelete(id);
+    } else {
+      // It's a tempId
+      comment = await Comment.findOneAndDelete({ tempId: id });
+    }
+
     if (comment) {
       await Post.findByIdAndUpdate(comment.post, {
         $inc: { commentCount: -1 },
