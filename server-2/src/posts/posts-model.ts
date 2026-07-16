@@ -68,6 +68,7 @@ export interface IComment extends Document {
   author: Schema.Types.ObjectId;
   content: string;
   parent: Schema.Types.ObjectId | null;
+  tempId?: string | null;
 }
 
 const commentSchema = new Schema<IComment>(
@@ -76,6 +77,7 @@ const commentSchema = new Schema<IComment>(
     author: { type: Schema.Types.ObjectId, ref: "user", required: true },
     content: { type: String, required: true },
     parent: { type: Schema.Types.ObjectId, ref: "comment", default: null },
+    tempId: { type: String, default: null },
   },
   { timestamps: true },
 );

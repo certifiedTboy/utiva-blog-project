@@ -151,12 +151,14 @@ export class PostServices {
     authorId: string,
     content: string,
     parentId: string | null = null,
+    tempId?: string,
   ): Promise<IComment> {
     const comment = new Comment({
       post: postId,
       author: authorId,
       content,
       parent: parentId,
+      tempId,
     });
     await comment.save();
 
@@ -445,6 +447,24 @@ export class PostServices {
     commentId: string,
   ): Promise<{ message: string }> {
     const comment = await Comment.findByIdAndDelete(commentId);
+    if (comment) {
+      await Post.findByIdAndUpdate(comment.post, {
+        $inc: { commentCount: -1 },
+      });
+    }
+    return { message: "Comment deleted successfully" };
+  }
+
+  /**
+   * @static deleteCommentByTempId
+   * @description Deletes a comment and its replies by temp id.
+   * @param {string} tempId - The temporary id of the comment or reply.
+   * @returns {Promise<{message: string}>} A promise that resolves to a success message.
+   */
+  public static async deleteCommentByTempId(
+    tempId: string,
+  ): Promise<{ message: string }> {
+    const comment = await Comment.findOneAndDelete({ tempId });
     if (comment) {
       await Post.findByIdAndUpdate(comment.post, {
         $inc: { commentCount: -1 },

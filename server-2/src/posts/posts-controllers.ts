@@ -148,18 +148,19 @@ export class PostControllers {
     try {
       const postId = req.params.postId as string;
       const authorId = req.user!.id;
-      const { content, parentId } = req.body;
+      const { content, parentId, tempId } = req.body;
 
       eventEmitter.emitEvent("add-comment", {
-        id: `add-comment-${postId}-${authorId}`,
+        id: `add-comment-${postId}-${tempId}`,
         delayInMinutes: 0.5,
         postId,
         authorId,
         content,
         parentId,
+        tempId,
       });
 
-      ResponseHandler.created(res, 202, "Comment has been queued.");
+      return ResponseHandler.created(res, 202, "Comment has been queued.");
     } catch (error) {
       next(error);
     }
@@ -204,7 +205,7 @@ export class PostControllers {
   ) {
     try {
       const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
+      const limit = parseInt(req.query.limit as string) || 50;
       const { comments, total } = await PostServices.getAllComments(
         limit,
         page,
@@ -313,11 +314,15 @@ export class PostControllers {
   ) {
     try {
       const { commentId } = req.params;
+      const { postId } = req?.query;
+
       eventEmitter.emitEvent("delete-comment", {
         id: `delete-comment-${commentId}`,
         delayInMinutes: 0.5,
         commentId,
+        postId,
       });
+
       ResponseHandler.ok(res, 202, "Comment deletion has been queued.");
     } catch (error) {
       next(error);

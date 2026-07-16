@@ -9,6 +9,7 @@ import {
   type IUpdateCommentEvent,
 } from "../lib/types.ts";
 import { PostServices } from "../posts/posts-services.ts";
+import { isValidObjectId } from "mongoose";
 
 /**
  * @class AppEvents
@@ -223,14 +224,28 @@ export class AppEvents extends EventEmitter {
           commentData.authorId,
           commentData.content,
           commentData.parentId,
+          commentData.tempId,
         );
         console.log(`Comment added to post ${commentData.postId} via event.`);
         break;
 
       case "delete-comment":
         if (eventData.commentId) {
-          await PostServices.deleteComment(eventData.commentId);
-          console.log(`Comment ${eventData.commentId} deleted via event.`);
+          if (isValidObjectId(eventData.commentId)) {
+            await PostServices.deleteComment(eventData.commentId);
+            console.log(`Comment ${eventData.commentId} deleted via event.`);
+          } else {
+            const eventId = `add-comment-${eventData?.postId}-${eventData?.commentId}`;
+
+            if (this.activeJobs.has(eventId)) {
+              this.activeJobs.delete(eventId);
+
+              console.log(`job with ${eventId} is deleted`);
+            } else {
+              await PostServices.deleteCommentByTempId(eventData?.commentId);
+              console.log(`Comment ${eventData?.tempId} deleted via event.`);
+            }
+          }
         }
         break;
 
