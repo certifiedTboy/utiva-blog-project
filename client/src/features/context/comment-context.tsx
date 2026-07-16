@@ -1,7 +1,9 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import { useGetCommentsByPostMutation } from "../apis/post-apis";
-import type { Comment } from "@/lib/types";
+import type { Comment, Replies } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+
+type DeleteReason = "delete-comment" | "delete-reply" | "none";
 
 export interface CommentContextType {
   comments: Comment[];
@@ -23,9 +25,12 @@ export interface CommentContextType {
   deleteComment: (commentId: string, postId: string) => void;
   deleteReply: (parentId: string, postId: string, replyId: string) => void;
   onGetComment: (postId: string) => void;
-  commentToDelete: { comment: Comment | null; reason: string };
+  commentToDelete: { comment: Comment | Replies | null; reason: DeleteReason };
   isDeleteModalOpen: boolean;
-  setCommentToDelete: (comment: Comment | null, reason: string) => void;
+  setCommentToDelete: (
+    comment: Comment | Replies | null,
+    reason: DeleteReason,
+  ) => void;
   setIsDeleteModalOpen: (isOpen: boolean) => void;
 }
 
@@ -36,9 +41,12 @@ const CommentContext = createContext<CommentContextType>({
   deleteComment: () => {},
   deleteReply: () => {},
   onGetComment: () => {},
-  commentToDelete: { comment: null, reason: "" },
+  commentToDelete: { comment: null, reason: "none" },
   isDeleteModalOpen: false,
-  setCommentToDelete: () => {},
+  setCommentToDelete: (
+    comment: Comment | Replies | null,
+    reason: DeleteReason,
+  ) => {},
   setIsDeleteModalOpen: () => {},
 });
 
@@ -48,9 +56,9 @@ export const CommentContextProvider = ({
   const [comments, setComments] = useState<Comment[]>([]);
 
   const [commentToDelete, setCommentToDelete] = useState<{
-    comment: Comment | null;
-    reason: string;
-  }>({ comment: null, reason: "" });
+    comment: Comment | Replies | null;
+    reason: DeleteReason;
+  }>({ comment: null, reason: "none" });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const { toast } = useToast();
@@ -143,10 +151,10 @@ export const CommentContextProvider = ({
     toast({ title: "Comment deleted!" });
   };
 
-  const deleteReply = (commentId: string, postId: string, replyId: string) => {
+  const deleteReply = (parentId: string, postId: string, replyId: string) => {
     setComments((prev) =>
       prev.map((c) =>
-        c._id === commentId
+        c._id === parentId
           ? {
               ...c,
               replies: c?.replies?.filter((r) => r._id !== replyId),
@@ -166,7 +174,10 @@ export const CommentContextProvider = ({
     deleteReply,
     onGetComment: (postId: string) => getCommentsByPost(postId),
     commentToDelete,
-    setCommentToDelete: (comment: Comment | null, reason: string) => {
+    setCommentToDelete: (
+      comment: Comment | Replies | null,
+      reason: DeleteReason,
+    ) => {
       setCommentToDelete({ comment, reason });
       setIsDeleteModalOpen(true);
     },

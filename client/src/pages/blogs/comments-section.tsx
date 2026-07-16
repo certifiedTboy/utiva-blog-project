@@ -22,6 +22,7 @@ export default function CommentsSection({ postId }: { postId: any }) {
     deleteComment,
     deleteReply,
     setIsDeleteModalOpen,
+    setCommentToDelete,
     onGetComment,
   } = useComments();
 
@@ -120,9 +121,59 @@ export default function CommentsSection({ postId }: { postId: any }) {
           <ConfirmationModal
             isOpen={isDeleteModalOpen}
             onClose={() => setIsDeleteModalOpen(false)}
-            onConfirm={() =>
-              deleteComment(commentToDelete?.comment?._id, postId)
+            onConfirm={() => {
+              deleteComment(commentToDelete?.comment?._id, postId);
+              setIsDeleteModalOpen(false);
+            }}
+            title="Delete Comment"
+            description={
+              <>
+                Are you sure you want to delete this comment? This action cannot
+                be undone.
+              </>
             }
+            confirmText="sudo delete"
+            // isPending={isDeleting}
+          />
+        )}
+
+      {commentToDelete?.comment &&
+        commentToDelete?.reason === "delete-reply" && (
+          <ConfirmationModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            onConfirm={() => {
+              deleteComment(commentToDelete?.comment?._id, postId);
+              setIsDeleteModalOpen(false);
+            }}
+            title="Delete Comment"
+            description={
+              <>
+                Are you sure you want to delete this comment? This action cannot
+                be undone.
+              </>
+            }
+            confirmText="sudo delete"
+            // isPending={isDeleting}
+          />
+        )}
+
+      {commentToDelete?.comment &&
+        commentToDelete?.reason === "delete-reply" && (
+          <ConfirmationModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => {
+              setIsDeleteModalOpen(false);
+              setCommentToDelete(null, "none");
+            }}
+            onConfirm={() => {
+              deleteReply(
+                commentToDelete?.comment?.parentId as string,
+                postId,
+                commentToDelete?.comment?._id,
+              );
+              setIsDeleteModalOpen(false);
+            }}
             title="Delete Comment"
             description={
               <>

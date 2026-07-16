@@ -61,12 +61,18 @@ export function ConfirmationModal({
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isPending}>
+          <Button
+            variant="outline"
+            className="cursor-pointer"
+            onClick={onClose}
+            disabled={isPending}
+          >
             Cancel
           </Button>
           <Button
             variant="destructive"
             onClick={onConfirm}
+            className="cursor-pointer"
             disabled={isConfirmationDisabled}
             data-testid="button-confirm-delete"
           >

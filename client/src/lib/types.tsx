@@ -55,5 +55,6 @@ export type Replies = {
   createdAt: string;
   depth?: number;
   authorId: string;
-  onDelete: (commentId: string | number) => void;
+  postId: any;
+  parentId: string;
 };

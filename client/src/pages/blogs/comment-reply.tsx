@@ -11,10 +11,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useComments } from "@/features/context/comment-context";
 import type { Replies } from "@/lib/types";
 
 export function CommentReply(replies: Replies) {
   const { user, isAuthenticated: isSignedIn } = useAuth();
+
+  const { setCommentToDelete } = useComments();
 
   return (
     <motion.div
@@ -69,7 +72,9 @@ export function CommentReply(replies: Replies) {
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         className="text-destructive cursor-pointer"
-                        onClick={() => replies?.onDelete(replies?._id)}
+                        onClick={() =>
+                          setCommentToDelete(replies, "delete-reply")
+                        }
                         data-testid={`button-delete-comment-${replies?._id}`}
                       >
                         Delete comment

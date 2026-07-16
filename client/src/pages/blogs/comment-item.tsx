@@ -34,8 +34,7 @@ export default function CommentItem({
   const [replying, setReplying] = useState(false);
   const { isAuthenticated: isSignedIn, user } = useAuth();
 
-  const { addReply, deleteReply, deleteComment, setCommentToDelete } =
-    useComments();
+  const { addReply, setCommentToDelete } = useComments();
 
   const form = useForm({
     resolver: zodResolver(z.object({ content: z.string().min(1) })),
@@ -69,15 +68,15 @@ export default function CommentItem({
     >
       <div className="flex gap-3 py-4">
         <div className="flex-shrink-0">
-          {comment.authorAvatar ? (
+          {comment?.authorAvatar ? (
             <img
-              src={comment.authorAvatar}
-              alt={comment.authorName}
+              src={comment?.authorAvatar}
+              alt={comment?.authorName}
               className="w-8 h-8 rounded-full"
             />
           ) : (
             <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-sm font-bold">
-              {comment.authorName?.[0]}
+              {comment?.authorName?.[0]}
             </div>
           )}
         </div>
@@ -87,7 +86,7 @@ export default function CommentItem({
               {comment?.authorName}
             </span>
             <span className="text-xs text-muted-foreground">
-              {new Date(comment.createdAt).toLocaleDateString("en-US", {
+              {new Date(comment?.createdAt).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
               })}
@@ -188,9 +187,11 @@ export default function CommentItem({
           <CommentReply
             key={index}
             _id={reply._id}
+            postId={postId}
             depth={depth + 1}
             content={reply?.content}
-            authorId={reply?.author?._id}
+            authorId={reply?.authorId}
+            parentId={comment?._id}
             authorName={
               reply.author
                 ? `${reply.author.firstName} ${reply.author.lastName}`
@@ -198,7 +199,6 @@ export default function CommentItem({
             }
             authorAvatar={reply?.author?.picture || reply?.authorAvatar}
             createdAt={reply?.createdAt}
-            onDelete={() => deleteReply(comment._id, postId, reply._id)}
           />
         ))}
     </motion.div>

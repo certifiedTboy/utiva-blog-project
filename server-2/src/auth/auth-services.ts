@@ -66,6 +66,7 @@ export class AuthServices {
       accessToken,
       refreshToken,
       user: {
+        _id: userExist._id,
         firstName: userExist.firstName,
         lastName: userExist.lastName,
         email: userExist.email,
@@ -124,6 +125,7 @@ export class AuthServices {
       accessToken,
       refreshToken,
       user: {
+        _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
