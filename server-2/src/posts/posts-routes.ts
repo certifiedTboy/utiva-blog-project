@@ -133,10 +133,7 @@ export class PostRoutes extends AppRoutesHandler {
   private getAddCommentValidationRules() {
     return [
       body("content").notEmpty().withMessage("Comment content is required"),
-      body("parentId")
-        .optional({ nullable: true })
-        .isMongoId()
-        .withMessage("Invalid parent ID"),
+      body("parentId").optional({ nullable: true }),
     ];
   }
 

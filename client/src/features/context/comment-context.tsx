@@ -75,27 +75,35 @@ export const CommentContextProvider = ({
   useEffect(() => {
     if (commentData && commentIsSuccess) {
       setComments(
-        commentData?.data?.map((comment: any) => {
-          return {
-            _id: comment._id,
-            authorName: `${comment?.author?.firstName} ${comment?.author?.lastName}`,
-            authorAvatar: comment?.author?.picture,
-            content: comment?.content,
-            authorId: comment?.author?._id,
-            createdAt: comment?.createdAt,
-            replies: comment?.replies?.map((reply: any) => {
-              return {
-                _id: reply._id,
-                authorName: `${reply?.author?.firstName} ${reply?.author?.lastName}`,
-                authorAvatar: reply?.author?.picture,
-                content: reply?.content,
-                authorId: reply?.author?._id,
-                createdAt: reply?.createdAt,
-                id: reply._id,
-              };
-            }),
-          };
-        }),
+        commentData?.data
+          ?.slice()
+          ?.sort((a: any, b: any) => {
+            return (
+              new Date(b?.createdAt).getTime() -
+              new Date(a?.createdAt).getTime()
+            );
+          })
+          ?.map((comment: any) => {
+            return {
+              _id: comment._id,
+              authorName: `${comment?.author?.firstName} ${comment?.author?.lastName}`,
+              authorAvatar: comment?.author?.picture,
+              content: comment?.content,
+              authorId: comment?.author?._id,
+              createdAt: comment?.createdAt,
+              replies: comment?.replies?.map((reply: any) => {
+                return {
+                  _id: reply._id,
+                  authorName: `${reply?.author?.firstName} ${reply?.author?.lastName}`,
+                  authorAvatar: reply?.author?.picture,
+                  content: reply?.content,
+                  authorId: reply?.author?._id,
+                  createdAt: reply?.createdAt,
+                  id: reply._id,
+                };
+              }),
+            };
+          }),
       );
     }
   }, [commentData, commentIsSuccess]);
@@ -154,10 +162,6 @@ export const CommentContextProvider = ({
       ),
     );
 
-    toast({ title: "Reply posted!" });
-
-    // check this reply operation for newly created reply
-    // the function is not being called
     addCommentToPost({
       content: comment,
       postId,

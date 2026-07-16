@@ -8,6 +8,7 @@ import Post, {
   type IReaction,
   type IPost,
 } from "./posts-model.ts";
+import mongoose from "mongoose";
 
 export class PostServices {
   /**
@@ -153,13 +154,29 @@ export class PostServices {
     parentId: string | null = null,
     tempId?: string,
   ): Promise<IComment> {
+    if (parentId) {
+      // If parentId is not a valid ObjectId, it's a tempId.
+      // We need to find the actual parent comment's _id.
+      if (!mongoose.isValidObjectId(parentId)) {
+        const parentComment = await Comment.findOne({ tempId: parentId });
+        if (!parentComment) {
+          throw new HttpException(404, "Parent comment not found.");
+        }
+        // Use the real _id of the parent for the new comment.
+        parentId = parentComment._id.toString();
+      }
+    }
+
+    // All branches lead here. `parentId` is either null, a valid ObjectId,
+    // or has been resolved from a tempId to a valid ObjectId.
     const comment = new Comment({
       post: postId,
       author: authorId,
       content,
-      parent: parentId,
+      parent: parentId, // This will be null for top-level comments
       tempId,
     });
+
     await comment.save();
 
     // Increment comment count on the post
