@@ -16,7 +16,12 @@ class ExpressApp extends App {
     }
 }
 const newApp = new ExpressApp({
-    origin: ["http://localhost:5173"],
+    origin: [
+        "http://localhost:5173",
+        "https://adesnotes.vercel.app",
+        "https://adesnotes-git-main-certifiedtboys-projects.vercel.app",
+        "https://adesnotes-i8wbnwv8b-certifiedtboys-projects.vercel.app",
+    ],
     credentials: true,
 });
 const { app } = newApp;
