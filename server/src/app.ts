@@ -1,65 +1,32 @@
-const express = require("express");
-const helmet = require("helmet");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const morgan = require("morgan");
-const path = require("path");
-const apiV1 = require("./routes/apiV1");
-const GlobalErrorHandler = require("./lib/errorInstances/GlobalErrorHandler");
-const app = express();
+import { App } from "./lib/App.ts";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./helpers/swagger-spec.ts";
+import { UserRoutes } from "./users/user-routes.ts";
+import { AuthRoutes } from "./auth/auth-routes.ts";
+import { PostRoutes } from "./posts/posts-routes.ts";
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://utiva-webdev-blog-project.vercel.app",
-  "https://webdev-blogg.vercel.app",
-  "https://www.webdevblog.live",
-];
-const expressOptions = {
-  urlencodExtended: true,
-  requestSizeLimit: "20mb",
-};
-const corsOption = {
-  allowedHeaders: [
-    "Origin",
-    "X-Requested-With",
-    "Content-Type",
-    "Accept",
-    "X-Access-Token",
-    "X-Auth-Token",
-    "Authorization",
-    "Accept-Encoding",
-    "Connection",
-    "Content-Length",
-  ],
+class ExpressApp extends App {
+  public routes(): void {
+    this.app.get("/", (__, res) => {
+      res.json({ message: "Server is live" });
+    });
+
+    this.app.use(
+      "/api/v1/api-docs",
+      swaggerUi.serve,
+      swaggerUi.setup(swaggerSpec),
+    );
+
+    this.app.use("/api/v1/users", new UserRoutes().routes);
+    this.app.use("/api/v1/auth", new AuthRoutes().routes);
+    this.app.use("/api/v1/posts", new PostRoutes().routes);
+  }
+}
+
+const newApp = new ExpressApp({
+  origin: ["http://localhost:5173"],
   credentials: true,
-  methods: "GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE",
-  origin: allowedOrigins,
-  preflightContinue: false,
-};
-
-app.use(
-  helmet({
-    crossOriginResourcePolicy: false,
-  })
-);
-
-app.use(cookieParser());
-// app.use(morgan("combined"));
-app.use(cors(corsOption));
-app.use(express.json({ limit: expressOptions.requestSizeLimit }));
-
-app.use(
-  express.urlencoded({
-    limit: expressOptions.requestSizeLimit,
-    extended: expressOptions.urlencodExtended,
-  })
-);
-app.use(express.static(path.join(process.cwd(), "public")));
-app.use("/api/v1", apiV1);
-app.use(GlobalErrorHandler);
-
-app.get("/", (req, res) => {
-  res.send("server is live");
 });
+const { app } = newApp;
 
-module.exports = app;
+export default app;

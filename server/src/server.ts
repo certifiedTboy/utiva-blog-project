@@ -1,17 +1,15 @@
-const http = require("http");
-const app = require("./app");
-const server = http.createServer(app);
-const envVariable = require("./config/config");
-const { mongoConnect } = require("./helpers/database/dbConfig");
+import http from "node:http";
+import app from "./app.ts";
+import { PORT } from "./lib/constants.ts";
+import { AppHelpers } from "./helpers/app-helpers.ts";
 
-const PORT = envVariable.PORT || 8000;
+const httpServer = http.createServer(app);
 
-const startServer = async () => {
-  await mongoConnect();
-
-  server.listen(PORT, () => {
-    console.log(`server is live on port: ${PORT}`);
-  });
-};
+async function startServer() {
+  await AppHelpers.connectDb();
+  httpServer.listen(PORT, () =>
+    console.log(`Server is running on port ${PORT}`),
+  );
+}
 
 startServer();
