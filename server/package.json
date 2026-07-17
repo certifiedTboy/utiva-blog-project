@@ -7,7 +7,7 @@
   "type": "module",
   "main": "server.ts",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node dist/src/server.js",
     "build": "tsc",
     "copy-assets": "cpx --watch \"src/helpers/templates/**/*\" \"dist/src/helpers/templates\"",
     "dev": "concurrently \"tsc -w\" \"npm:copy-assets\" \"nodemon dist/src/server.js\"",
