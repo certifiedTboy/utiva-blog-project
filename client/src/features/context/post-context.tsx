@@ -4,7 +4,7 @@ import {
   useUpdatePostViewCountMutation,
 } from "../apis/post-apis";
 import { CATEGORIES } from "@/lib/mock-data";
-import type { IPost, Comment } from "@/lib/types";
+import type { IPost } from "@/lib/types";
 
 export interface PostContextType {
   posts: IPost[];

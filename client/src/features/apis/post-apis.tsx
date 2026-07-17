@@ -19,7 +19,7 @@ export const postApis = createApi({
     }),
 
     getAllPosts: builder.mutation({
-      query: (payload) => ({
+      query: (_payload) => ({
         url: "/posts",
         method: "GET",
         credentials: "include",
