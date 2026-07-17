@@ -192,6 +192,18 @@ export const postDocs = {
           schema: { type: "string" },
           description: "ID of the post to fetch comments for",
         },
+        {
+          name: "page",
+          in: "query",
+          schema: { type: "integer", default: 1 },
+          description: "Page number for pagination",
+        },
+        {
+          name: "limit",
+          in: "query",
+          schema: { type: "integer", default: 10 },
+          description: "Number of comments per page",
+        },
       ],
       responses: {
         200: {

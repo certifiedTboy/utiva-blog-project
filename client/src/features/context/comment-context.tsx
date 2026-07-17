@@ -28,7 +28,7 @@ export interface CommentContextType {
   ) => void;
   deleteComment: (commentId: string, postId: string) => void;
   deleteReply: (parentId: string, postId: string, replyId: string) => void;
-  onGetComment: (postId: string) => void;
+  onGetComment: (postId: string, page: number) => void;
   commentToDelete: { comment: Comment | Replies | null; reason: DeleteReason };
   isDeleteModalOpen: boolean;
   setCommentToDelete: (
@@ -36,6 +36,8 @@ export interface CommentContextType {
     reason: DeleteReason,
   ) => void;
   setIsDeleteModalOpen: (isOpen: boolean) => void;
+  commentIsLoading: boolean;
+  hasMore: boolean;
 }
 
 const CommentContext = createContext<CommentContextType>({
@@ -49,24 +51,30 @@ const CommentContext = createContext<CommentContextType>({
   isDeleteModalOpen: false,
   setCommentToDelete: () => {},
   setIsDeleteModalOpen: () => {},
+  commentIsLoading: false,
+  hasMore: true,
 });
 
 export const CommentContextProvider = ({
   children,
 }: React.PropsWithChildren) => {
   const [comments, setComments] = useState<Comment[]>([]);
-
   const [commentToDelete, setCommentToDelete] = useState<{
     comment: Comment | Replies | null;
     reason: DeleteReason;
   }>({ comment: null, reason: "none" });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   const { toast } = useToast();
 
   const [
     getCommentsByPost,
-    { data: commentData, isSuccess: commentIsSuccess },
+    {
+      data: commentData,
+      isSuccess: commentIsSuccess,
+      isLoading: commentIsLoading,
+    },
   ] = useGetCommentsByPostMutation();
 
   const [addCommentToPost] = useAddCommentToPostMutation();
@@ -74,39 +82,44 @@ export const CommentContextProvider = ({
 
   useEffect(() => {
     if (commentData && commentIsSuccess) {
-      setComments(
-        commentData?.data
-          ?.slice()
-          ?.sort((a: any, b: any) => {
-            return (
-              new Date(b?.createdAt).getTime() -
-              new Date(a?.createdAt).getTime()
-            );
-          })
-          ?.map((comment: any) => {
-            return {
-              _id: comment._id,
-              authorName: `${comment?.author?.firstName} ${comment?.author?.lastName}`,
-              authorAvatar: comment?.author?.picture,
-              content: comment?.content,
-              authorId: comment?.author?._id,
-              createdAt: comment?.createdAt,
-              replies: comment?.replies?.map((reply: any) => {
-                return {
-                  _id: reply._id,
-                  authorName: `${reply?.author?.firstName} ${reply?.author?.lastName}`,
-                  authorAvatar: reply?.author?.picture,
-                  content: reply?.content,
-                  authorId: reply?.author?._id,
-                  createdAt: reply?.createdAt,
-                  id: reply._id,
-                };
-              }),
-            };
-          }),
-      );
+      const newComments = commentData?.data?.comments || [];
+
+      const mappedComments = newComments.map((comment: any) => ({
+        _id: comment._id,
+        authorName: `${comment?.author?.firstName} ${comment?.author?.lastName}`,
+        authorAvatar: comment?.author?.picture,
+        content: comment?.content,
+        authorId: comment?.author?._id,
+        createdAt: comment?.createdAt,
+        replies: (comment?.replies || []).map((reply: any) => ({
+          _id: reply._id,
+          authorName: `${reply?.author?.firstName} ${reply?.author?.lastName}`,
+          authorAvatar: reply?.author?.picture,
+          content: reply?.content,
+          authorId: reply?.author?._id,
+          createdAt: reply?.createdAt,
+          id: reply._id,
+        })),
+      }));
+
+      setComments((prevComments) => {
+        const existingCommentIds = new Set(prevComments.map((c) => c._id));
+        const uniqueNewComments = mappedComments.filter(
+          (c: Comment) => !existingCommentIds.has(c._id),
+        );
+        const allComments = [...prevComments, ...uniqueNewComments];
+        return allComments.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
+      });
     }
   }, [commentData, commentIsSuccess]);
+
+  useEffect(() => {
+    if (commentIsSuccess && comments?.length === commentData?.data?.total)
+      return setHasMore(false);
+  }, [comments, commentIsSuccess]);
 
   const addComment = (
     comment: string,
@@ -200,7 +213,8 @@ export const CommentContextProvider = ({
     addReply,
     deleteComment,
     deleteReply,
-    onGetComment: (postId: string) => getCommentsByPost(postId),
+    onGetComment: (postId: string, page: number = 1) =>
+      getCommentsByPost({ postId, page }),
     commentToDelete,
     setCommentToDelete: (
       comment: Comment | Replies | null,
@@ -211,6 +225,8 @@ export const CommentContextProvider = ({
     },
     isDeleteModalOpen,
     setIsDeleteModalOpen,
+    commentIsLoading,
+    hasMore,
   };
 
   return (

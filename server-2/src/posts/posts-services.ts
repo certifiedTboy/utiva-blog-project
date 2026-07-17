@@ -254,9 +254,17 @@ export class PostServices {
   /**
    * @static getCommentsByPost
    * @description Retrieves all comments for a given post.
+   * @param {string} postId - The ID of the post.
+   * @param {number} limit - The number of comments to return per page.
+   * @param {number} page - The page number.
+   * @returns {Promise<{comments: IComment[], total: number}>} A promise that resolves to the comments and total count.
    */
-  public static async getCommentsByPost(postId: string): Promise<IComment[]> {
-    return Comment.aggregate([
+  public static async getCommentsByPost(
+    postId: string,
+    limit: number,
+    page: number,
+  ): Promise<{ comments: IComment[]; total: number }> {
+    const results = await Comment.aggregate([
       {
         $match: {
           post: new Types.ObjectId(postId),
@@ -264,12 +272,10 @@ export class PostServices {
         },
       },
 
-      {
-        $sort: {
-          createdAt: 1,
-        },
-      },
+      { $sort: { createdAt: -1 } },
 
+      { $skip: limit * (page - 1) },
+      { $limit: limit },
       // Get every descendant reply for each top-level comment
       {
         $graphLookup: {
@@ -401,6 +407,14 @@ export class PostServices {
         },
       },
     ]);
+
+    const total = await Comment.countDocuments({
+      // @ts-ignore
+      post: new Types.ObjectId(postId),
+      parent: null,
+    });
+
+    return { comments: results, total };
   }
 
   /**

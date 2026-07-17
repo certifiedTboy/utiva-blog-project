@@ -71,7 +71,7 @@ export const postApis = createApi({
 
     getCommentsByPost: builder.mutation({
       query: (payload) => ({
-        url: `/posts/${payload}/comments`,
+        url: `/posts/${payload.postId}/comments?page=${payload.page}&limit=10`,
         method: "GET",
         credentials: "include",
       }),

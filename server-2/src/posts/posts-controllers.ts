@@ -233,8 +233,20 @@ export class PostControllers {
   ) {
     try {
       const { postId } = req.params;
-      const comments = await PostServices.getCommentsByPost(postId as string);
-      ResponseHandler.ok(res, 200, "Comments fetched successfully", comments);
+
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const { comments, total } = await PostServices.getCommentsByPost(
+        postId as string,
+        limit,
+        page,
+      );
+      ResponseHandler.ok(res, 200, "Comments fetched successfully", {
+        comments,
+        total,
+        page,
+        limit,
+      });
     } catch (error) {
       next(error);
     }

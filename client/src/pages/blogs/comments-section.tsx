@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
-import { MessageCircle } from "lucide-react";
+import { Loader2, MessageCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,10 +13,13 @@ import { ConfirmationModal } from "@/components/common/confirmation-modal";
 import CommentItem from "./comment-item";
 
 export default function CommentsSection({ postId }: { postId: any }) {
+  const [page, setPage] = useState(1);
   const { isAuthenticated: isSignedIn, user } = useAuth();
   const {
     comments,
     addComment,
+    commentIsLoading,
+    hasMore,
     commentToDelete,
     isDeleteModalOpen,
     deleteComment,
@@ -43,9 +46,9 @@ export default function CommentsSection({ postId }: { postId: any }) {
 
   useEffect(() => {
     if (postId) {
-      onGetComment(postId);
+      onGetComment(postId, page);
     }
-  }, [postId]);
+  }, [postId, page]);
 
   return (
     <div className="mt-12">
@@ -114,6 +117,23 @@ export default function CommentsSection({ postId }: { postId: any }) {
                 postId={postId}
               />
             ))}
+
+          {comments?.length > 9 && (
+            <div className="text-center py-4">
+              <Button
+                variant="outline"
+                className="cursor-pointer"
+                onClick={() => hasMore && setPage((p) => p + 1)}
+                disabled={commentIsLoading || !hasMore}
+                data-testid="button-load-more-comments"
+              >
+                {commentIsLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Load More
+              </Button>
+            </div>
+          )}
         </div>
       )}
       {commentToDelete?.comment &&
