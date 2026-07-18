@@ -47,7 +47,6 @@ export class AuthControllers {
             ResponseHandler.auth(res, 201, "user created successfully", result);
         }
         catch (error) {
-            console.log(error);
             next(error);
         }
     }

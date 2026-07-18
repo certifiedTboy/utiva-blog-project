@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Code2, Search } from "lucide-react";
+import { micromark } from "micromark";
+import { gfm, gfmHtml } from "micromark-extension-gfm";
 import { FormControl } from "@/components/ui/form";
 import { supportedLanguages } from "@/lib/mock-data";
+import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 
 type Language = (typeof supportedLanguages)[number];
@@ -23,12 +26,23 @@ export function MarkdownContentField({
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [languageQuery, setLanguageQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
+  const { toast } = useToast();
 
   /*
    * Stores the position where the latest opening code fence begins.
    * For example, the index of the first backtick in ```typescript.
    */
   const fenceStartRef = useRef<number | null>(null);
+
+  const renderedHtml = useMemo(() => {
+    if (!field.value) return "";
+    return micromark(field.value, {
+      extensions: [gfm()],
+      htmlExtensions: [gfmHtml()],
+      allowDangerousHtml: true,
+      allowDangerousProtocol: true,
+    });
+  }, [field.value]);
 
   const filteredLanguages = useMemo(() => {
     const query = languageQuery.trim().toLowerCase();
@@ -109,6 +123,77 @@ export function MarkdownContentField({
 
     field.onChange(value);
     detectCodeFence(value, cursorPosition);
+  }
+
+  async function handleImageUpload(file: File) {
+    // This is a mock upload function.
+    // In a real application, you would upload the file to your server or a cloud storage service
+    // and get a URL in return.
+    console.log("Uploading image:", file.name);
+    toast({
+      title: "Uploading Image...",
+      description: "Please wait while the image is being uploaded.",
+    });
+
+    return new Promise<string>((resolve) => {
+      setTimeout(() => {
+        const mockUrl = URL.createObjectURL(file);
+        console.log("Mock URL:", mockUrl);
+        toast({
+          title: "Image Uploaded",
+          description: "The image has been added to your post.",
+        });
+        resolve(mockUrl);
+      }, 1000);
+    });
+  }
+
+  async function handlePaste(event: React.ClipboardEvent<HTMLTextAreaElement>) {
+    const imageItem = Array.from(event.clipboardData.items).find((item) =>
+      item.type.startsWith("image/"),
+    );
+
+    // Allow normal text pasting when no image exists.
+    if (!imageItem) return;
+
+    const file = imageItem.getAsFile();
+    if (!file) return;
+
+    event.preventDefault();
+
+    const textarea = event.currentTarget;
+
+    // Capture these before the asynchronous upload.
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const currentValue = textarea.value;
+
+    try {
+      const imageUrl = await handleImageUpload(file);
+
+      if (!imageUrl) return;
+
+      // Valid Markdown image syntax.
+      const imageMarkdown = `\n![Pasted image](${imageUrl})\n`;
+
+      const newValue =
+        currentValue.slice(0, start) + imageMarkdown + currentValue.slice(end);
+
+      field.onChange(newValue);
+
+      const newCursorPosition = start + imageMarkdown.length;
+
+      requestAnimationFrame(() => {
+        const currentTextarea = textareaRef.current;
+
+        if (!currentTextarea) return;
+
+        currentTextarea.focus();
+        currentTextarea.setSelectionRange(newCursorPosition, newCursorPosition);
+      });
+    } catch (error) {
+      console.error("Unable to paste image:", error);
+    }
   }
 
   function selectLanguage(language: Language) {
@@ -241,7 +326,17 @@ export function MarkdownContentField({
           spellCheck={false}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
         />
+        <div className="mt-4 rounded-xl border border-border bg-card p-4">
+          <p className="text-sm text-muted-foreground mb-2">Preview</p>
+          <div
+            className="prose prose-sm dark:prose-invert max-w-none"
+            dangerouslySetInnerHTML={{
+              __html: renderedHtml,
+            }}
+          />
+        </div>
 
         {showLanguageMenu && (
           <div

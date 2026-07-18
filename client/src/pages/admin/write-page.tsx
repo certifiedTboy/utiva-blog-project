@@ -147,6 +147,8 @@ export default function WritePage() {
 
   const coverImagePreview = form.watch("coverImage");
 
+  console.log(form?.getValues());
+
   return (
     <div className="min-h-screen pt-20 pb-20">
       <div className="max-w-4xl mx-auto px-4">
