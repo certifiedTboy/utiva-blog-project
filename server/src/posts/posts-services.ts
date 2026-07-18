@@ -1,5 +1,9 @@
 import { HttpException } from "../lib/exceptions/http-exception.ts";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import {
   AWS_ACCESS_KEY_ID,
   AWS_BUCKET_NAME,
@@ -473,13 +477,15 @@ export class PostServices {
    * @param {string} postId - The ID of the post to delete.
    * @returns {Promise<{message: string}>} A promise that resolves to a success message.
    */
-  public static async deletePost(postId: string): Promise<{ message: string }> {
-    await Post.findByIdAndDelete(postId);
+  public static async deletePost(
+    postId: string,
+  ): Promise<{ message: string; post: IPost | null }> {
+    const post = await Post.findByIdAndDelete(postId);
     // @ts-ignore
     await Comment.deleteMany({ post: postId });
     // @ts-ignore
     await Reaction.deleteMany({ post: postId });
-    return { message: "Post deleted successfully" };
+    return { message: "Post deleted successfully", post };
   }
 
   /**
@@ -488,21 +494,17 @@ export class PostServices {
    * @param {string} commentId - The ID of the comment to delete.
    * @returns {Promise<{message: string}>} A promise that resolves to a success message.
    */
-  public static async deleteComment(id: string): Promise<{ message: string }> {
-    let comment;
-    if (Types.ObjectId.isValid(id)) {
-      comment = await Comment.findByIdAndDelete(id);
-    } else {
-      // It's a tempId
-      comment = await Comment.findOneAndDelete({ tempId: id });
-    }
+  public static async deleteComment(
+    id: string,
+  ): Promise<{ message: string; comment: IComment | null }> {
+    const comment = await Comment.findByIdAndDelete(id);
 
     if (comment) {
       await Post.findByIdAndUpdate(comment.post, {
         $inc: { commentCount: -1 },
       });
     }
-    return { message: "Comment deleted successfully" };
+    return { message: "Comment deleted successfully", comment };
   }
 
   /**
@@ -513,16 +515,22 @@ export class PostServices {
    */
   public static async deleteCommentByTempId(
     tempId: string,
-  ): Promise<{ message: string }> {
+  ): Promise<{ message: string; comment: IComment | null }> {
     const comment = await Comment.findOneAndDelete({ tempId });
     if (comment) {
       await Post.findByIdAndUpdate(comment.post, {
         $inc: { commentCount: -1 },
       });
     }
-    return { message: "Comment deleted successfully" };
+    return { message: "Comment deleted successfully", comment };
   }
 
+  /**
+   * @static uploadFileToAWSs3Bucket
+   * @description Uploads a file to the configured AWS S3 bucket.
+   * @param {Express.Multer.File} file - The file to upload, handled by multer.
+   * @returns {Promise<{ url: string }>} A promise that resolves to an object containing the public URL of the uploaded file.
+   */
   public static async uploadFileToAWSs3Bucket(
     file: Express.Multer.File,
   ): Promise<{ url: string }> {
@@ -540,5 +548,28 @@ export class PostServices {
     const url = `https://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/${fileName}`;
 
     return { url };
+  }
+
+  /**
+   * @static deleteFileFromAWSs3Bucket
+   * @description Deletes a file from the AWS S3 bucket using its public URL.
+   * @param {string} fileUrl - The public URL of the file to be deleted.
+   * @returns {Promise<{ message: string }>} A promise that resolves to a success message.
+   * @throws {HttpException} If the file cannot be deleted.
+   */
+  public static async deleteFileFromAWSs3Bucket(
+    fileUrl: string,
+  ): Promise<{ message: string }> {
+    const url = new URL(fileUrl);
+    const key = decodeURIComponent(url.pathname.substring(1)); // Remove leading '/' and decode URI component
+
+    const command = new DeleteObjectCommand({
+      Bucket: AWS_BUCKET_NAME,
+      Key: key,
+    });
+
+    await this.s3.send(command);
+
+    return { message: "File deleted successfully from S3." };
   }
 }

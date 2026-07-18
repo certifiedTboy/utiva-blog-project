@@ -50,6 +50,7 @@ export class AppEvents extends EventEmitter {
       "update-post",
       "update-comment",
       "update-post-view-count",
+      "delete-s3-file",
     ];
 
     this.initializeListeners();
@@ -91,6 +92,7 @@ export class AppEvents extends EventEmitter {
     // Stop and remove the scheduled cron job if it exists
     if (this.scheduledTasks.has(eventId)) {
       const task = this.scheduledTasks.get(eventId);
+
       task?.stop();
       this.scheduledTasks.delete(eventId);
     }
@@ -193,6 +195,13 @@ export class AppEvents extends EventEmitter {
     this.scheduledTasks.set(eventData.id, task);
   }
 
+  extractS3Urls(content: string): string[] {
+    const regex =
+      /https:\/\/itakuroso-files\.s3\.eu-west-2\.amazonaws\.com\/[^\s)"']+/g;
+
+    return content.match(regex) ?? [];
+  }
+
   private async runEvent(name: EventTypes, eventData: IEventData) {
     switch (name) {
       case "new-user":
@@ -245,7 +254,21 @@ export class AppEvents extends EventEmitter {
 
       case "delete-post":
         if (eventData.postId) {
-          await PostServices.deletePost(eventData.postId);
+          const result = await PostServices.deletePost(eventData.postId);
+
+          if (result && result?.post && result?.post.content) {
+            const s3Urls = this.extractS3Urls(result.post.content);
+
+            if (s3Urls && s3Urls.length > 0) {
+              for (const url of s3Urls) {
+                this.emitEvent("delete-s3-file", {
+                  id: `delete-s3-file-${url}`,
+                  delayInMinutes: 0.5,
+                  url,
+                });
+              }
+            }
+          }
           console.log(`Post ${eventData.postId} deleted via event.`);
         }
         break;
@@ -263,19 +286,35 @@ export class AppEvents extends EventEmitter {
         break;
 
       case "delete-comment":
+        let result;
         if (eventData.commentId) {
           if (isValidObjectId(eventData.commentId)) {
             // This event is now a fallback for when immediate cancellation fails.
-            await PostServices.deleteComment(eventData.commentId);
+            result = await PostServices.deleteComment(eventData.commentId);
             console.log(
               `Comment ${eventData.commentId} deleted from DB via event.`,
             );
           } else {
             // This event is now a fallback for when immediate cancellation fails.
-            await PostServices.deleteCommentByTempId(eventData?.commentId);
+            result = await PostServices.deleteCommentByTempId(
+              eventData?.commentId,
+            );
             console.log(
               `Comment ${eventData.commentId} deleted from DB via event.`,
             );
+          }
+        }
+
+        if (result && result?.comment && result?.comment.content) {
+          const s3Urls = this.extractS3Urls(result.comment.content);
+          if (s3Urls && s3Urls.length > 0) {
+            for (const url of s3Urls) {
+              this.emitEvent("delete-s3-file", {
+                id: `delete-s3-file-${url}`,
+                delayInMinutes: 0.5,
+                url,
+              });
+            }
           }
         }
         break;
@@ -310,6 +349,11 @@ export class AppEvents extends EventEmitter {
         }
         break;
 
+      case "delete-s3-file":
+        if (eventData.url) {
+          await PostServices.deleteFileFromAWSs3Bucket(eventData.url);
+          console.log(`S3 file ${eventData.url} deleted via event.`);
+        }
       default:
         break;
     }
