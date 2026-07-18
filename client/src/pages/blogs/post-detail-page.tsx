@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from "react";
 import { useRoute, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, Clock, Eye } from "lucide-react";
@@ -10,17 +11,26 @@ import ReactionsPanel from "./reaction-panel";
 import CommentsSection from "./comments-section";
 import { usePosts } from "@/features/context/post-context";
 import NotFoundBlog from "./not-found-blog";
-import { useEffect } from "react";
+import { PageMetadata } from "@/components/common/page-metadata";
 
 export default function PostDetailPage() {
   const { posts: POSTS, viewPostsDetails } = usePosts();
-
   const [, params] = useRoute("/blog/:slug");
   const [, navigate] = useLocation();
   const { isAuthenticated: isSignedIn } = useAuth();
   const slug = params?.slug ?? "";
 
   const post = POSTS.find((p) => p.slug === slug);
+  const renderedContent = useMemo(
+    () =>
+      post?.content
+        ? marked.parse(post.content, {
+            gfm: true,
+            breaks: true,
+          })
+        : "",
+    [post?.content],
+  );
 
   useEffect(() => {
     if (slug) {
@@ -32,10 +42,8 @@ export default function PostDetailPage() {
     return <NotFoundBlog />;
   }
 
-  const renderedContent = marked.parse(post?.content, {
-    gfm: true,
-    breaks: true,
-  });
+  const metaDescription =
+    post?.excerpt || post?.content.substring(0, 155) + "...";
 
   const credit = post?.coverImageCredit;
   let creditText = credit;
@@ -51,6 +59,9 @@ export default function PostDetailPage() {
 
   return (
     <div className="min-h-screen pt-20 pb-20">
+      {post && post?.title && metaDescription && (
+        <PageMetadata title={post.title} description={metaDescription} />
+      )}
       <ReadingProgress />
       {post?.coverImage && (
         <motion.div

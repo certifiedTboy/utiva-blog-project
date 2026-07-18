@@ -126,10 +126,6 @@ export function MarkdownContentField({
   }
 
   async function handleImageUpload(file: File) {
-    // This is a mock upload function.
-    // In a real application, you would upload the file to your server or a cloud storage service
-    // and get a URL in return.
-    console.log("Uploading image:", file.name);
     toast({
       title: "Uploading Image...",
       description: "Please wait while the image is being uploaded.",

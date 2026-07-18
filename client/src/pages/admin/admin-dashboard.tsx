@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useAdminContext } from "@/features/context/admin-context";
 import StatCard from "./stat-card";
+import { PageMetadata } from "@/components/common/page-metadata";
 import { ADMIN_TABS } from "@/lib/mock-data";
 
 export default function AdminDashboard() {
@@ -27,6 +28,10 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen pt-24 pb-20">
+      <PageMetadata
+        title="Admin Dashboard"
+        description="Platform overview and management."
+      />
       <div className="max-w-7xl mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

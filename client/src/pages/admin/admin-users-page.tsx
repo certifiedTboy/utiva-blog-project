@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Shield, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PageMetadata } from "@/components/common/page-metadata";
 import { useAdminContext } from "@/features/context/admin-context";
 import { ADMIN_TABS } from "@/lib/mock-data";
 
@@ -18,6 +19,10 @@ export default function AdminUsersPage() {
 
   return (
     <div className="min-h-screen pt-24 pb-20">
+      <PageMetadata
+        title="Manage Users"
+        description="View and manage all registered users."
+      />
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">

@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { ConfirmationModal } from "@/components/common/confirmation-modal";
 import { useAdminContext } from "@/features/context/admin-context";
+import { PageMetadata } from "@/components/common/page-metadata";
 import type { IPost } from "@/lib/types";
 
 export default function DashboardPage() {
@@ -53,6 +54,10 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen pt-24 pb-20">
+      <PageMetadata
+        title="Dashboard"
+        description="Manage your posts and track your impact."
+      />
       <div className="max-w-6xl mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
