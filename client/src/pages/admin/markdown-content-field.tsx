@@ -1,18 +1,26 @@
+// Import necessary hooks and components from React and other libraries.
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Code2, Search } from "lucide-react";
+import { Check, Code2, Image, Search } from "lucide-react";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
+// UI components from shadcn/ui.
 import { FormControl } from "@/components/ui/form";
 import { supportedLanguages } from "@/lib/mock-data";
-import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-import { useUploadFileToAWSs3Mutation } from "@/features/apis/post-apis";
+import { Button } from "@/components/ui/button";
+import { useFileUpload } from "@/hooks/usefile-upload";
 
+// Define a type for the supported programming languages.
 type Language = (typeof supportedLanguages)[number];
 
+/**
+ * A rich markdown editor component with features like code block language detection,
+ * image pasting/uploading, and a live preview.
+ */
 export function MarkdownContentField({
   field,
 }: {
+  // The field object from react-hook-form.
   field: {
     value?: string;
     onChange: (value: string) => void;
@@ -21,40 +29,48 @@ export function MarkdownContentField({
     ref?: React.Ref<HTMLTextAreaElement>;
   };
 }) {
+  // Refs for direct DOM manipulation.
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const { handleFileSelect, handlePaste } = useFileUpload(textareaRef, field);
+
+  /**
+   * Ref to store the starting position of the current code fence (```).
+   * This is used to correctly replace the language identifier.
+   */
+  const fenceStartRef = useRef<number | null>(null);
+
+  // State for managing the language selection menu for code blocks.
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [languageQuery, setLanguageQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const [uploadFileToAWSs3] = useUploadFileToAWSs3Mutation();
-
-  const { toast } = useToast();
-
-  /*
-   * Stores the position where the latest opening code fence begins.
-   * For example, the index of the first backtick in ```typescript.
-   */
-  const fenceStartRef = useRef<number | null>(null);
-
+  // Memoize the conversion of markdown to HTML for the preview pane.
+  // This prevents re-rendering on every keystroke if the content hasn't changed.
   const renderedHtml = useMemo(() => {
     if (!field.value) return "";
     return micromark(field.value, {
       extensions: [gfm()],
       htmlExtensions: [gfmHtml()],
+      // These are needed to allow raw HTML and custom protocols in the markdown.
       allowDangerousHtml: true,
       allowDangerousProtocol: true,
     });
   }, [field.value]);
 
+  // Memoize the list of filtered languages based on the user's query.
+  // This improves performance by avoiding re-filtering on every render.
   const filteredLanguages = useMemo(() => {
     const query = languageQuery.trim().toLowerCase();
 
+    // If there's no query, return all supported languages.
     if (!query) {
       return supportedLanguages;
     }
 
+    // Filter languages based on label, value, or aliases.
     return supportedLanguages.filter((language) => {
       return (
         language.label.toLowerCase().includes(query) ||
@@ -64,10 +80,13 @@ export function MarkdownContentField({
     });
   }, [languageQuery]);
 
+  // Reset the active index whenever the language query changes.
   useEffect(() => {
     setActiveIndex(0);
   }, [languageQuery]);
 
+  // Effect to handle clicks outside the component to close the language menu.
+  // This improves user experience by allowing an intuitive way to close the menu.
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
       if (
@@ -85,6 +104,9 @@ export function MarkdownContentField({
     };
   }, []);
 
+  /**
+   * Resets the state related to the language menu, effectively closing it.
+   */
   function closeLanguageMenu() {
     setShowLanguageMenu(false);
     setLanguageQuery("");
@@ -92,20 +114,22 @@ export function MarkdownContentField({
     fenceStartRef.current = null;
   }
 
+  /**
+   * Analyzes the text before the cursor to detect if a code fence (```)
+   * has been typed, and if so, opens the language selection menu.
+   */
   function detectCodeFence(value: string, cursorPosition: number) {
     const contentBeforeCursor = value.slice(0, cursorPosition);
     const currentLineStart = contentBeforeCursor.lastIndexOf("\n") + 1;
-
     const currentLine = contentBeforeCursor.slice(currentLineStart);
 
-    /*
-     * Matches:
+    /**
+     * This regex matches a code fence at the beginning of a line.
+     * It allows for optional whitespace before the backticks and captures
+     * the language identifier that follows.
      * ```
      * ```j
      * ```javascript
-     *
-     * It only opens for a code fence at the beginning of the current line,
-     * allowing optional spaces before the fence.
      */
     const match = currentLine.match(/^\s*```([a-zA-Z0-9+#.-]*)$/);
 
@@ -114,13 +138,17 @@ export function MarkdownContentField({
       return;
     }
 
+    // Store the starting position of the fence and show the menu.
     const backtickOffset = currentLine.indexOf("```");
-
     fenceStartRef.current = currentLineStart + backtickOffset;
     setLanguageQuery(match[1] ?? "");
     setShowLanguageMenu(true);
   }
 
+  /**
+   * Handles the `onChange` event of the textarea. It updates the form field's
+   * value and calls `detectCodeFence` to check for language selection triggers.
+   */
   function handleChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
     const value = event.target.value;
     const cursorPosition = event.target.selectionStart;
@@ -129,80 +157,10 @@ export function MarkdownContentField({
     detectCodeFence(value, cursorPosition);
   }
 
-  async function handleImageUpload(file: File) {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      toast({
-        title: "Uploading Image...",
-        description: "Please wait while the image is being uploaded.",
-      });
-      const result = await uploadFileToAWSs3(formData).unwrap();
-      toast({
-        title: "Image Uploaded",
-        description: "The image has been added to your post.",
-      });
-      return result.data.url;
-    } catch (error) {
-      toast({
-        title: "Upload Failed",
-        description: "Could not upload the image. Please try again.",
-        variant: "destructive",
-      });
-      console.error("Upload failed:", error);
-      return null;
-    }
-  }
-
-  async function handlePaste(event: React.ClipboardEvent<HTMLTextAreaElement>) {
-    const imageItem = Array.from(event.clipboardData.items).find((item) =>
-      item.type.startsWith("image/"),
-    );
-
-    // Allow normal text pasting when no image exists.
-    if (!imageItem) return;
-
-    const file = imageItem.getAsFile();
-    if (!file) return;
-
-    event.preventDefault();
-
-    const textarea = event.currentTarget;
-
-    // Capture these before the asynchronous upload.
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const currentValue = textarea.value;
-
-    try {
-      const imageUrl = await handleImageUpload(file);
-
-      if (!imageUrl) return;
-
-      // Valid Markdown image syntax.
-      const imageMarkdown = `\n![Pasted image](${imageUrl})\n`;
-
-      const newValue =
-        currentValue.slice(0, start) + imageMarkdown + currentValue.slice(end);
-
-      field.onChange(newValue);
-
-      const newCursorPosition = start + imageMarkdown.length;
-
-      requestAnimationFrame(() => {
-        const currentTextarea = textareaRef.current;
-
-        if (!currentTextarea) return;
-
-        currentTextarea.focus();
-        currentTextarea.setSelectionRange(newCursorPosition, newCursorPosition);
-      });
-    } catch (error) {
-      console.error("Unable to paste image:", error);
-    }
-  }
-
+  /**
+   * Inserts the selected programming language into the code fence.
+   * @param language The language object selected from the menu.
+   */
   function selectLanguage(language: Language) {
     const textarea = textareaRef.current;
     const fenceStart = fenceStartRef.current;
@@ -214,10 +172,9 @@ export function MarkdownContentField({
     const value = textarea.value;
     const cursorPosition = textarea.selectionStart;
 
-    /*
-     * Replace everything between the opening ``` and the cursor
-     * with the selected language, then create the code body and
-     * closing fence.
+    /**
+     * Reconstructs the textarea value with the selected language,
+     * a new line for code, and a closing fence.
      */
     const beforeFence = value.slice(0, fenceStart);
     const afterCursor = value.slice(cursorPosition);
@@ -229,8 +186,9 @@ export function MarkdownContentField({
     field.onChange(updatedValue);
     closeLanguageMenu();
 
-    /*
-     * Place the cursor on the empty line inside the code block.
+    /**
+     * Moves the cursor to the empty line inside the newly created code block,
+     * providing a seamless writing experience.
      */
     const nextCursorPosition =
       beforeFence.length + 3 + language.value.length + 1;
@@ -241,7 +199,11 @@ export function MarkdownContentField({
     });
   }
 
+  /**
+   * Handles keydown events for keyboard navigation within the language menu and for tab indentation.
+   */
   function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    // Handle navigation within the language menu.
     if (showLanguageMenu && filteredLanguages.length > 0) {
       if (event.key === "ArrowDown") {
         event.preventDefault();
@@ -282,8 +244,9 @@ export function MarkdownContentField({
       }
     }
 
-    /*
-     * Insert two spaces when Tab is pressed outside the language menu.
+    /**
+     * Handles the Tab key for indentation when the language menu is not open.
+     * It inserts two spaces at the cursor position.
      */
     if (event.key === "Tab" && !event.shiftKey) {
       event.preventDefault();
@@ -308,6 +271,7 @@ export function MarkdownContentField({
       <div ref={containerRef} className="relative">
         <Textarea
           {...field}
+          // Combine the ref from react-hook-form with our local ref.
           ref={(element) => {
             textareaRef.current = element;
 
@@ -335,6 +299,27 @@ export function MarkdownContentField({
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
         />
+        {/* Button to trigger the hidden file input for image uploads. */}
+        <div className="absolute top-2 right-2 flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="cursor-pointer"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Image className="w-4 h-4 mr-2" />
+            Upload Image
+          </Button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileSelect}
+            accept="image/*"
+            className="hidden"
+          />
+        </div>
+        {/* Live preview pane for the markdown content. */}
         <div className="mt-4 rounded-xl border border-border bg-card p-4">
           <p className="text-sm text-muted-foreground mb-2">Preview</p>
           <div
@@ -345,6 +330,7 @@ export function MarkdownContentField({
           />
         </div>
 
+        {/* The language selection menu, rendered conditionally. */}
         {showLanguageMenu && (
           <div
             role="listbox"
@@ -369,6 +355,7 @@ export function MarkdownContentField({
               duration-150
             "
           >
+            {/* Header of the language menu. */}
             <div className="border-b border-border/60 px-3 py-3">
               <div className="flex items-center gap-2">
                 <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
@@ -384,6 +371,7 @@ export function MarkdownContentField({
                 </div>
               </div>
 
+              {/* Display the current search query. */}
               {languageQuery && (
                 <div className="mt-3 flex items-center gap-2 rounded-lg bg-muted/60 px-2.5 py-2">
                   <Search className="size-3.5 text-muted-foreground" />
@@ -395,6 +383,7 @@ export function MarkdownContentField({
               )}
             </div>
 
+            {/* Scrollable list of filtered languages. */}
             <div className="max-h-64 overflow-y-auto p-1.5 language-menu-scrollbar">
               {filteredLanguages.length > 0 ? (
                 filteredLanguages.map((language, index) => {
@@ -425,9 +414,8 @@ export function MarkdownContentField({
                       `}
                       onMouseEnter={() => setActiveIndex(index)}
                       onMouseDown={(event) => {
-                        /*
-                         * Prevent the textarea from losing focus before
-                         * the language is inserted.
+                        /**
+                         * Prevents the textarea from losing focus, which would close the menu.
                          */
                         event.preventDefault();
                       }}
@@ -469,6 +457,7 @@ export function MarkdownContentField({
               )}
             </div>
 
+            {/* Footer with keyboard navigation hints. */}
             <div className="flex items-center gap-3 border-t border-border/60 bg-muted/30 px-3 py-2 text-[11px] text-muted-foreground">
               <span>
                 <kbd className="rounded border bg-background px-1.5 py-0.5">
