@@ -151,7 +151,9 @@ export default function CommentItem({
                         <FormControl>
                           <MarkdownCommentField
                             field={field}
-                            placeholder="Write a reply... Use ``` for code blocks."
+                            placeholder={`Write a reply... 
+Use \`\`\` for code blocks.
+Paste muched images. or use markdown syntax.`}
                           />
                         </FormControl>
                       </FormItem>

@@ -74,7 +74,9 @@ export default function CommentsSection({ postId }: { postId: any }) {
                     <FormControl>
                       <MarkdownCommentField
                         field={field}
-                        placeholder="Share your thoughts... Use ``` for code blocks."
+                        placeholder={`Share your thoughts... 
+Use \`\`\` for code blocks.
+Paste muched images. or use markdown syntax.`}
                       />
                     </FormControl>
                   </FormItem>

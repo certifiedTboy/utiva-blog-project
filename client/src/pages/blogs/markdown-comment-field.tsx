@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Code2, Search } from "lucide-react";
+import { Check, Code2, Search, Image } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form";
 import { supportedLanguages } from "@/lib/mock-data";
 import { Textarea } from "@/components/ui/textarea";
+import { useFileUpload } from "@/hooks/usefile-upload";
 
 type Language = (typeof supportedLanguages)[number];
 
@@ -21,16 +23,18 @@ export function MarkdownCommentField({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-
-  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
-  const [languageQuery, setLanguageQuery] = useState("");
-  const [activeIndex, setActiveIndex] = useState(0);
-
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   /*
    * Stores the position where the latest opening code fence begins.
    * For example, the index of the first backtick in ```typescript.
    */
   const fenceStartRef = useRef<number | null>(null);
+
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
+  const [languageQuery, setLanguageQuery] = useState("");
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const { handleFileSelect, handlePaste } = useFileUpload(textareaRef, field);
 
   const filteredLanguages = useMemo(() => {
     const query = languageQuery.trim().toLowerCase();
@@ -241,7 +245,29 @@ export function MarkdownCommentField({
           spellCheck={false}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
         />
+
+        {/* Button to trigger the hidden file input for image uploads. */}
+        <div className="absolute top-2 right-2 flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="cursor-pointer"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Image className="w-4 h-4 mr-2" />
+            Upload Image
+          </Button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileSelect}
+            accept="image/*"
+            className="hidden"
+          />
+        </div>
 
         {showLanguageMenu && (
           <div
