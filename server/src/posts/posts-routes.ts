@@ -96,6 +96,13 @@ export class PostRoutes extends AppRoutesHandler {
       this.checkValidationResult,
       PostControllers.addReaction,
     );
+
+    this.routes.post(
+      "/files/upload",
+      this.adminGuard,
+      this.multerUpload().single("file"),
+      PostControllers.uploadFiles,
+    );
   }
 
   private getCreatePostValidationRules() {

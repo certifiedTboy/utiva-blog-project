@@ -18,3 +18,8 @@ export const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN;
 
 export const OAUTH_CLIENT_ID = process.env.OAUTH_CLIENT_ID;
 export const OAUTH_CLIENT_SECRET = process.env.OAUTH_CLIENT_SECRET;
+
+export const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME;
+export const AWS_BUCKET_REGION = process.env.AWS_BUCKET_REGION;
+export const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
+export const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;

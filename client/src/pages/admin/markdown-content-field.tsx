@@ -6,6 +6,7 @@ import { FormControl } from "@/components/ui/form";
 import { supportedLanguages } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import { useUploadFileToAWSs3Mutation } from "@/features/apis/post-apis";
 
 type Language = (typeof supportedLanguages)[number];
 
@@ -26,6 +27,9 @@ export function MarkdownContentField({
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [languageQuery, setLanguageQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
+
+  const [uploadFileToAWSs3] = useUploadFileToAWSs3Mutation();
+
   const { toast } = useToast();
 
   /*
@@ -126,22 +130,29 @@ export function MarkdownContentField({
   }
 
   async function handleImageUpload(file: File) {
-    toast({
-      title: "Uploading Image...",
-      description: "Please wait while the image is being uploaded.",
-    });
+    const formData = new FormData();
+    formData.append("file", file);
 
-    return new Promise<string>((resolve) => {
-      setTimeout(() => {
-        const mockUrl = URL.createObjectURL(file);
-        console.log("Mock URL:", mockUrl);
-        toast({
-          title: "Image Uploaded",
-          description: "The image has been added to your post.",
-        });
-        resolve(mockUrl);
-      }, 1000);
-    });
+    try {
+      toast({
+        title: "Uploading Image...",
+        description: "Please wait while the image is being uploaded.",
+      });
+      const result = await uploadFileToAWSs3(formData).unwrap();
+      toast({
+        title: "Image Uploaded",
+        description: "The image has been added to your post.",
+      });
+      return result.data.url;
+    } catch (error) {
+      toast({
+        title: "Upload Failed",
+        description: "Could not upload the image. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Upload failed:", error);
+      return null;
+    }
   }
 
   async function handlePaste(event: React.ClipboardEvent<HTMLTextAreaElement>) {

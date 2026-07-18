@@ -2,6 +2,7 @@ import { Router, } from "express";
 import { newJwt } from "./jwt.js";
 import { HttpException } from "./exceptions/http-exception.js";
 import { validationResult } from "express-validator";
+import multer from "multer";
 import {} from "./types.js";
 /**
  * @class AppRoutesHandler
@@ -106,5 +107,24 @@ export class AppRoutesHandler {
         }
         req.user = payload;
         next();
+    }
+    /**
+     * @method multerUpload
+     */
+    multerUpload() {
+        const storage = multer.memoryStorage();
+        const fileFilter = (_req, file, cb) => {
+            if (file.mimetype.startsWith("image/")) {
+                cb(null, true);
+            }
+            else {
+                cb(new HttpException(400, "Only image files are allowed!"));
+            }
+        };
+        return multer({
+            storage,
+            fileFilter,
+            limits: { fileSize: 1024 * 1024 * 5 }, // 5MB file size limit
+        });
     }
 }

@@ -1,8 +1,17 @@
 import { HttpException } from "../lib/exceptions/http-exception.js";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { AWS_ACCESS_KEY_ID, AWS_BUCKET_NAME, AWS_BUCKET_REGION, AWS_SECRET_ACCESS_KEY, } from "../lib/constants.js";
 import { Types } from "mongoose";
 import Post, { Comment, Reaction, } from "./posts-model.js";
 import mongoose from "mongoose";
 export class PostServices {
+    static s3 = new S3Client({
+        region: AWS_BUCKET_REGION,
+        credentials: {
+            accessKeyId: AWS_ACCESS_KEY_ID,
+            secretAccessKey: AWS_SECRET_ACCESS_KEY,
+        },
+    });
     /**
      * @static createPost
      * @description Creates a new blog post.
@@ -421,5 +430,17 @@ export class PostServices {
             });
         }
         return { message: "Comment deleted successfully" };
+    }
+    static async uploadFileToAWSs3Bucket(file) {
+        const fileName = `${Date.now()}-${file.originalname.replace(/ /g, "-")}`;
+        const command = new PutObjectCommand({
+            Bucket: AWS_BUCKET_NAME,
+            Key: fileName,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+        });
+        await this.s3.send(command);
+        const url = `https://${AWS_BUCKET_NAME}.s3.${AWS_BUCKET_REGION}.amazonaws.com/${fileName}`;
+        return { url };
     }
 }

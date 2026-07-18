@@ -36,6 +36,7 @@ export class PostRoutes extends AppRoutesHandler {
         this.routes.get("/:postId/reactions", this.checkValidationResult, PostControllers.getReactionsByPost);
         // Add or update a reaction to a post (protected)
         this.routes.post("/:postId/reactions", this.authGuard, this.getAddReactionValidationRules(), this.checkValidationResult, PostControllers.addReaction);
+        this.routes.post("/files/upload", this.adminGuard, this.multerUpload().single("file"), PostControllers.uploadFiles);
     }
     getCreatePostValidationRules() {
         return [

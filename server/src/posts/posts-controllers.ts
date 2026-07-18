@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { ResponseHandler } from "../lib/response-handler.ts";
+import { HttpException } from "../lib/exceptions/http-exception.ts";
 import { PostServices } from "./posts-services.ts";
 import eventEmitter from "../helpers/events.ts";
 
@@ -350,6 +351,27 @@ export class PostControllers {
         commentId,
       });
       return ResponseHandler.ok(res, 202, "Comment deletion has been queued.");
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * @method uploadFiles
+   * @description generate a signed and secured url to upload file on the AWS s3 bucket directly from the client side
+   */
+  public static async uploadFiles(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      if (!req.file) {
+        throw new HttpException(400, "No file uploaded.");
+      }
+
+      const result = await PostServices.uploadFileToAWSs3Bucket(req.file);
+      ResponseHandler.ok(res, 200, "File uploaded successfully", result);
     } catch (error) {
       next(error);
     }

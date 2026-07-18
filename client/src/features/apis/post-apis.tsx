@@ -126,6 +126,15 @@ export const postApis = createApi({
         credentials: "include",
       }),
     }),
+
+    uploadFileToAWSs3: builder.mutation({
+      query: (payload) => ({
+        url: `/posts/files/upload`,
+        method: "POST",
+        body: payload,
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -144,4 +153,5 @@ export const {
   useGetAllCommentsMutation,
   useUpdateCommentMutation,
   useDeleteCommentMutation,
+  useUploadFileToAWSs3Mutation,
 } = postApis;
