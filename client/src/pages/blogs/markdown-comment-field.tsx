@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Code2, Search, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form";
-import { UnsaveConfirmationModal } from "@/components/common/unsave-confirmation-modal";
 import { supportedLanguages } from "@/lib/mock-data";
 import { Textarea } from "@/components/ui/textarea";
 import { useFileUpload } from "@/hooks/usefile-upload";
