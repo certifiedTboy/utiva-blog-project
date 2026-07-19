@@ -125,9 +125,12 @@ export default function DashboardPage() {
               <FileText className="w-12 h-12 mx-auto mb-4 opacity-30" />
               <p className="font-medium">No posts yet</p>
               <p className="text-sm mt-1">Start writing your first article</p>
-              <Link href="/write">
-                <Button className="mt-4 gap-2" data-testid="button-write-first">
-                  <Plus className="w-4 h-4" /> Write Now
+              <Link href="/write" className="cursor-pointer">
+                <Button
+                  className="mt-4 gap-2 cursor-pointer"
+                  data-testid="button-write-first"
+                >
+                  <Plus className="w-4 h-4 cursor-pointer" /> Write Now
                 </Button>
               </Link>
             </div>

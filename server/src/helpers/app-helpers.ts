@@ -37,7 +37,7 @@ export class AppHelpers {
 
       await mongoose.connect(DB_URI);
 
-      console.log("connected to database:", DB_URI);
+      console.log("connected to database");
     } catch (error) {
       console.log(error);
     }

@@ -33,7 +33,7 @@ export class AppHelpers {
             if (!DB_URI)
                 throw new Error("DB_URI is not defined");
             await mongoose.connect(DB_URI);
-            console.log("connected to database:", DB_URI);
+            console.log("connected to database");
         }
         catch (error) {
             console.log(error);
