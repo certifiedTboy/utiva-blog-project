@@ -11,7 +11,7 @@ export default function NotFoundBlog() {
           Article not found
         </h2>
         <Button
-          onClick={() => navigate("/blog")}
+          onClick={() => navigate("/blogs")}
           data-testid="button-back-to-blog"
         >
           Back to Blog

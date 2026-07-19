@@ -30,7 +30,7 @@ export default function Categories() {
             viewport={{ once: true }}
             transition={{ delay: i * 0.08 }}
           >
-            <Link href={`/blog?category=${cat.name}`}>
+            <Link href={`/blogs?category=${cat.name}`}>
               <div
                 className="group p-6 bg-card border border-card-border rounded-xl hover:border-primary/40 hover:shadow-md transition-all duration-300 cursor-pointer text-center"
                 data-testid={`card-category-${cat.id}`}

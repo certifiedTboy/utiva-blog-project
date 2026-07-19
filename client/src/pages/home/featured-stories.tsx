@@ -23,7 +23,7 @@ export default function FeaturedStories() {
             Handpicked articles from our editors
           </p>
         </div>
-        <Link href="/blog">
+        <Link href="/blogs">
           <Button
             variant="ghost"
             className="gap-2 hidden sm:flex"

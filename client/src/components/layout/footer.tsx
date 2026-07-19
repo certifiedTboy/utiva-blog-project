@@ -6,7 +6,7 @@ export default function Footer() {
           <span className="font-serif font-semibold text-foreground">
             Ade's Notes
           </span>
-          <span>· A place where I share my thoughtful ideas...</span>
+          {/* <span>· A place where I share my thoughtful ideas...</span> */}
         </div>
 
         <p>© {new Date().getFullYear()} Ade's Notes</p>

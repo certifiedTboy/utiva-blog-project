@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminContext } from "@/features/context/admin-context";
 import { ConfirmationModal } from "@/components/common/confirmation-modal";
-import { PageMetadata } from "@/components/common/page-metadata";
 import { ADMIN_TABS } from "@/lib/mock-data";
 import type { IPost } from "@/lib/types";
 
@@ -48,10 +47,6 @@ export default function AdminPostsPage() {
 
   return (
     <div className="min-h-screen pt-24 pb-20">
-      <PageMetadata
-        title="Manage Posts"
-        description="View, search, and manage all posts on the platform."
-      />
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">

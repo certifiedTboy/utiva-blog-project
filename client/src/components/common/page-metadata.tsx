@@ -7,7 +7,7 @@ interface PageMetadataProps {
 
 export function PageMetadata({ title, description }: PageMetadataProps) {
   useEffect(() => {
-    document.title = `${title} | Ade's Note`;
+    document.title = `${title}`;
 
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {

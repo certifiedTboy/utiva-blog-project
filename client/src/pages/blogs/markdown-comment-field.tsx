@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Code2, Search, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form";
+import { UnsaveConfirmationModal } from "@/components/common/unsave-confirmation-modal";
 import { supportedLanguages } from "@/lib/mock-data";
 import { Textarea } from "@/components/ui/textarea";
 import { useFileUpload } from "@/hooks/usefile-upload";
@@ -218,20 +219,21 @@ export function MarkdownCommentField({
   }
 
   return (
-    <FormControl>
-      <div ref={containerRef} className="relative">
-        <Textarea
-          {...field}
-          ref={(element) => {
-            textareaRef.current = element;
+    <>
+      <FormControl>
+        <div ref={containerRef} className="relative">
+          <Textarea
+            {...field}
+            ref={(element) => {
+              textareaRef.current = element;
 
-            if (typeof field.ref === "function") {
-              field.ref(element);
-            }
-          }}
-          value={field.value ?? ""}
-          placeholder={placeholder ?? "Write a reply..."}
-          className="
+              if (typeof field.ref === "function") {
+                field.ref(element);
+              }
+            }}
+            value={field.value ?? ""}
+            placeholder={placeholder ?? "Write a reply..."}
+            className="
             min-h-[120px]
             resize-y
             rounded-xl
@@ -241,39 +243,39 @@ export function MarkdownCommentField({
             text-sm
             leading-6
           "
-          data-testid="input-content"
-          spellCheck={false}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          onPaste={handlePaste}
-        />
-
-        {/* Button to trigger the hidden file input for image uploads. */}
-        <div className="absolute top-2 right-2 flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            className="cursor-pointer"
-            size="sm"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Image className="w-4 h-4 mr-2" />
-            Upload Image
-          </Button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileSelect}
-            accept="image/*"
-            className="hidden"
+            data-testid="input-content"
+            spellCheck={false}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
           />
-        </div>
 
-        {showLanguageMenu && (
-          <div
-            role="listbox"
-            aria-label="Supported programming languages"
-            className="
+          {/* Button to trigger the hidden file input for image uploads. */}
+          <div className="absolute top-2 right-2 flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="cursor-pointer"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Image className="w-4 h-4 mr-2" />
+              Upload Image
+            </Button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              accept="image/*"
+              className="hidden"
+            />
+          </div>
+
+          {showLanguageMenu && (
+            <div
+              role="listbox"
+              aria-label="Supported programming languages"
+              className="
               absolute
               left-3
               top-14
@@ -292,45 +294,45 @@ export function MarkdownCommentField({
               zoom-in-95
               duration-150
             "
-          >
-            <div className="border-b border-border/60 px-3 py-3">
-              <div className="flex items-center gap-2">
-                <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
-                  <Code2 className="size-4 text-primary" />
+            >
+              <div className="border-b border-border/60 px-3 py-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
+                    <Code2 className="size-4 text-primary" />
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">Select a language</p>
+
+                    <p className="truncate text-xs text-muted-foreground">
+                      Continue typing to filter the list
+                    </p>
+                  </div>
                 </div>
 
-                <div className="min-w-0">
-                  <p className="text-sm font-medium">Select a language</p>
+                {languageQuery && (
+                  <div className="mt-3 flex items-center gap-2 rounded-lg bg-muted/60 px-2.5 py-2">
+                    <Search className="size-3.5 text-muted-foreground" />
 
-                  <p className="truncate text-xs text-muted-foreground">
-                    Continue typing to filter the list
-                  </p>
-                </div>
+                    <span className="truncate font-mono text-xs">
+                      {languageQuery}
+                    </span>
+                  </div>
+                )}
               </div>
 
-              {languageQuery && (
-                <div className="mt-3 flex items-center gap-2 rounded-lg bg-muted/60 px-2.5 py-2">
-                  <Search className="size-3.5 text-muted-foreground" />
+              <div className="max-h-64 overflow-y-auto p-1.5 language-menu-scrollbar">
+                {filteredLanguages.length > 0 ? (
+                  filteredLanguages.map((language, index) => {
+                    const isActive = index === activeIndex;
 
-                  <span className="truncate font-mono text-xs">
-                    {languageQuery}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div className="max-h-64 overflow-y-auto p-1.5 language-menu-scrollbar">
-              {filteredLanguages.length > 0 ? (
-                filteredLanguages.map((language, index) => {
-                  const isActive = index === activeIndex;
-
-                  return (
-                    <button
-                      key={`${language.label}-${language.value}`}
-                      type="button"
-                      role="option"
-                      aria-selected={isActive}
-                      className={`
+                    return (
+                      <button
+                        key={`${language.label}-${language.value}`}
+                        type="button"
+                        role="option"
+                        aria-selected={isActive}
+                        className={`
                         flex
                         w-full
                         items-center
@@ -347,23 +349,23 @@ export function MarkdownCommentField({
                             : "hover:bg-muted"
                         }
                       `}
-                      onMouseEnter={() => setActiveIndex(index)}
-                      onMouseDown={(event) => {
-                        /*
-                         * Prevent the textarea from losing focus before
-                         * the language is inserted.
-                         */
-                        event.preventDefault();
-                      }}
-                      onClick={() => selectLanguage(language)}
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium">
-                          {language.label}
-                        </p>
+                        onMouseEnter={() => setActiveIndex(index)}
+                        onMouseDown={(event) => {
+                          /*
+                           * Prevent the textarea from losing focus before
+                           * the language is inserted.
+                           */
+                          event.preventDefault();
+                        }}
+                        onClick={() => selectLanguage(language)}
+                      >
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium">
+                            {language.label}
+                          </p>
 
-                        <p
-                          className={`
+                          <p
+                            className={`
                             truncate font-mono text-xs
                             ${
                               isActive
@@ -371,53 +373,54 @@ export function MarkdownCommentField({
                                 : "text-muted-foreground"
                             }
                           `}
-                        >
-                          ```{language.value}
-                        </p>
-                      </div>
+                          >
+                            ```{language.value}
+                          </p>
+                        </div>
 
-                      {isActive && <Check className="size-4 shrink-0" />}
-                    </button>
-                  );
-                })
-              ) : (
-                <div className="px-4 py-8 text-center">
-                  <Code2 className="mx-auto mb-2 size-6 text-muted-foreground" />
+                        {isActive && <Check className="size-4 shrink-0" />}
+                      </button>
+                    );
+                  })
+                ) : (
+                  <div className="px-4 py-8 text-center">
+                    <Code2 className="mx-auto mb-2 size-6 text-muted-foreground" />
 
-                  <p className="text-sm font-medium">No language found</p>
+                    <p className="text-sm font-medium">No language found</p>
 
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Try another language name or alias.
-                  </p>
-                </div>
-              )}
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Try another language name or alias.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3 border-t border-border/60 bg-muted/30 px-3 py-2 text-[11px] text-muted-foreground">
+                <span>
+                  <kbd className="rounded border bg-background px-1.5 py-0.5">
+                    ↑↓
+                  </kbd>{" "}
+                  navigate
+                </span>
+
+                <span>
+                  <kbd className="rounded border bg-background px-1.5 py-0.5">
+                    Enter
+                  </kbd>{" "}
+                  select
+                </span>
+
+                <span>
+                  <kbd className="rounded border bg-background px-1.5 py-0.5">
+                    Esc
+                  </kbd>{" "}
+                  close
+                </span>
+              </div>
             </div>
-
-            <div className="flex items-center gap-3 border-t border-border/60 bg-muted/30 px-3 py-2 text-[11px] text-muted-foreground">
-              <span>
-                <kbd className="rounded border bg-background px-1.5 py-0.5">
-                  ↑↓
-                </kbd>{" "}
-                navigate
-              </span>
-
-              <span>
-                <kbd className="rounded border bg-background px-1.5 py-0.5">
-                  Enter
-                </kbd>{" "}
-                select
-              </span>
-
-              <span>
-                <kbd className="rounded border bg-background px-1.5 py-0.5">
-                  Esc
-                </kbd>{" "}
-                close
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
-    </FormControl>
+          )}
+        </div>
+      </FormControl>
+    </>
   );
 }

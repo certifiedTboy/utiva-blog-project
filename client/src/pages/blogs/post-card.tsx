@@ -23,7 +23,7 @@ export default function PostCard({
   variant = "default",
 }: PostCardProps) {
   return (
-    <Link href={`/blog/${post?.slug}`}>
+    <Link href={`/blogs/${post?.slug}`}>
       <motion.article
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -43,10 +43,8 @@ export default function PostCard({
         )}
         <div className="p-5">
           <div className="flex items-center justify-between text-xs text-muted-foreground gap-2 mb-2">
-            {/* @ts-ignore */}
             {post?.categoryName && (
               <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                {/* @ts-ignore */}
                 {post.categoryName}
               </span>
             )}

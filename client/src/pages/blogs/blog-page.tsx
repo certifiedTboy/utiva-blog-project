@@ -6,7 +6,6 @@ import { TAGS } from "@/lib/mock-data";
 import PostCard from "@/pages/blogs/post-card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PageMetadata } from "@/components/common/page-metadata";
 import BookOpenIcon from "./book-open-icon";
 
 const PAGE_SIZE = 9;
@@ -47,10 +46,6 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen pt-24 pb-20">
-      <PageMetadata
-        title="The Blog"
-        description="Discover articles on web development, design, and more."
-      />
       <div className="max-w-7xl mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

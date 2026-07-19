@@ -5,7 +5,6 @@ import { Shield, Trash2, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminContext } from "@/features/context/admin-context";
-import { PageMetadata } from "@/components/common/page-metadata";
 import { ConfirmationModal } from "@/components/common/confirmation-modal";
 import type { Comment } from "@/lib/types";
 import { ADMIN_TABS } from "@/lib/mock-data";
@@ -37,10 +36,6 @@ export default function AdminCommentsPage() {
 
   return (
     <div className="min-h-screen pt-24 pb-20">
-      <PageMetadata
-        title="Manage Comments"
-        description="View and delete comments from users."
-      />
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">

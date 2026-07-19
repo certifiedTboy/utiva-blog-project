@@ -34,7 +34,6 @@ import {
   useUpdatePostMutation,
 } from "@/features/apis/post-apis";
 import { useAdminContext } from "@/features/context/admin-context";
-import { PageMetadata } from "@/components/common/page-metadata";
 
 export default function WritePage() {
   const [, params] = useRoute("/write/:id");
@@ -93,6 +92,8 @@ export default function WritePage() {
         },
   });
 
+  const { isDirty } = form.formState;
+
   function addTag() {
     const t = tagInput.trim();
     if (t && !tags.includes(t)) setTags((prev) => [...prev, t]);
@@ -104,6 +105,17 @@ export default function WritePage() {
   }
 
   const isLoading = isCreating || isUpdating;
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (isDirty) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isDirty]);
 
   useEffect(() => {
     if (isCreateSuccess || isUpdateSuccess) {
@@ -136,6 +148,7 @@ export default function WritePage() {
   ]);
 
   function onSubmit(data: PostFormData, asDraft = false) {
+    form.reset(data); // Mark form as not dirty
     const status = asDraft ? "draft" : data.status;
     const payload = { ...data, tags, status };
 
@@ -150,10 +163,6 @@ export default function WritePage() {
 
   return (
     <div className="min-h-screen pt-20 pb-20">
-      <PageMetadata
-        title={editId ? "Edit Post" : "Write a New Post"}
-        description="Share your ideas with the world."
-      />
       <div className="max-w-4xl mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

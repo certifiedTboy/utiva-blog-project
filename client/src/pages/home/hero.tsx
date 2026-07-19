@@ -1,6 +1,10 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { BookOpen, Sparkles } from "lucide-react";
+import {
+  BookOpen,
+  // Sparkles,
+  // ArrowRight
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Hero() {
@@ -16,15 +20,14 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <motion.span
+          {/* <motion.span
             className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary bg-primary/10 px-4 py-2 rounded-full mb-6"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <Sparkles className="w-3 h-3" /> Discover essays, tutorials, and
-            stories that make you think.
-          </motion.span>
+            <Sparkles className="w-3 h-3" /> Welcome to a world of ideas
+          </motion.span> */}
 
           <motion.h1
             className="font-serif text-5xl sm:text-6xl lg:text-7xl font-semibold text-foreground leading-tight mb-6"
@@ -32,10 +35,18 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.7 }}
           >
-            Ideas worth
-            <br />
-            <span className="text-primary italic">reading</span>
+            Where Curiosity
+            <br /> Meets Content
           </motion.h1>
+          <motion.p
+            className="max-w-2xl mx-auto text-lg text-muted-foreground mb-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.7 }}
+          >
+            Journey through a curated collection of fascinating essays, in-depth
+            tutorials, and captivating stories designed to spark your curiosity.
+          </motion.p>
 
           <motion.div
             className="flex flex-col sm:flex-row gap-4 justify-center"
@@ -43,10 +54,10 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
           >
-            <Link href="/blog" className="cursor-pointer">
+            <Link href="/blogs">
               <Button
                 size="lg"
-                className="gap-2 text-base px-8 cursor-pointer"
+                className="gap-2 cursor-pointer text-base px-8"
                 data-testid="button-explore-blog"
               >
                 <BookOpen className="w-5 h-5" /> Explore Blog
@@ -59,35 +70,11 @@ export default function Hero() {
                 className="gap-2 text-base px-8"
                 data-testid="button-start-writing"
               >
-                Start Writing <ArrowRight className="w-5 h-5" />
+                Start Writing
               </Button>
             </Link> */}
           </motion.div>
         </motion.div>
-
-        {/* <motion.div
-          className="mt-20 text-sm text-muted-foreground"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-        >
-          <div className="flex items-center justify-center gap-8">
-            {[
-              ["5+", "Articles"],
-              ["4+", "Authors"],
-              ["5+", "Topics"],
-            ].map(([num, label]) => (
-              <div key={label} className="text-center">
-                <div className="font-serif text-2xl font-semibold text-foreground">
-                  {num}
-                </div>
-                <div className="text-xs uppercase tracking-wider mt-1">
-                  {label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div> */}
       </div>
     </section>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { useRoute, useLocation } from "wouter";
+import { useRoute } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, Clock, Eye } from "lucide-react";
 import { transform } from "./transform";
@@ -11,13 +11,16 @@ import ReactionsPanel from "./reaction-panel";
 import CommentsSection from "./comments-section";
 import { usePosts } from "@/features/context/post-context";
 import NotFoundBlog from "./not-found-blog";
-import { PageMetadata } from "@/components/common/page-metadata";
+import { useUnsaveContext } from "@/features/context/unsave-context";
 
 export default function PostDetailPage() {
   const { posts: POSTS, viewPostsDetails } = usePosts();
-  const [, params] = useRoute("/blog/:slug");
-  const [, navigate] = useLocation();
+  const [, params] = useRoute("/blogs/:slug");
+  // const [, navigate] = useLocation();
   const { isAuthenticated: isSignedIn } = useAuth();
+
+  const { navigate } = useUnsaveContext();
+
   const slug = params?.slug ?? "";
 
   const post = POSTS.find((p) => p.slug === slug);
@@ -42,9 +45,6 @@ export default function PostDetailPage() {
     return <NotFoundBlog />;
   }
 
-  const metaDescription =
-    post?.excerpt || post?.content.substring(0, 155) + "...";
-
   const credit = post?.coverImageCredit;
   let creditText = credit;
   let creditUrl: string | undefined;
@@ -59,9 +59,6 @@ export default function PostDetailPage() {
 
   return (
     <div className="min-h-screen pt-20 pb-20">
-      {post && post?.title && metaDescription && (
-        <PageMetadata title={post.title} description={metaDescription} />
-      )}
       <ReadingProgress />
       {post?.coverImage && (
         <motion.div

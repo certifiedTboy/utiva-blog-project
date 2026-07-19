@@ -13,14 +13,16 @@ import SignUpPage from "@/pages/auth/signup-page";
 import AccountVerificationPage from "@/pages/auth/account-verification-page";
 import PasswordResetRequestPage from "@/pages/auth/password-reset-request-page";
 import PasswordUpdatePage from "@/pages/auth/password-update-page";
+import About from "@/pages/about";
 import NotFound from "@/pages/not-found";
 
 export default function Router() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
-      <Route path="/blog" component={BlogPage} />
-      <Route path="/blog/:slug" component={PostDetailPage} />
+      <Route path="/blogs" component={BlogPage} />
+      <Route path="/about" component={About} />
+      <Route path="/blogs/:slug" component={PostDetailPage} />
       <Route path="/write" component={WritePage} />
       <Route path="/write/:id" component={WritePage} />
       <Route path="/dashboard" component={DashboardPage} />
