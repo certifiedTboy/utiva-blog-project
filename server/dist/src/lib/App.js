@@ -54,8 +54,8 @@ export class App {
         this.app.use(this.limiter);
         this.app.use(cors(this.corsConfig));
         this.app.use(cookieParser());
-        this.app.use(express.json({ limit: "10kb" }));
-        this.app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+        this.app.use(express.json({ limit: "100kb" }));
+        this.app.use(express.urlencoded({ extended: true, limit: "100kb" }));
     }
     errorHandlers() {
         this.app.use(notFoundException);
