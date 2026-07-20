@@ -29,6 +29,7 @@ const newApp = new ExpressApp({
     "https://adesnotes.vercel.app",
     "https://adesnotes-git-main-certifiedtboys-projects.vercel.app",
     "https://adesnotes-i8wbnwv8b-certifiedtboys-projects.vercel.app",
+    "https://www.adesnotes.tech",
   ],
   credentials: true,
 });
