@@ -7,12 +7,12 @@
   "type": "module",
   "main": "server.ts",
   "scripts": {
-    "start": "node dist/src/server.js",
+    "start": "node build/src/server.js",
     "build": "tsc",
-    "copy-assets": "cpx --watch \"src/helpers/templates/**/*\" \"dist/src/helpers/templates\"",
-    "dev": "concurrently \"tsc -w\" \"npm:copy-assets\" \"nodemon dist/src/server.js\"",
+    "copy-assets": "cpx --watch \"src/helpers/templates/**/*\" \"build/src/helpers/templates\"",
+    "dev": "concurrently \"tsc -w\" \"npm:copy-assets\" \"nodemon build/src/server.js\"",
     "new": "ts-node src/server.ts",
-    "start:prod": "node dist/src/server.js"
+    "start:prod": "node build/src/server.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1090.0",

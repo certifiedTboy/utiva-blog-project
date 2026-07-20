@@ -16,7 +16,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --only=prod
 
-COPY --from=build /app/dist ./dist
+COPY --from=build /dist ./dist
 
 EXPOSE 9000
 CMD ["npm", "run", "start:prod"]
