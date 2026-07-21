@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Build and Deploy to Azure Container Apps
 
 on:
   push:
@@ -7,16 +7,18 @@ on:
 
 env:
   IMAGE_NAME: certifiedtboy/adesnotesserver
-  IMAGE_TAG: v3.0.2
+  IMAGE_TAG: latest
   CONTAINER_APP_NAME: adesnotesserver
   RESOURCE_GROUP: adesnotes
 
 jobs:
   deploy:
+    name: Build, Push & Deploy
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -24,36 +26,32 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Image
+      - name: Build Docker Image
         run: |
           docker build \
-            -t $IMAGE_NAME:latest \
+            --pull \
+            -f ./server/Dockerfile \
             -t $IMAGE_NAME:$IMAGE_TAG \
-            .
+            ./server
 
-      - name: Push Image
+      - name: Push Docker Image
         run: |
-          docker push $IMAGE_NAME:latest
           docker push $IMAGE_NAME:$IMAGE_TAG
 
-      - name: Azure Login
+      - name: Login to Azure
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Update Container App
+      - name: Deploy to Azure Container Apps
+        shell: bash
         run: |
-          az containerapp update \
-            --name $CONTAINER_APP_NAME \
-            --resource-group $RESOURCE_GROUP \
-            --image $IMAGE_NAME:$IMAGE_TAG
+          set -e
 
-      - name: Update Azure Container App
-        run: |
           az containerapp update \
-            --name adesnotesserver \
-            --resource-group adesnotes \
-            --image certifiedtboy/adesnotesserver:v3.0.2 \
+            --name "$CONTAINER_APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --image "$IMAGE_NAME:$IMAGE_TAG" \
             --set-env-vars \
               ACCESS_TOKEN_EXPIRES_IN="${{ secrets.ACCESS_TOKEN_EXPIRES_IN }}" \
               ACCESS_TOKEN_SECRET="${{ secrets.ACCESS_TOKEN_SECRET }}" \
