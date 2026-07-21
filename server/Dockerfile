@@ -1,10 +1,10 @@
 # --- Build Stage ---
-FROM node:lts-alpine as build
+FROM node:lts-alpine AS build
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install   # install dev + prod
+RUN npm install --legacy-peer-deps
 
 COPY . .
 RUN npm run build
@@ -14,7 +14,7 @@ FROM node:lts-alpine
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --only=prod
+RUN npm install --omit=dev --legacy-peer-deps
 
 COPY --from=build /app/dist ./dist
 
