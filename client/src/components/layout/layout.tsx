@@ -85,6 +85,23 @@ export default function Layout() {
       description:
         "Join the Ade's Notes community. Create an account to start writing your own articles, reacting to posts, and joining the conversation.",
     };
+  } else if (location === "/account-verification") {
+    metaData = {
+      title: "Ade's Notes | Account Verification",
+      description: "Verify you account with the OTP sent to your email address",
+    };
+  } else if (location === "/password-reset") {
+    metaData = {
+      title: "Ade's Notes | Password Reset",
+      description:
+        "Reset your password with the OTP sent to your email address",
+    };
+  } else if (location === "/password-update") {
+    metaData = {
+      title: "Ade's Notes | Password Update",
+      description:
+        "Update your password with the OTP sent to your email address",
+    };
   } else {
     metaData = {
       title: "404 - Page Not Found",
