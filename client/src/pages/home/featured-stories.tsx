@@ -3,10 +3,11 @@ import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
 import { usePosts } from "@/features/context/post-context";
 import PostCard from "@/pages/blogs/post-card";
+import PostCardSkeleton from "./post-card-skeleton";
 import { Button } from "@/components/ui/button";
 
 export default function FeaturedStories() {
-  const { featuredPosts } = usePosts();
+  const { featuredPosts, isLoading } = usePosts();
   return (
     <section className="py-20 px-4 max-w-7xl mx-auto">
       <motion.div
@@ -35,9 +36,18 @@ export default function FeaturedStories() {
       </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {featuredPosts.map((post, i) => (
-          <PostCard key={post._id} post={post} index={i} variant="featured" />
-        ))}
+        {isLoading
+          ? Array.from({ length: 3 }).map((_, i) => (
+              <PostCardSkeleton key={i} variant="featured" />
+            ))
+          : featuredPosts.map((post, i) => (
+              <PostCard
+                key={post._id}
+                post={post}
+                index={i}
+                variant="featured"
+              />
+            ))}
       </div>
     </section>
   );

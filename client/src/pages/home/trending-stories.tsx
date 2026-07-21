@@ -2,9 +2,10 @@ import { motion } from "framer-motion";
 import { TrendingUp } from "lucide-react";
 import { usePosts } from "@/features/context/post-context";
 import PostCard from "@/pages/blogs/post-card";
+import PostCardSkeleton from "./post-card-skeleton";
 
 export default function TrendingStories() {
-  const { trendingPosts } = usePosts();
+  const { trendingPosts, isLoading } = usePosts();
   return (
     <section className="py-16 bg-muted/40">
       <div className="max-w-7xl mx-auto px-4">
@@ -21,9 +22,18 @@ export default function TrendingStories() {
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-          {trendingPosts.map((post, i) => (
-            <PostCard key={post._id} post={post} index={i} variant="compact" />
-          ))}
+          {isLoading
+            ? Array.from({ length: 5 }).map((_, i) => (
+                <PostCardSkeleton key={i} variant="compact" />
+              ))
+            : trendingPosts.map((post, i) => (
+                <PostCard
+                  key={post._id}
+                  post={post}
+                  index={i}
+                  variant="compact"
+                />
+              ))}
         </div>
       </div>
     </section>

@@ -7,11 +7,13 @@ import PostCard from "@/pages/blogs/post-card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import BookOpenIcon from "./book-open-icon";
+import PostCardSkeleton from "../home/post-card-skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const PAGE_SIZE = 9;
 
 export default function BlogPage() {
-  const { posts: allPosts, categories: CATEGORIES } = usePosts();
+  const { posts: allPosts, categories: CATEGORIES, isLoading } = usePosts();
 
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -29,7 +31,6 @@ export default function BlogPage() {
           p.excerpt?.toLowerCase().includes(search.toLowerCase());
 
         const matchCat =
-          //@ts-ignore
           !selectedCategory || p.categoryName === selectedCategory;
         const matchTag = !selectedTag || p.tags.includes(selectedTag);
         return matchSearch && matchCat && matchTag;
@@ -128,14 +129,20 @@ export default function BlogPage() {
               </div>
             )}
 
-            {posts && posts.length > 0 ? (
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <PostCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : posts && posts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {posts.map((post, i) => (
                   <PostCard key={i} post={post} index={i} />
                 ))}
               </div>
             ) : (
-              <div className="text-center py-20 text-muted-foreground">
+              <div className="text-center py-20 text-muted-foreground border-2 border-dashed border-border rounded-xl">
                 <BookOpenIcon className="w-12 h-12 mx-auto mb-4 opacity-30" />
                 <p className="text-lg font-medium">No articles found</p>
                 <p className="text-sm mt-1">
@@ -144,7 +151,7 @@ export default function BlogPage() {
               </div>
             )}
 
-            {totalPages && totalPages > 1 && (
+            {!isLoading && totalPages && totalPages > 1 && (
               <div className="flex justify-center gap-2 mt-12">
                 <Button
                   variant="outline"
@@ -181,32 +188,42 @@ export default function BlogPage() {
               <h3 className="font-serif text-lg font-semibold text-foreground mb-4">
                 Categories
               </h3>
-              <div className="space-y-1">
-                <button
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${!selectedCategory ? "bg-primary text-primary-foreground" : "hover:bg-muted text-foreground"}`}
-                  onClick={() => {
-                    setSelectedCategory("");
-                    setPage(1);
-                  }}
-                  data-testid="button-category-all"
-                >
-                  All Topics
-                </button>
-                {CATEGORIES.map((cat) => (
+              {isLoading ? (
+                <div className="space-y-2">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Skeleton key={i} className="h-8 w-full" />
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-1">
                   <button
-                    key={cat.id}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex justify-between ${selectedCategory === cat.name ? "bg-primary text-primary-foreground" : "hover:bg-muted text-foreground"}`}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${!selectedCategory ? "bg-primary text-primary-foreground" : "hover:bg-muted text-foreground"}`}
                     onClick={() => {
-                      setSelectedCategory(cat.name);
+                      setSelectedCategory("");
                       setPage(1);
                     }}
-                    data-testid={`button-category-${cat.id}`}
+                    data-testid="button-category-all"
                   >
-                    <span>{cat.name}</span>
-                    <span className="opacity-60 text-xs">{cat.postCount}</span>
+                    All Topics
                   </button>
-                ))}
-              </div>
+                  {CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.id}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex justify-between ${selectedCategory === cat.name ? "bg-primary text-primary-foreground" : "hover:bg-muted text-foreground"}`}
+                      onClick={() => {
+                        setSelectedCategory(cat.name);
+                        setPage(1);
+                      }}
+                      data-testid={`button-category-${cat.id}`}
+                    >
+                      <span>{cat.name}</span>
+                      <span className="opacity-60 text-xs">
+                        {cat.postCount}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </motion.div>
 
             <motion.div

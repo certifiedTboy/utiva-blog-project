@@ -13,6 +13,7 @@ export interface PostContextType {
   featuredPosts: IPost[];
   trendingPosts: IPost[];
   viewPostsDetails: (id: string) => void;
+  isLoading: boolean;
 }
 
 const PostContext = createContext<PostContextType>({
@@ -22,6 +23,7 @@ const PostContext = createContext<PostContextType>({
   featuredPosts: [],
   trendingPosts: [],
   viewPostsDetails: () => {},
+  isLoading: true,
 });
 
 let tempPosts: IPost[] = [];
@@ -33,7 +35,7 @@ export const PostContextProvider = ({ children }: React.PropsWithChildren) => {
   const [featuredPosts, setFeaturedPosts] = useState<IPost[]>([]);
   const [trendingPosts, setTrendingPosts] = useState<IPost[]>([]);
 
-  const [getPublishedPosts, { data, isSuccess }] =
+  const [getPublishedPosts, { data, isSuccess, isLoading }] =
     useGetPublishedPostsMutation();
 
   const [updatePostViewCount] = useUpdatePostViewCountMutation();
@@ -103,6 +105,7 @@ export const PostContextProvider = ({ children }: React.PropsWithChildren) => {
     featuredPosts,
     trendingPosts,
     viewPostsDetails,
+    isLoading,
   };
 
   return <PostContext.Provider value={value}>{children}</PostContext.Provider>;
