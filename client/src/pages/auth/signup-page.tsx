@@ -2,29 +2,24 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { PenLine } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
 import { Button } from "@/components/ui/button";
 import Github from "./github";
 import Microsoft from "./microsoft";
+import Google from "./google";
 import { useToast } from "@/hooks/use-toast";
 import {
   useLoginWithGoogleMutation,
   useLoginWithGithubMutation,
 } from "@/features/apis/auth-apis";
 import { useAuth } from "@/features/context/auth-context";
-
-const visitGithubConsentScreen = () => {
-  const params = new URLSearchParams({
-    client_id: import.meta.env.VITE_GITHUB_CLIENT_ID,
-    scope: "read:user user:email",
-  });
-
-  window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
-};
+import { useSigninStrategy } from "@/hooks/use-signin-strategy";
 
 export default function SignUpPage() {
   const [, navigate] = useLocation();
   const { checkUserIsAuthenticated } = useAuth();
+
+  const { visitGithubConsentScreen } = useSigninStrategy();
 
   const [
     loginWithGoogle,
@@ -48,6 +43,12 @@ export default function SignUpPage() {
   ] = useLoginWithGithubMutation();
 
   const { toast } = useToast();
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: (tokenResponse) =>
+      loginWithGoogle({ token: tokenResponse.access_token }),
+    flow: "implicit",
+  });
 
   useEffect(() => {
     const queryString = window?.location.search;
@@ -166,23 +167,14 @@ export default function SignUpPage() {
               <Microsoft className="mr-2 h-4 w-4" />
               Continue with Microsoft
             </Button>
-            <div className="flex justify-center">
-              <GoogleLogin
-                onSuccess={(credentialResponse) => {
-                  loginWithGoogle({ token: credentialResponse.credential });
-                }}
-                onError={() => {
-                  toast({
-                    title: "Google Sign-in Failed",
-                    description: "Something went wrong",
-                    variant: "destructive",
-                  });
-                }}
-                theme="outline"
-                text="continue_with"
-                shape="rectangular"
-              />
-            </div>
+            <Button
+              variant="outline"
+              className="w-full cursor-pointer"
+              onClick={() => handleGoogleLogin()}
+            >
+              <Google className="mr-2 h-5 w-5" />
+              Continue with Google
+            </Button>
           </div>
         </div>
       </motion.div>
