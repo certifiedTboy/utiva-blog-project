@@ -81,7 +81,7 @@ export class UserServices {
    * @returns {Promise<IUser>} A promise that resolves to an object containing the user's email.
    * @throws {HttpException} If the user already exists and is verified.
    */
-  public static async createGoogleUser(userData: IUser) {
+  public static async createNewUser(userData: IUser) {
     const userExist = await this.checkIfUserExistByEmail(userData.email);
 
     if (userExist) {

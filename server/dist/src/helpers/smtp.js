@@ -11,14 +11,6 @@ import { SMTP_API_KEY, EMAIL_FROM } from "../lib/constants.js";
 class EmailService {
     transporter;
     constructor() {
-        // this.transporter = nodemailer.createTransport({
-        //   host: SMTP_HOST,
-        //   port: SMTP_PORT,
-        //   auth: {
-        //     user: "hello@adesnotes.tech",
-        //     pass: SMTP_PASS,
-        //   },
-        // } as TransportOptions);
         this.transporter = nodemailer.createTransport(MailtrapTransport({
             token: SMTP_API_KEY,
         }));

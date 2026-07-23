@@ -58,7 +58,9 @@ export class App {
         this.app.use(express.urlencoded({ extended: true, limit: "100kb" }));
     }
     errorHandlers() {
+        // @ts-ignore
         this.app.use(notFoundException);
+        // @ts-ignore
         this.app.use(globalExceptionHandler);
     }
 }

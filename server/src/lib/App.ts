@@ -71,7 +71,9 @@ export abstract class App {
   }
 
   private errorHandlers() {
+    // @ts-ignore
     this.app.use(notFoundException);
+    // @ts-ignore
     this.app.use(globalExceptionHandler);
   }
 

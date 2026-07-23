@@ -57,6 +57,14 @@ export const authApis = createApi({
         body: payload,
       }),
     }),
+
+    loginWithGithub: builder.mutation({
+      query: (payload) => ({
+        url: `/auth/login/github?code=${payload}`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -66,4 +74,5 @@ export const {
   useGetNewTokenMutation,
   useUpdatePasswordMutation,
   useLoginWithGoogleMutation,
+  useLoginWithGithubMutation,
 } = authApis;

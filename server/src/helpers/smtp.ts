@@ -13,15 +13,6 @@ class EmailService {
   private transporter: nodemailer.Transporter;
 
   constructor() {
-    // this.transporter = nodemailer.createTransport({
-    //   host: SMTP_HOST,
-    //   port: SMTP_PORT,
-    //   auth: {
-    //     user: "hello@adesnotes.tech",
-    //     pass: SMTP_PASS,
-    //   },
-    // } as TransportOptions);
-
     this.transporter = nodemailer.createTransport(
       MailtrapTransport({
         token: SMTP_API_KEY!,

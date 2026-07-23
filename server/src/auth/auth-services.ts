@@ -4,7 +4,13 @@ import { UserServices } from "../users/user-services.ts";
 import { newJwt } from "../lib/jwt.ts";
 import eventEmitter from "../helpers/events.ts";
 import { AppHelpers } from "../helpers/app-helpers.ts";
-import { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET } from "../lib/constants.ts";
+import {
+  OAUTH_CLIENT_ID,
+  OAUTH_CLIENT_SECRET,
+  GITHUB_OAUTH_CLIENT_ID,
+  GITHUB_OAUTH_SECRET,
+} from "../lib/constants.ts";
+import axios from "axios";
 
 /**
  * @class AuthServices
@@ -107,7 +113,96 @@ export class AuthServices {
       picture: payload?.picture!,
     };
 
-    const user = await UserServices.createGoogleUser(userData);
+    const user = await UserServices.createNewUser(userData);
+
+    const accessToken = newJwt.generateAccessToken({
+      id: user._id?.toString(),
+      email: user.email,
+      role: user.role,
+    });
+
+    const refreshToken = newJwt.generateRefreshToken({
+      id: user._id?.toString(),
+      email: user.email,
+      role: user.role,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role || "user",
+        picture: user.picture,
+      },
+    };
+  }
+
+  /**
+   * @static
+   * @async
+   * @method githubLogin
+   * @description handle user login with github
+   * @param {string} code a github unique code sent from the client from github server
+   * @return {Promise<IUser>}
+   * @throws {HttpException} if authentication fails, it throws and exception with the actual reason
+   */
+  public static async githubLogin(code: string) {
+    const response = await axios.post(
+      "https://github.com/login/oauth/access_token",
+      {
+        client_id: GITHUB_OAUTH_CLIENT_ID,
+        client_secret: GITHUB_OAUTH_SECRET,
+        code,
+      },
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    const headers = {
+      Authorization: `Bearer ${response?.data?.access_token}`,
+      Accept: "application/vnd.github+json",
+    };
+
+    const [{ data: profile }, { data: emails }] = await Promise.all([
+      axios.get("https://api.github.com/user", { headers }),
+      axios.get("https://api.github.com/user/emails", { headers }),
+    ]);
+
+    const primaryEmail =
+      emails.find(
+        (email: { email: string; primary: boolean; verified: boolean }) =>
+          email.primary && email.verified,
+      )?.email ??
+      emails.find((email: { verified: boolean }) => email.verified)?.email ??
+      null;
+
+    const fullName = (profile.name ?? "").trim();
+
+    const nameParts = fullName.split(/\s+/).filter(Boolean);
+
+    const firstName = nameParts[0] ?? "";
+
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+    const githubUser = {
+      githubId: profile.id,
+      firstName,
+      lastName,
+      picture: profile.avatar_url,
+      email: primaryEmail,
+      isVerified: true,
+      role: "user",
+    };
+
+    const user = await UserServices.createNewUser(githubUser);
 
     const accessToken = newJwt.generateAccessToken({
       id: user._id?.toString(),

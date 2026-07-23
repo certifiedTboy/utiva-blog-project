@@ -68,6 +68,31 @@ export class AuthControllers {
   /**
    * @static
    * @async
+   * @method loginUserWithGithub
+   * @description Handles the user login request with github.
+   * @param {Request} req - The Express request object.
+   * @param {Response} res - The Express response object.
+   * @param {NextFunction} next - The Express next middleware function.
+   */
+  public static async loginUserWithGithub(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const { code } = req.query;
+
+      const result = await AuthServices.githubLogin(code as string);
+
+      ResponseHandler.auth(res, 201, "user created successfully", result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * @static
+   * @async
    * @method requestPasswordReset
    * @description Handles a request to initiate a password reset. It takes an email from the
    * request body, calls the service to send a reset OTP, and returns a success message.

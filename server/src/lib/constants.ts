@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 
 dotenv.config();
+export const CLIENT_URL = process.env.CLIENT_URL;
 
 export const PORT = process.env.PORT;
 export const DB_URI = process.env.MONGO_URL;
@@ -20,3 +21,7 @@ export const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME;
 export const AWS_BUCKET_REGION = process.env.AWS_BUCKET_REGION;
 export const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
 export const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
+
+export const GITHUB_OAUTH_CLIENT_ID = process.env.GITHUB_OAUTH_CLIENT_ID;
+export const GITHUB_OAUTH_SECRET = process.env.GITHUB_OAUTH_SECRET;
+export const GITHUB_OAUTH_CALLBACK_URL = process.env.GITHUB_OAUTH_CALLBACK_URL;
